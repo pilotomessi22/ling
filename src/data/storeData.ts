@@ -1998,15 +1998,30 @@ export const PRODUCTS: Product[] = DEFAULT_REAL_PRODUCTS;
 export function getSavedProducts(): Product[] {
   if (typeof window === 'undefined') return DEFAULT_REAL_PRODUCTS;
   try {
-    if (!localStorage.getItem('ling_catalog_zendrop_33_v2')) {
+    if (!localStorage.getItem('ling_catalog_zendrop_33_v4')) {
       localStorage.removeItem('ling_admin_products');
-      localStorage.setItem('ling_catalog_zendrop_33_v2', 'true');
+      localStorage.setItem('ling_catalog_zendrop_33_v4', 'true');
     }
     const saved = localStorage.getItem('ling_admin_products');
     if (saved !== null) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
+        // Ensure every product has a valid non-empty heroImage
+        const valid = parsed.map((p: any) => {
+          const defaultProd = DEFAULT_REAL_PRODUCTS.find(d => d.id === p.id);
+          const hero = p.heroImage && p.heroImage.trim() !== '' 
+            ? p.heroImage 
+            : (defaultProd?.heroImage || 'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85');
+          const gallery = p.galleryImages && p.galleryImages.length > 0
+            ? p.galleryImages
+            : (defaultProd?.galleryImages || [hero]);
+          return {
+            ...p,
+            heroImage: hero,
+            galleryImages: gallery
+          };
+        });
+        return valid;
       }
     }
   } catch (e) {
