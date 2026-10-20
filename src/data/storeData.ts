@@ -160,7 +160,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     isLingPick: true,
     repeatDeliveryEligible: false,
     inStockAustin: true,
-    heroImage: "https://file.zendrop.com/products/06/ee/b16863484e24800cd1e5d9553f50.jpeg",
+    heroImage: "https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=90",
     secondaryImage: "https://file.zendrop.com/products/59/d6/666729bf4c3b9f88c5917075d175.jpeg",
     galleryImages: [
       "https://file.zendrop.com/products/06/ee/b16863484e24800cd1e5d9553f50.jpeg",
