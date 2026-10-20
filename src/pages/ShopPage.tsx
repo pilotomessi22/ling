@@ -260,20 +260,6 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                       loading="lazy"
                     />
 
-                    {/* Top Badges */}
-                    <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5 items-start">
-                      {p.badge && (
-                        <span className="bg-[#0F2942]/90 backdrop-blur-xs text-white font-semibold text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">
-                          {p.badge}
-                        </span>
-                      )}
-                      {p.isLingPick && (
-                        <span className="bg-[#2563EB]/95 backdrop-blur-xs text-white font-bold text-[9px] px-2.5 py-0.5 rounded-full tracking-wide">
-                          ★ Studio Choice
-                        </span>
-                      )}
-                    </div>
-
                     {/* Wishlist Heart */}
                     <button
                       onClick={(e) => toggleWishlist(p.id, e)}
@@ -286,12 +272,6 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                     >
                       <Heart size={14} className={isWished ? 'fill-current' : ''} />
                     </button>
-
-                    {discountPct > 0 && (
-                      <span className="absolute bottom-3 left-3 z-10 bg-white/95 backdrop-blur-xs text-[#0F2942] font-black text-[10px] px-2.5 py-1 rounded-md shadow-2xs">
-                        SAVE {discountPct}%
-                      </span>
-                    )}
 
                     {/* Quick Add Button overlay */}
                     <button
@@ -327,8 +307,21 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                         </div>
                       )}
 
-                      <div className="text-[10px] font-bold tracking-widest text-[#94A3B8] uppercase mb-1">
-                        {p.brand || 'Ling Petshop'} · {p.petType}
+                      {/* Brand & Collection Tag + Clean Badges */}
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className="text-[10px] font-bold tracking-widest text-[#94A3B8] uppercase">
+                          {p.brand || 'Ling Petshop'} · {p.petType}
+                        </span>
+                        {p.badge && (
+                          <span className="bg-[#F1F5F9] text-[#0F2942] border border-[#CBD5E1] font-semibold text-[9px] px-2 py-0.5 rounded-full">
+                            {p.badge}
+                          </span>
+                        )}
+                        {discountPct > 0 && (
+                          <span className="text-emerald-700 bg-emerald-50 border border-emerald-200/70 font-bold text-[9px] px-1.5 py-0.5 rounded">
+                            Save {discountPct}%
+                          </span>
+                        )}
                       </div>
 
                       <h3 className="text-base font-bold text-[#0F2942] group-hover:text-[#2563EB] transition-colors leading-snug font-serif">

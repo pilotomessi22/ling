@@ -279,20 +279,6 @@ export const BestsellersGrid: React.FC<BestsellersGridProps> = ({
                       loading="lazy"
                     />
 
-                    {/* Top Badges Floating Overlay */}
-                    <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5 items-start">
-                      {p.badge && (
-                        <span className="bg-[#2C2724]/90 backdrop-blur-xs text-[#FAF7F2] font-semibold text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">
-                          {p.badge}
-                        </span>
-                      )}
-                      {p.isLingPick && (
-                        <span className="bg-[#C86446]/95 backdrop-blur-xs text-white font-semibold text-[9px] px-2.5 py-0.5 rounded-full tracking-wide">
-                          ★ Studio Choice
-                        </span>
-                      )}
-                    </div>
-
                     {/* Wishlist Heart Button */}
                     <button
                       onClick={(e) => toggleWishlist(p.id, e)}
@@ -305,13 +291,6 @@ export const BestsellersGrid: React.FC<BestsellersGridProps> = ({
                     >
                       <Heart size={14} className={isWished ? 'fill-current' : ''} />
                     </button>
-
-                    {/* Discount Pill */}
-                    {discountPct > 0 && (
-                      <span className="absolute bottom-3 left-3 z-10 bg-white/95 backdrop-blur-xs text-[#2C2724] font-black text-[10px] px-2.5 py-1 rounded-md shadow-2xs">
-                        SAVE {discountPct}%
-                      </span>
-                    )}
 
                     {/* Floating Hover Glass Action Bar */}
                     <div className="absolute inset-x-3 bottom-3 z-10 flex items-center gap-2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
@@ -360,9 +339,21 @@ export const BestsellersGrid: React.FC<BestsellersGridProps> = ({
                         </div>
                       )}
 
-                      {/* Brand & Collection Tag */}
-                      <div className="text-[10px] font-semibold tracking-widest text-[#8E867C] uppercase mb-1">
-                        {p.brand || 'Ling Petshop'} · {p.petType}
+                      {/* Brand & Collection Tag + Clean Badges */}
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className="text-[10px] font-semibold tracking-widest text-[#8E867C] uppercase">
+                          {p.brand || 'Ling Petshop'} · {p.petType}
+                        </span>
+                        {p.badge && (
+                          <span className="bg-[#FAF7F2] text-[#2C2724] border border-[#E7DFD5] font-semibold text-[9px] px-2 py-0.5 rounded-full">
+                            {p.badge}
+                          </span>
+                        )}
+                        {discountPct > 0 && (
+                          <span className="text-emerald-700 bg-emerald-50 border border-emerald-200/70 font-bold text-[9px] px-1.5 py-0.5 rounded">
+                            Save {discountPct}%
+                          </span>
+                        )}
                       </div>
 
                       {/* Product Name */}

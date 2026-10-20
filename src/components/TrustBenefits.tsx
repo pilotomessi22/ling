@@ -5,23 +5,23 @@ export const TrustBenefits: React.FC = () => {
   const benefits = [
     {
       icon: <ShieldCheck size={36} className="text-[#00a84e]" />,
-      title: 'Compra Segura',
-      description: 'Ambiente seguro para pagamentos online',
+      title: 'Secure Checkout',
+      description: 'Bank-grade 256-bit encrypted card processing',
     },
     {
       icon: <Truck size={36} className="text-[#00a84e]" />,
-      title: 'Frete Grátis',
-      description: 'Envio rápido e acompanhado com código de rastreio',
+      title: 'Fast Tracked US Shipping',
+      description: 'Dispatched within 24h with official USPS tracking',
     },
     {
       icon: <Headphones size={36} className="text-[#00a84e]" />,
-      title: 'Suporte Profissional',
-      description: 'Equipe de suporte de extrema qualidade a semana toda',
+      title: '24/7 Dedicated Support',
+      description: 'US-based pet care team ready to help anytime',
     },
     {
       icon: <RotateCcw size={36} className="text-[#00a84e]" />,
-      title: 'Satisfação ou Reembolso',
-      description: 'Caso haja algo, devolvemos seu dinheiro com velocidade',
+      title: '30-Day In-Home Trial',
+      description: 'Love it or return it for a 100% full refund',
     },
   ];
 

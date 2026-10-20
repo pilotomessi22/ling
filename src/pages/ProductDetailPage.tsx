@@ -129,11 +129,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 alt={product.name}
                 className="w-full h-full object-cover transition-all duration-300"
               />
-              {product.badge && (
-                <span className="absolute top-4 left-4 bg-[#0F2942]/90 backdrop-blur-xs text-white font-semibold text-xs px-3.5 py-1 rounded-full uppercase tracking-wider">
-                  {product.badge}
-                </span>
-              )}
             </div>
 
             {/* Thumbnail Selectors */}
@@ -159,10 +154,15 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           {/* Right Column: Order Panel & Specifications (5 Cols) */}
           <div className="lg:col-span-5 space-y-6">
             <div>
-              <div className="inline-flex items-center gap-2 mb-2">
+              <div className="inline-flex items-center gap-2 mb-2 flex-wrap">
                 <span className="text-[11px] font-bold uppercase tracking-widest text-[#64748B]">
                   {product.brand || 'Ling Petshop'} · {product.department}
                 </span>
+                {product.badge && (
+                  <span className="bg-[#0F2942] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+                    {product.badge}
+                  </span>
+                )}
                 {product.isLingPick && (
                   <span className="bg-[#EFF6FF] border border-[#BFDBFE] text-[#2563EB] text-[10px] font-bold px-2 py-0.5 rounded-full">
                     ★ Premium Standard

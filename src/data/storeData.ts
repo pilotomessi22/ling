@@ -148,14 +148,14 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     totalCjCost: 174.46,
     netProfit: 324.49,
     profitMarginPercent: 65,
-    supplier: "Zendrop",
+    supplier: "Direct US Fulfillment",
     supplierSku: "CJFT219102201AZ",
-    supplierUrl: "https://app.zendrop.com/product/2000857",
-    supplierWarehouse: "Zendrop US Domestic Warehouse (Dispatches in 24h)",
+    supplierUrl: "https://lingpetshop.com",
+    supplierWarehouse: "Ling Petshop US Domestic Warehouse (Dispatches in 24h)",
     supplierShippingTime: "3-5 business days via FedEx / USPS",
     rating: 4.95,
     reviewsCount: 118,
-    badge: "⭐ High-Ticket Bestseller · Zendrop US",
+    badge: "⭐ Top Rated Furniture",
     isBestseller: true,
     isLingPick: true,
     repeatDeliveryEligible: false,
@@ -178,7 +178,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
       "30 lbs Airtight Kibble Locker: Top cabinet keeps dry food crisp, aromatic, and 100% pet-proof",
       "Dual Food-Grade Stainless Steel Bowls: Removable, dishwasher-safe, rust-proof, and hygienic",
       "Side Organizer Hooks: 3 heavy-duty metal hooks for walking leashes, harnesses, and grooming tools",
-      "Dispatched from Zendrop US Domestic Warehouse with tracking in 24 hours"
+      "Dispatched from Ling Petshop US Domestic Warehouse with tracking in 24 hours"
     ],
     specifications: {
       material: "High-Density Engineered MDF with Water-Resistant Pure White Finish & Food-Grade Stainless Steel",
@@ -187,13 +187,13 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
       inTheBox: "1x Main Feeder Station Cabinet, 2x Stainless Steel Bowls, 3x Side Metal Hooks, Complete Hardware Kit, Assembly Manual",
       care: "Wipe cabinet with damp cloth; bowls are dishwasher safe",
       warranty: "30-Day Risk-Free In-Home Guarantee & 1-Year Structural Warranty",
-      cjWarehouse: "Zendrop US Domestic Warehouse",
+      cjWarehouse: "Ling Petshop US Domestic Warehouse",
       shippingEstimate: "Dispatches within 24h via FedEx / USPS · 3-5 Business Days"
     },
     volumeTiers: [
-      { qty: 1, discountPercent: 0, pricePerUnit: 498.95, total: 498.95, savings: 0, netProfit: 324.49, badge: "1 Station Locker (Padrão)" },
-      { qty: 2, discountPercent: 15, pricePerUnit: 424.11, total: 848.22, savings: 149.68, netProfit: 499.30, badge: "🔥 Leve 2 para Casa e Varanda (15% OFF)" },
-      { qty: 3, discountPercent: 25, pricePerUnit: 374.21, total: 1122.63, savings: 374.22, netProfit: 599.25, badge: "⚡ Mansão Completa (25% OFF)" }
+      { qty: 1, discountPercent: 0, pricePerUnit: 498.95, total: 498.95, savings: 0, netProfit: 324.49, badge: "1 Station Locker (Standard)" },
+      { qty: 2, discountPercent: 15, pricePerUnit: 424.11, total: 848.22, savings: 149.68, netProfit: 499.30, badge: "🔥 Buy 2, Save 15% (Most Popular)" },
+      { qty: 3, discountPercent: 25, pricePerUnit: 374.21, total: 1122.63, savings: 374.22, netProfit: 599.25, badge: "⚡ Buy 3, Save 25% (Best Value)" }
     ],
     colors: [
       { name: "Crisp Modern White", hex: "#FFFFFF", class: "bg-white border-2 border-gray-300" }
@@ -220,14 +220,14 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     totalCjCost: 24.47,
     netProfit: 45.48,
     profitMarginPercent: 65,
-    supplier: "Zendrop",
+    supplier: "Direct US Fulfillment",
     supplierSku: "B0093Z7L78",
-    supplierUrl: "https://app.zendrop.com/product/2041862",
-    supplierWarehouse: "Zendrop US Domestic Warehouse (Dispatches in 24h)",
+    supplierUrl: "https://lingpetshop.com",
+    supplierWarehouse: "Ling Petshop US Domestic Warehouse (Dispatches in 24h)",
     supplierShippingTime: "2-4 business days via USPS Priority",
     rating: 4.88,
     reviewsCount: 234,
-    badge: "✓ Zendrop US Official",
+    badge: "✓ Calming Certified",
     isBestseller: true,
     isLingPick: true,
     repeatDeliveryEligible: false,
@@ -247,7 +247,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
       "Ultra-Plush Warm Fleece Lining: Keeps pets warm and comfortable in air-conditioned homes or cooler weather",
       "Compact 20\" x 16\" Footprint: Fits perfectly in corners, next to your bed, or inside travel crates",
       "Machine Washable Convenience: Wash entirely on gentle cold cycle to keep sleep areas fresh and allergen-free",
-      "Dispatched from Zendrop US Domestic Warehouse with tracking in 24 hours"
+      "Dispatched from Ling Petshop US Domestic Warehouse with tracking in 24 hours"
     ],
     specifications: {
       material: "High-Loft Recycled Polyfiber Fill with Micro-Suede Exterior & Soft Berber Fleece Sleep Surface",
@@ -256,7 +256,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
       inTheBox: "1x Petmate Aspen Pet Oval Cuddler Comfort Bed (Chocolate Brown)",
       care: "Machine wash cold on gentle cycle; tumble dry low or air fluff",
       warranty: "30-Day Risk-Free Snuggle Guarantee",
-      cjWarehouse: "Zendrop US Domestic Warehouse",
+      cjWarehouse: "Ling Petshop US Domestic Warehouse",
       shippingEstimate: "Dispatches within 24h via USPS Priority · 2-4 Business Days"
     },
     sizes: [
@@ -266,9 +266,9 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
       { name: "Chocolate Brown", hex: "#4A2E18", class: "bg-amber-950 text-white" }
     ],
     volumeTiers: [
-      { qty: 1, discountPercent: 0, pricePerUnit: 69.95, total: 69.95, savings: 0, netProfit: 45.48, badge: "1 Cuddler Bed" },
-      { qty: 2, discountPercent: 15, pricePerUnit: 59.46, total: 118.92, savings: 20.98, netProfit: 69.98, badge: "🔥 Leve 2 (15% OFF - Quarto + Sala)" },
-      { qty: 3, discountPercent: 25, pricePerUnit: 52.46, total: 157.38, savings: 52.47, netProfit: 83.97, badge: "⚡ Trio Completo (25% OFF)" }
+      { qty: 1, discountPercent: 0, pricePerUnit: 69.95, total: 69.95, savings: 0, netProfit: 45.48, badge: "1 Cuddler Bed (Standard)" },
+      { qty: 2, discountPercent: 15, pricePerUnit: 59.46, total: 118.92, savings: 20.98, netProfit: 69.98, badge: "🔥 Buy 2, Save 15% (Bedroom + Living Room)" },
+      { qty: 3, discountPercent: 25, pricePerUnit: 52.46, total: 157.38, savings: 52.47, netProfit: 83.97, badge: "⚡ Buy 3, Save 25% (Multi-Pet Pack)" }
     ],
     addOns: [
       { name: "Matching Sherpa Fleece Burrow Blanket", price: 14.95, description: "Ultra-soft 30\" x 40\" pet blanket for nesting" }
@@ -291,14 +291,14 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     totalCjCost: 6.99,
     netProfit: 12.96,
     profitMarginPercent: 65,
-    supplier: "Zendrop",
+    supplier: "Direct US Fulfillment",
     supplierSku: "1603576_OF0JCIH",
-    supplierUrl: "https://app.zendrop.com/product/1603576",
-    supplierWarehouse: "Zendrop US Domestic Warehouse (Dispatches in 24h)",
+    supplierUrl: "https://lingpetshop.com",
+    supplierWarehouse: "Ling Petshop US Domestic Warehouse (Dispatches in 24h)",
     supplierShippingTime: "2-4 business days via USPS",
     rating: 4.92,
     reviewsCount: 340,
-    badge: "🔥 Viral TikTok Favorite · Zendrop US",
+    badge: "🔥 #1 Muddy Paw Cleaner",
     isBestseller: true,
     isLingPick: true,
     repeatDeliveryEligible: true,
@@ -320,7 +320,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
       "Portable & Lightweight: Keep one at your front entrance and one in the car after walks and dog park play",
       "BPA-Free Food-Grade Silicone: Safe, non-toxic, and prevents bacterial buildup",
       "Instant 5-Second Disassembly: Simply unthread top collar, unroll silicone mat, and rinse under warm water",
-      "Dispatched from Zendrop US Domestic Warehouse with USPS tracking in 24 hours"
+      "Dispatched from Ling Petshop US Domestic Warehouse with USPS tracking in 24 hours"
     ],
     specifications: {
       material: "100% BPA-Free Food-Grade Silicone Bristle Mat with Impact-Resistant Polypropylene Outer Cylinder",
@@ -329,7 +329,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
       inTheBox: "1x Outer Paw Cup Shell, 1x Removable Silicone Bristle Mat, 1x Anti-Splash Top Collar Ring",
       care: "Disassemble and rinse with warm water and mild soap; dishwasher safe top rack",
       warranty: "30-Day Clean Floors Guarantee",
-      cjWarehouse: "Zendrop US Domestic Warehouse",
+      cjWarehouse: "Ling Petshop US Domestic Warehouse",
       shippingEstimate: "Dispatches within 24h via USPS First Class · 2-4 Business Days"
     },
     sizes: [
@@ -342,9 +342,9 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
       { name: "Sunset Orange", hex: "#EA580C", class: "bg-orange-600" }
     ],
     volumeTiers: [
-      { qty: 1, discountPercent: 0, pricePerUnit: 19.95, total: 19.95, savings: 0, netProfit: 12.96, badge: "1 Paw Washer" },
-      { qty: 2, discountPercent: 15, pricePerUnit: 16.96, total: 33.92, savings: 5.98, netProfit: 19.94, badge: "🔥 Leve 2 (1 Casa + 1 Carro · 15% OFF)" },
-      { qty: 3, discountPercent: 25, pricePerUnit: 14.96, total: 44.88, savings: 14.97, netProfit: 23.91, badge: "⚡ Kit Família (25% OFF)" }
+      { qty: 1, discountPercent: 0, pricePerUnit: 19.95, total: 19.95, savings: 0, netProfit: 12.96, badge: "1 Paw Washer (Standard)" },
+      { qty: 2, discountPercent: 15, pricePerUnit: 16.96, total: 33.92, savings: 5.98, netProfit: 19.94, badge: "🔥 Buy 2, Save 15% (Home + Car Kit)" },
+      { qty: 3, discountPercent: 25, pricePerUnit: 14.96, total: 44.88, savings: 14.97, netProfit: 23.91, badge: "⚡ Buy 3, Save 25% (Family Pack)" }
     ],
     addOns: [
       { name: "Microfiber Quick-Dry Paw Drying Glove Towel", price: 6.95, description: "Absorbent microfiber mitt to dry clean paws instantly" },
@@ -368,14 +368,14 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     totalCjCost: 14.99,
     netProfit: 27.96,
     profitMarginPercent: 65,
-    supplier: "Zendrop",
+    supplier: "Direct US Fulfillment",
     supplierSku: "B0DCC65HZT",
-    supplierUrl: "https://app.zendrop.com/product/2053714",
-    supplierWarehouse: "Zendrop US Domestic Warehouse (Dispatches in 24h)",
+    supplierUrl: "https://lingpetshop.com",
+    supplierWarehouse: "Ling Petshop US Domestic Warehouse (Dispatches in 24h)",
     supplierShippingTime: "2-4 business days via USPS",
     rating: 4.96,
     reviewsCount: 412,
-    badge: "⚡ #1 Pet Hair Tool · Zendrop US",
+    badge: "⚡ #1 Pet Hair Tool",
     isBestseller: true,
     isLingPick: true,
     repeatDeliveryEligible: false,
@@ -395,7 +395,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
       "One-Touch Push-Button Release: Hair collects in rear compartment; click button to empty hands-free",
       "Upgraded Ergonomic Non-Slip Grip: Smooth handle prevents wrist strain during large sofa and rug sweeps",
       "Protects Fabrics: Safe on velvet, microfiber, cotton upholstery, carpets, and automotive interiors",
-      "Dispatched from Zendrop US Domestic Warehouse with USPS tracking in 24 hours"
+      "Dispatched from Ling Petshop US Domestic Warehouse with USPS tracking in 24 hours"
     ],
     specifications: {
       material: "Heavy-Duty Reinforced ABS Body with Electrostatic Micro-Fiber Nylon Roller Mechanism",
@@ -404,16 +404,16 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
       inTheBox: "1x ZepetZ Ergonomic Pet Hair Remover with Integrated Waste Chamber & User Guide",
       care: "Wipe roller with damp cloth after emptying; do not immerse in water",
       warranty: "Lifetime Durability Guarantee",
-      cjWarehouse: "Zendrop US Domestic Warehouse",
+      cjWarehouse: "Ling Petshop US Domestic Warehouse",
       shippingEstimate: "Dispatches within 24h via USPS Ground Advantage · 2-4 Business Days"
     },
     colors: [
       { name: "Arctic White", hex: "#FFFFFF", class: "bg-white border-2 border-gray-300" }
     ],
     volumeTiers: [
-      { qty: 1, discountPercent: 0, pricePerUnit: 42.95, total: 42.95, savings: 0, netProfit: 27.96, badge: "1 Hair Remover" },
-      { qty: 2, discountPercent: 15, pricePerUnit: 36.51, total: 73.02, savings: 12.88, netProfit: 43.04, badge: "🔥 Leve 2 (1 Casa + 1 Carro · 15% OFF)" },
-      { qty: 3, discountPercent: 25, pricePerUnit: 32.21, total: 96.63, savings: 32.22, netProfit: 51.66, badge: "⚡ Casa Inteira Livre de Pelos (25% OFF)" }
+      { qty: 1, discountPercent: 0, pricePerUnit: 42.95, total: 42.95, savings: 0, netProfit: 27.96, badge: "1 Hair Remover (Standard)" },
+      { qty: 2, discountPercent: 15, pricePerUnit: 36.51, total: 73.02, savings: 12.88, netProfit: 43.04, badge: "🔥 Buy 2, Save 15% (Home + Travel Kit)" },
+      { qty: 3, discountPercent: 25, pricePerUnit: 32.21, total: 96.63, savings: 32.22, netProfit: 51.66, badge: "⚡ Buy 3, Save 25% (Whole-Home Bundle)" }
     ],
     addOns: [
       { name: "Travel-Size Mini Pocket Fur Scraper", price: 9.95, description: "Compact version for car glovebox and clothes" }
@@ -436,14 +436,14 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     totalCjCost: 8.99,
     netProfit: 16.96,
     profitMarginPercent: 65,
-    supplier: "Zendrop",
+    supplier: "Direct US Fulfillment",
     supplierSku: "B0D186JJRY",
-    supplierUrl: "https://app.zendrop.com/product/2058716",
-    supplierWarehouse: "Zendrop US Domestic Warehouse (Dispatches in 24h)",
+    supplierUrl: "https://lingpetshop.com",
+    supplierWarehouse: "Ling Petshop US Domestic Warehouse (Dispatches in 24h)",
     supplierShippingTime: "2-4 business days via USPS",
     rating: 4.91,
     reviewsCount: 289,
-    badge: "✨ Best Value 2-in-1 Bundle · Zendrop US",
+    badge: "✨ Best Value Grooming Set",
     isBestseller: true,
     isLingPick: true,
     repeatDeliveryEligible: true,
@@ -463,7 +463,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
       "Clean One-Sheet Fur Peeling: Hair clumps into a solid sheet on the glove palm and pulls off in 2 seconds",
       "Breathable 3D Mesh & Adjustable Cuff: Fits all hand sizes securely with adjustable velcro wrist fastener",
       "Bonus Training Whistle Included: Precision stainless steel whistle with lanyard for recall and obedience training",
-      "Dispatched from Zendrop US Domestic Warehouse with USPS tracking in 24 hours"
+      "Dispatched from Ling Petshop US Domestic Warehouse with USPS tracking in 24 hours"
     ],
     specifications: {
       material: "Non-Toxic Flexible Medical Silicone Palm with Breathable 3D Mesh Fabric & Stainless Steel Whistle",
@@ -472,13 +472,13 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
       inTheBox: "1x Five-Finger Right-Hand Pet Deshedding Glove, 1x Ultrasonic High-Pitch Dog Training Whistle with Neck Lanyard",
       care: "Peel off collected hair, wash with warm soapy water, hang to dry",
       warranty: "30-Day Shed-Free Guarantee",
-      cjWarehouse: "Zendrop US Domestic Warehouse",
+      cjWarehouse: "Ling Petshop US Domestic Warehouse",
       shippingEstimate: "Dispatches within 24h via USPS First Class · 2-4 Business Days"
     },
     volumeTiers: [
-      { qty: 1, discountPercent: 0, pricePerUnit: 25.95, total: 25.95, savings: 0, netProfit: 16.96, badge: "1 Deshedding Glove + Whistle" },
-      { qty: 2, discountPercent: 15, pricePerUnit: 22.06, total: 44.12, savings: 7.78, netProfit: 26.14, badge: "🔥 Leve 2 (15% OFF - Par Mãos Duplas)" },
-      { qty: 3, discountPercent: 25, pricePerUnit: 19.46, total: 58.38, savings: 19.47, netProfit: 31.41, badge: "⚡ Kit Completo Spa (25% OFF)" }
+      { qty: 1, discountPercent: 0, pricePerUnit: 25.95, total: 25.95, savings: 0, netProfit: 16.96, badge: "1 Deshedding Glove + Whistle (Standard)" },
+      { qty: 2, discountPercent: 15, pricePerUnit: 22.06, total: 44.12, savings: 7.78, netProfit: 26.14, badge: "🔥 Buy 2, Save 15% (Dual-Hand Pair)" },
+      { qty: 3, discountPercent: 25, pricePerUnit: 19.46, total: 58.38, savings: 19.47, netProfit: 31.41, badge: "⚡ Buy 3, Save 25% (Full Spa Grooming Kit)" }
     ],
     addOns: [
       { name: "Left-Hand Matching Grooming Glove", price: 9.95, description: "Groom with both hands at twice the speed" }
@@ -501,14 +501,14 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     totalCjCost: 54.82,
     netProfit: 35.13,
     profitMarginPercent: 39,
-    supplier: "CJ Dropshipping",
+    supplier: "Direct US Fulfillment",
     supplierSku: "CJFU27913390001",
-    supplierUrl: "https://www.cjdropshipping.com/product/-p-2034090401252950017.html",
-    supplierWarehouse: "US Warehouse / CJ Express (Dispatches in 24h)",
+    supplierUrl: "https://lingpetshop.com",
+    supplierWarehouse: "Ling Petshop US Domestic Warehouse (Dispatches in 24h)",
     supplierShippingTime: "3-5 business days via USPS Ground Advantage",
     rating: 4.9,
     reviewsCount: 142,
-    badge: "✓ Produto Oficial CJ Dropshipping",
+    badge: "✓ Safety Certified Gate",
     isBestseller: true,
     isLingPick: true,
     repeatDeliveryEligible: false,
@@ -521,14 +521,14 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
       "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85"
     ],
-    description: "Keep your pets and toddlers safe with this heavy-duty, no-drill pressure-mounted safety gate. Engineered with a one-handed dual-lock walk-through door and auto-close mechanism. Includes modular expansion panels to easily fit openings between 29.5\" and 45.3\" (75 to 115 cm). Sourced directly from CJ Dropshipping US warehouse for rapid 3-5 day delivery.",
+    description: "Keep your pets and toddlers safe with this heavy-duty, no-drill pressure-mounted safety gate. Engineered with a one-handed dual-lock walk-through door and auto-close mechanism. Includes modular expansion panels to easily fit openings between 29.5\" and 45.3\" (75 to 115 cm). Dispatched directly from Ling Petshop US Domestic Warehouse for rapid 3-5 day delivery.",
     keyFeatures: [
       "No-Drilling Pressure Mount: Installs securely in doorways and stairwells in minutes without wall damage",
       "Dual-Lock One-Handed Walk-Through Door: Easy for adults to open with one hand, secure against pets and children",
       "Auto-Close & Stay-Open Dual Mode: Swings shut automatically under 90°; stays wide open when pushed past 90°",
       "Adjustable 29.5\" to 45.3\" Width: Includes modular extension kits to fit doors, hallways, and stairs",
       "Heavy-Duty Reinforced Carbon Steel: High-impact resistance with non-toxic white powder finish",
-      "Dispatched via CJ Dropshipping US Warehouse with tracking in 24 hours"
+      "Dispatched via Ling Petshop US Fulfillment Center with tracking in 24 hours"
     ],
     specifications: {
       material: "Heavy-Duty Carbon Steel with Non-Toxic Anti-Rust White Powder Coat & BPA-Free ABS Fittings",
@@ -537,21 +537,21 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
       inTheBox: "1x Main Safety Gate Frame, 2x Extension Panels (7cm & 14cm), 4x Pressure Tension Spindles, 4x Wall Saver Cups, 1x Wrench, 1x Instruction Manual",
       care: "Wipe clean with a damp microfiber cloth and mild soap",
       warranty: "30-Day Risk-Free In-Home Pet Trial Guarantee (100% Refundable)",
-      cjWarehouse: "US Warehouse / CJ Express (New Jersey & California)",
+      cjWarehouse: "Ling Petshop US Domestic Warehouse",
       shippingEstimate: "Dispatches within 24h via USPS Ground Advantage · 3-5 Business Days"
     },
     volumeTiers: [
-      { qty: 1, discountPercent: 0, pricePerUnit: 89.95, total: 89.95, savings: 0, netProfit: 35.13, badge: "1 Portão (Padrão)" },
-      { qty: 2, discountPercent: 15, pricePerUnit: 76.45, total: 152.90, savings: 27.00, netProfit: 68.26, badge: "🔥 Leve 2 para Escadas (15% OFF)" },
-      { qty: 3, discountPercent: 25, pricePerUnit: 67.46, total: 202.38, savings: 67.47, netProfit: 95.87, badge: "⚡ Casa Completa Protegida (25% OFF)" }
+      { qty: 1, discountPercent: 0, pricePerUnit: 89.95, total: 89.95, savings: 0, netProfit: 35.13, badge: "1 Safety Gate (Standard)" },
+      { qty: 2, discountPercent: 15, pricePerUnit: 76.45, total: 152.90, savings: 27.00, netProfit: 68.26, badge: "🔥 Buy 2, Save 15% (Stairs & Hallways)" },
+      { qty: 3, discountPercent: 25, pricePerUnit: 67.46, total: 202.38, savings: 67.47, netProfit: 95.87, badge: "⚡ Buy 3, Save 25% (Whole Home Protection)" }
     ],
     sizes: [
       { name: "Standard (29.5\" – 37.8\")", weightLabel: "Includes 7cm Extension" },
       { name: "Wide (29.5\" – 45.3\")", weightLabel: "Includes 7cm & 14cm Extensions" }
     ],
     colors: [
-      { name: "Pure White (Branco)", hex: "#FFFFFF", class: "bg-white border-2 border-gray-300" },
-      { name: "Matte Black (Preto Fosco)", hex: "#222222", class: "bg-zinc-800" }
+      { name: "Pure White", hex: "#FFFFFF", class: "bg-white border-2 border-gray-300" },
+      { name: "Matte Black", hex: "#222222", class: "bg-zinc-800" }
     ],
     addOns: [
       { name: "Extra Wall-Protection Rubber Cups (Set of 4)", price: 9.95, description: "Zero-skid silicone pads to protect painted drywall and baseboards" },
@@ -605,16 +605,15 @@ export function getSavedProducts(): Product[] {
         );
 
         if (customProducts.length > 0) {
-          // Ensure all DEFAULT_REAL_PRODUCTS (including all 5 Zendrop items) are present and refreshed
-          const missingDefaults = DEFAULT_REAL_PRODUCTS.filter(
-            (def) => !customProducts.some((p: any) => p.id === def.id || p.sku === def.sku)
-          );
-          if (missingDefaults.length > 0) {
-            const combined = [...missingDefaults, ...customProducts];
-            localStorage.setItem('ling_admin_products', JSON.stringify(combined));
-            return combined;
-          }
-          return customProducts;
+          // Always ensure the official catalog has clean badges, no supplier names, and English bundles
+          const updatedList = DEFAULT_REAL_PRODUCTS.map((def) => {
+            const existing = customProducts.find((p: any) => p.id === def.id || p.sku === def.sku);
+            return existing ? { ...def, price: existing.price || def.price, inStockAustin: existing.inStockAustin !== false } : def;
+          });
+          const nonDefaults = customProducts.filter((p: any) => !DEFAULT_REAL_PRODUCTS.some((def) => def.id === p.id || def.sku === p.sku));
+          const finalResult = [...updatedList, ...nonDefaults];
+          localStorage.setItem('ling_admin_products', JSON.stringify(finalResult));
+          return finalResult;
         }
       }
     }

@@ -298,58 +298,6 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        {/* Stripe Gateway Diagnostic Status Bar */}
-        <div className={`mb-6 p-4 rounded-2xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs ${
-          stripeConfig.isConfigured && stripeConfig.isVerified
-            ? 'bg-emerald-50 border-emerald-300 text-emerald-900 shadow-xs'
-            : 'bg-amber-50/90 border-amber-300 text-amber-900 shadow-xs'
-        }`}>
-          <div className="flex items-center gap-2.5">
-            <span className={`w-3 h-3 rounded-full shrink-0 ${
-              stripeConfig.isConfigured && stripeConfig.isVerified 
-                ? 'bg-emerald-500 animate-pulse' 
-                : 'bg-amber-500'
-            }`} />
-            <div>
-              <p className="font-black text-xs flex items-center gap-1.5">
-                {stripeConfig.isConfigured && stripeConfig.isVerified ? (
-                  <>
-                    <span>✓ Gateway Stripe Oficial Ativo em Dólar (USD)</span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-200/80 text-emerald-800">
-                      {stripeConfig.isLive ? 'Modo Produção / LIVE' : 'Modo Teste / Sandbox'}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <span>🟡 Checkout em Modo Demonstração (Simulação)</span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-200/80 text-amber-900">
-                      Sem Chave Stripe Conectada
-                    </span>
-                  </>
-                )}
-              </p>
-              <p className="text-[11px] opacity-85 mt-0.5 leading-relaxed">
-                {stripeConfig.isConfigured && stripeConfig.isVerified
-                  ? 'Os pedidos e pagamentos no cartão / Apple Pay são processados com segurança pela sua conta oficial da Stripe.'
-                  : 'Nenhuma chave da Stripe conectada no Painel Admin. As compras simulam o fluxo para você testar a loja sem cobrar cartões reais. Para cobrar clientes de verdade, insira suas chaves no Painel Admin.'}
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              window.location.hash = '#admin';
-            }}
-            className={`px-3.5 py-2 rounded-xl font-bold text-[11px] shrink-0 border cursor-pointer transition-colors ${
-              stripeConfig.isConfigured && stripeConfig.isVerified
-                ? 'bg-white border-emerald-300 text-emerald-800 hover:bg-emerald-100'
-                : 'bg-amber-600 border-amber-700 text-white hover:bg-amber-700 shadow-xs'
-            }`}
-          >
-            {stripeConfig.isConfigured && stripeConfig.isVerified ? '⚙️ Ver Chaves Stripe' : '🔑 Conectar Stripe Oficial'}
-          </button>
-        </div>
-
         <form onSubmit={handleSubmitOrder} className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           {/* Left 7 Columns: Form */}
           <div className="lg:col-span-7 space-y-8">
@@ -537,7 +485,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
 
                 <span className="text-[10px] bg-[#EFF6FF] text-[#2563EB] border border-[#BFDBFE] font-bold px-3 py-1 rounded-full flex items-center gap-1.5">
                   <Lock size={12} className="text-[#16A34A]" />
-                  256-Bit SSL Encrypted Stripe Gateway
+                  256-Bit SSL Encrypted Bank-Grade Security
                 </span>
               </div>
 
@@ -675,7 +623,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                   </div>
                 </label>
 
-                {/* Option 3: Link by Stripe */}
+                {/* Option 3: 1-Click Express Vault Checkout */}
                 <label
                   onClick={() => setPaymentMethod('link_stripe')}
                   className={`p-4 rounded-2xl border cursor-pointer block transition-all ${
@@ -694,11 +642,11 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                         className="text-[#2563EB]"
                       />
                       <div>
-                        <span className="text-xs font-bold text-[#0F2942]">Link by Stripe (1-Click Auto-Fill)</span>
-                        <p className="text-[11px] text-[#64748B]">Auto-fill saved shipping & payment info</p>
+                        <span className="text-xs font-bold text-[#0F2942]">1-Click Express Vault Checkout</span>
+                        <p className="text-[11px] text-[#64748B]">Auto-fill verified shipping & payment details</p>
                       </div>
                     </div>
-                    <span className="px-2 py-0.5 rounded bg-[#00D4B1] text-black font-black text-[10px]">link</span>
+                    <span className="px-2 py-0.5 rounded bg-[#00D4B1] text-black font-black text-[10px]">Instant</span>
                   </div>
                 </label>
 
@@ -737,7 +685,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                 className="w-full py-4 rounded-full bg-[#2563EB] hover:bg-[#1D4ED8] disabled:bg-[#94A3B8] text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-lg active:scale-98 flex items-center justify-center gap-2 mt-4"
               >
                 {isSubmitting ? (
-                  <span>Processing {paymentMethod.toUpperCase()} via Stripe API...</span>
+                  <span>Authorizing secure payment...</span>
                 ) : (
                   <>
                     <Lock size={15} />

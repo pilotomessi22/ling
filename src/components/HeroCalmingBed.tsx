@@ -100,30 +100,29 @@ export const HeroCalmingBed: React.FC<HeroCalmingBedProps> = ({
                   Engineered with raised orthopedic bolsters for joint relief and deep sleep.
                 </p>
               </div>
+            </div>
 
-              {/* Floating Bestseller Tag */}
-              <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-xs text-[#2D5A43] font-black text-xs px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5 border border-emerald-100">
-                <Sparkles size={13} className="text-amber-500 fill-amber-500" />
-                <span>#1 Ranked Calming Bed in Texas</span>
-              </div>
-
-              {/* Social Proof Overlay */}
-              <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-xs rounded-xl p-3 shadow-md border border-stone-100 flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex text-amber-500">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={14} className="fill-amber-400 stroke-amber-500" />
-                    ))}
-                  </div>
-                  <span className="text-xs font-extrabold text-stone-800">
-                    4.9 / 5.0
-                  </span>
-                  <span className="text-xs text-stone-500 hidden sm:inline">
-                    (14,800+ Verified US Pet Parents)
-                  </span>
+            {/* Social Proof & Rating Bar Cleanly Below Photo */}
+            <div className="bg-white rounded-xl p-3 shadow-xs border border-stone-200/80 flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2.5">
+                <div className="flex text-amber-500">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} size={14} className="fill-amber-400 stroke-amber-500" />
+                  ))}
                 </div>
-                <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full">
+                <span className="text-xs font-extrabold text-stone-800">
+                  4.9 / 5.0
+                </span>
+                <span className="text-xs text-stone-500 hidden sm:inline">
+                  (14,800+ Verified US Pet Parents)
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2.5 py-0.5 rounded-full">
                   ✓ Vet Approved
+                </span>
+                <span className="text-[11px] font-bold text-[#2D5A43] bg-emerald-50/50 border border-emerald-100 px-2 py-0.5 rounded-full hidden md:inline">
+                  #1 Ranked in Texas
                 </span>
               </div>
             </div>

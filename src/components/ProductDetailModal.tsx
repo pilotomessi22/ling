@@ -114,11 +114,6 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 alt={product.name}
                 className="w-full h-full object-cover transition-all duration-300"
               />
-              {product.badge && (
-                <span className="absolute top-3.5 left-3.5 bg-[#2C2724]/90 backdrop-blur-xs text-[#FAF7F2] font-semibold text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">
-                  {product.badge}
-                </span>
-              )}
             </div>
 
             {/* Thumbnail switcher if multiple images */}
@@ -145,10 +140,15 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           {/* Product Info & Actions */}
           <div className="space-y-5">
             <div>
-              <div className="flex items-center gap-2 mb-1.5">
+              <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                 <span className="text-[11px] font-bold uppercase tracking-widest text-[#8E867C]">
                   {product.brand || 'Ling Petshop'} · {product.department}
                 </span>
+                {product.badge && (
+                  <span className="bg-[#2C2724] text-[#FAF7F2] font-semibold text-[10px] px-2.5 py-0.5 rounded-full">
+                    {product.badge}
+                  </span>
+                )}
                 {product.isLingPick && (
                   <span className="bg-[#F9EDE8] border border-[#F2D7CD] text-[#C86446] text-[10px] font-bold px-2 py-0.5 rounded-full">
                     ★ Studio Pick

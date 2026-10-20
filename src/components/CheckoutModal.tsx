@@ -454,53 +454,22 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               </p>
             </div>
 
-            {/* STORE OWNER SECTION: 1-Click Dropship Supplier Payload */}
-            <div className="mt-6 pt-6 border-t border-gray-200 text-left">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="text-xs font-black uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
-                    <Package size={14} />
-                    Store Owner Dropship Fulfillment Payload
-                  </h4>
-                  <p className="text-[11px] text-gray-500">
-                    Copy and send this directly to CJ Dropshipping / Zendrop to ship to the customer:
-                  </p>
-                </div>
-                <button
-                  onClick={handleCopyPayload}
-                  className="bg-amber-400 hover:bg-amber-500 text-stone-900 font-bold text-xs px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer"
-                >
-                  {copiedPayload ? (
-                    <>
-                      <Check size={14} className="text-emerald-800" />
-                      <span>Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy size={14} />
-                      <span>Copy Payload</span>
-                    </>
-                  )}
-                </button>
+            {/* 30-Day Guarantee & Customer Care */}
+            <div className="mt-4 p-4 rounded-xl bg-gray-50 border border-gray-200 text-left space-y-2 text-xs">
+              <div className="flex items-center gap-2 text-gray-800 font-bold">
+                <ShieldCheck size={16} className="text-emerald-600" />
+                <span>30-Day In-Home Risk-Free Trial</span>
               </div>
-
-              <pre className="mt-2 p-3 bg-gray-900 text-emerald-400 rounded-xl text-[11px] font-mono overflow-x-auto max-h-48 border border-gray-800">
-                {supplierPayload}
-              </pre>
-
-              <div className="mt-3 flex items-center justify-between text-xs font-bold text-gray-700 bg-gray-50 p-3 rounded-lg border border-gray-200">
-                <span>Estimated Store Net Margin:</span>
-                <span className="text-emerald-700 font-black">
-                  +{formatCurrency(baseCalculations.totalEstimatedProfit)} Profit
-                </span>
-              </div>
+              <p className="text-gray-500 text-[11px] leading-relaxed">
+                If your pup or kitty isn&apos;t completely thrilled with your order, email <strong className="text-gray-700">support@lingpetshop.com</strong> within 30 days for an immediate prepaid return label and 100% full refund.
+              </p>
             </div>
 
             <button
               onClick={onClose}
-              className="mt-4 bg-[#002855] text-white font-bold text-xs px-8 py-3 rounded-full hover:bg-[#001e44] transition-colors cursor-pointer"
+              className="mt-6 w-full sm:w-auto bg-[#002855] hover:bg-[#001e44] text-white font-bold text-xs px-8 py-3.5 rounded-full transition-colors cursor-pointer shadow-md"
             >
-              Back to Storefront
+              Continue Shopping
             </button>
           </div>
         )}

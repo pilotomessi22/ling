@@ -94,7 +94,7 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ onApplyCoupon }) => {
           setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1))
         }
         className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20"
-        aria-label="Slide anterior"
+        aria-label="Previous slide"
       >
         <ChevronLeft size={24} />
       </button>
@@ -102,7 +102,7 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ onApplyCoupon }) => {
       <button
         onClick={() => setCurrentSlide((prev) => (prev + 1) % slides.length)}
         className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20"
-        aria-label="Próximo slide"
+        aria-label="Next slide"
       >
         <ChevronRight size={24} />
       </button>
@@ -118,7 +118,7 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ onApplyCoupon }) => {
                 ? 'bg-white w-6'
                 : 'bg-white/50 hover:bg-white/80'
             }`}
-            aria-label={`Ir para slide ${idx + 1}`}
+            aria-label={`Go to slide ${idx + 1}`}
           />
         ))}
       </div>
