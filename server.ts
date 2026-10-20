@@ -20,10 +20,45 @@ app.get('/api/health', (_req: Request, res: Response) => {
   });
 });
 
+// Endpoint to check live Stripe Account status
+app.get('/api/stripe-status', async (_req: Request, res: Response) => {
+  try {
+    const stripeSecretKey =
+      process.env.STRIPE_SECRET_KEY ||
+      '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';
+
+    const stripeRes = await fetch('https://api.stripe.com/v1/account', {
+      headers: {
+        Authorization: `Bearer ${stripeSecretKey.trim()}`,
+      },
+    });
+
+    const data = await stripeRes.json();
+    if (!stripeRes.ok) {
+      return res.status(stripeRes.status).json({ active: false, error: data.error?.message });
+    }
+
+    const cardStatus = data.capabilities?.card_payments;
+    const active = Boolean(data.charges_enabled && cardStatus === 'active');
+
+    return res.json({
+      active,
+      charges_enabled: data.charges_enabled,
+      payouts_enabled: data.payouts_enabled,
+      card_payments: cardStatus,
+      country: data.country,
+      currency: data.default_currency,
+      accountId: data.id,
+    });
+  } catch (err: any) {
+    return res.status(500).json({ active: false, error: err.message });
+  }
+});
+
 // Automatic Stripe Checkout Session Creation Endpoint
 app.post('/api/create-checkout-session', async (req: Request, res: Response) => {
   try {
-    const { items, customerEmail, customStripeKey, domainUrl } = req.body;
+    const { items, customerEmail, customStripeKey, domainUrl, currency } = req.body;
     const stripeSecretKey =
       customStripeKey ||
       process.env.STRIPE_SECRET_KEY ||
@@ -34,6 +69,7 @@ app.post('/api/create-checkout-session', async (req: Request, res: Response) => 
     }
 
     const host = domainUrl || `${req.protocol}://${req.get('host')}`;
+    const selectedCurrency = (currency || 'usd').toLowerCase();
 
     // Construct x-www-form-urlencoded params for Stripe API v1/checkout/sessions
     const params = new URLSearchParams();
@@ -47,7 +83,7 @@ app.post('/api/create-checkout-session', async (req: Request, res: Response) => 
 
     items.forEach((item: any, index: number) => {
       const unitAmount = Math.round((item.price || 10) * 100);
-      params.append(`line_items[${index}][price_data][currency]`, 'usd');
+      params.append(`line_items[${index}][price_data][currency]`, selectedCurrency);
       params.append(`line_items[${index}][price_data][unit_amount]`, unitAmount.toString());
       params.append(`line_items[${index}][price_data][product_data][name]`, item.name || 'Pet Product');
       if (item.image) {
