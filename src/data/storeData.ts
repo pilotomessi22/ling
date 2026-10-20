@@ -567,6 +567,10 @@ export const PRODUCTS: Product[] = DEFAULT_REAL_PRODUCTS;
 export function getSavedProducts(): Product[] {
   if (typeof window === 'undefined') return DEFAULT_REAL_PRODUCTS;
   try {
+    if (!localStorage.getItem('ling_catalog_v6_fresh')) {
+      localStorage.removeItem('ling_admin_products');
+      localStorage.setItem('ling_catalog_v6_fresh', 'true');
+    }
     const saved = localStorage.getItem('ling_admin_products');
     if (saved !== null) {
       const parsed = JSON.parse(saved);
