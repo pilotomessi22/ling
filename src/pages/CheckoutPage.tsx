@@ -49,6 +49,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState('');
+  const [confirmedPaidTotal, setConfirmedPaidTotal] = useState<number>(0);
+  const [confirmedCustomerName, setConfirmedCustomerName] = useState<string>('');
+  const [confirmedAddressText, setConfirmedAddressText] = useState<string>('');
 
   // Live Stripe Configuration & Verification Check
   const [stripeConfig] = useState(() => {
@@ -235,7 +238,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
               Order Confirmed
             </span>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0F2942] font-serif mt-1">
-              Thank You, {address.fullName}!
+              Thank You, {confirmedCustomerName || address.fullName || "Valued Customer"}!
             </h1>
             <p className="text-sm text-[#64748B] mt-2 font-light">
               Your order <strong className="text-[#0F2942]">#{orderId}</strong> has been received and routed to our nearest US fulfillment center.
@@ -250,7 +253,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
             <div className="flex items-center justify-between">
               <span className="text-[#64748B]">Shipping To:</span>
               <span className="font-semibold text-[#0F2942]">
-                {address.streetAddress}, {address.city}, {address.state} {address.zipCode}
+                {confirmedAddressText || "United States Fulfillment Center"}
               </span>
             </div>
             <div className="flex items-center justify-between">
@@ -261,7 +264,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
             </div>
             <div className="flex items-center justify-between">
               <span className="text-[#64748B]">Total Paid:</span>
-              <span className="font-bold text-[#0F2942]">{formatCurrency(finalTotal)}</span>
+              <span className="font-bold text-[#0F2942]">{formatCurrency(confirmedPaidTotal || finalTotal)}</span>
             </div>
           </div>
 

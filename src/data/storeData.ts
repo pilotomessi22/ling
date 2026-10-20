@@ -160,7 +160,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     isLingPick: true,
     repeatDeliveryEligible: false,
     inStockAustin: true,
-    heroImage: "https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=90",
+    heroImage: "https://file.zendrop.com/products/06/ee/b16863484e24800cd1e5d9553f50.jpeg",
     secondaryImage: "https://file.zendrop.com/products/59/d6/666729bf4c3b9f88c5917075d175.jpeg",
     galleryImages: [
       "https://file.zendrop.com/products/06/ee/b16863484e24800cd1e5d9553f50.jpeg",
@@ -238,7 +238,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
       "https://file.zendrop.com/products/27/ce/5258638a4b9197f9dad3d50bfeca.jpeg",
       "https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1200&q=85"
+      "https://file.zendrop.com/products/84/c1/98fb0df34d80a13eb2205ec61718.jpeg"
     ],
     description: "The Aspen Pet Oval Cuddler Pet Bed provides cozy comfort tailored to extra-small and toy breed dogs as well as cats. The soft raised bolster walls are generously filled with recycled high-loft polyester for cushioned joint comfort, while the nest-like circular design creates a soothing cocoon that eases separation anxiety. Ideal as a standalone bed in living rooms or as a plush liner for 20-inch crates and travel carriers.",
     keyFeatures: [
@@ -386,7 +386,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
       "https://file.zendrop.com/products/87/e1/c63523784fc396c4f2c6bd4c1c24.jpeg",
       "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1200&q=85"
+      "https://file.zendrop.com/products/84/c1/98fb0df34d80a13eb2205ec61718.jpeg"
     ],
     description: "The ultimate pet hair cleaning tool for pet parents tired of endless shedding. The ZepetZ utilizes an advanced electrostatic micro-bristle roller that grips and removes embedded dog and cat hair from couches, carpets, bedspreads, blankets, car seats, and clothing. No sticky tape refills, no batteries, and no mess. Simply roll back and forth, click the chamber button to pop open the lid, and empty the trapped hair clump directly into the trash.",
     keyFeatures: [
@@ -449,10 +449,10 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: true,
     inStockAustin: true,
     heroImage: "https://file.zendrop.com/products/e2/67/13ee6178492cbb4714ad09e346c8.jpeg",
-    secondaryImage: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1200&q=85",
+    secondaryImage: "https://file.zendrop.com/products/84/c1/98fb0df34d80a13eb2205ec61718.jpeg",
     galleryImages: [
       "https://file.zendrop.com/products/e2/67/13ee6178492cbb4714ad09e346c8.jpeg",
-      "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1200&q=85",
+      "https://file.zendrop.com/products/84/c1/98fb0df34d80a13eb2205ec61718.jpeg",
       "https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=85"
     ],
@@ -513,10 +513,10 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     isLingPick: true,
     repeatDeliveryEligible: false,
     inStockAustin: true,
-    heroImage: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1200&q=85",
+    heroImage: "https://file.zendrop.com/products/84/c1/98fb0df34d80a13eb2205ec61718.jpeg",
     secondaryImage: "https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85",
     galleryImages: [
-      "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1200&q=85",
+      "https://file.zendrop.com/products/84/c1/98fb0df34d80a13eb2205ec61718.jpeg",
       "https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85"
