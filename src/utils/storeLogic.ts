@@ -1,8 +1,10 @@
+import { getSavedCoupons } from '../data/storeData.ts';
+
 export interface CartItem {
   id: string;
   sku: string;
   name: string;
-  price: number; // in USD
+  price: number; // em USD
   quantity: number;
   size: string;
   color: string;
@@ -13,7 +15,7 @@ export interface CartItem {
     price: number;
   };
   image: string;
-  supplierCost: number; // For store owner margin tracking
+  supplierCost: number; // Custo do fornecedor para acompanhamento de margem
 }
 
 export interface ShippingAddress {
@@ -21,8 +23,8 @@ export interface ShippingAddress {
   streetAddress: string;
   aptOrSuite?: string;
   city: string;
-  state: string; // e.g. "TX"
-  zipCode: string; // e.g. "78704"
+  state: string; // ex: "TX"
+  zipCode: string; // ex: "78704"
   email: string;
   phone: string;
   deliveryMethod?: 'shipping';
@@ -36,7 +38,7 @@ export function formatCurrency(amount: number): string {
 }
 
 /**
- * Free Shipping threshold for US orders (Petco-standard $45)
+ * Free Shipping threshold for US orders ($45)
  */
 export const FREE_SHIPPING_THRESHOLD = 45.0;
 export const STANDARD_US_SHIPPING_FEE = 4.95;
@@ -44,19 +46,19 @@ export const EXPRESS_SHIPPING_FEE = 9.95;
 export const REPEAT_DELIVERY_DISCOUNT_PERCENT = 0;
 
 /**
- * Calculate bundle discount percentage based on quantity
+ * Estratégia de desconto em lote (Comprar 3+ leva desconto sem prejuízo)
  * Buy 1: 0% off
- * Buy 2: 15% off
- * Buy 3+: 25% off
+ * Buy 2: 10% off
+ * Buy 3+: 15% off
  */
 export function getBundleDiscountPercent(itemQuantity: number): number {
-  if (itemQuantity >= 3) return 25;
-  if (itemQuantity >= 2) return 15;
+  if (itemQuantity >= 3) return 15;
+  if (itemQuantity >= 2) return 10;
   return 0;
 }
 
 /**
- * Calculate single item unit price including optional add-ons and Repeat Delivery
+ * Calculate single item unit price including optional add-ons
  */
 export function getItemUnitPrice(
   basePrice: number,
@@ -89,7 +91,7 @@ export interface OrderCalculationResult {
 }
 
 /**
- * Calculate complete order totals with US bundle savings, Repeat Delivery and promo codes
+ * Calculate complete order totals with dynamic coupons and anti-loss profit protection
  */
 export function calculateOrderTotals(
   items: CartItem[],
@@ -110,7 +112,6 @@ export function calculateOrderTotals(
     totalSupplierCost += item.supplierCost * item.quantity;
 
     if (item.isRepeatDelivery) {
-      // 35% off repeat delivery
       repeatDeliverySavings += rawTotal * (REPEAT_DELIVERY_DISCOUNT_PERCENT / 100);
     } else {
       const discountPct = getBundleDiscountPercent(item.quantity);
@@ -125,14 +126,26 @@ export function calculateOrderTotals(
 
   const discountedSubtotal = Math.max(0, subtotal - bundleDiscount - repeatDeliverySavings);
 
-  if (cleanPromo === 'LING20' || cleanPromo === 'PETCO20' || cleanPromo === 'SPRING20') {
-    promoDiscount = Number((discountedSubtotal * 0.20).toFixed(2));
-    appliedPromo = `${cleanPromo} (20% OFF)`;
-  } else if (cleanPromo === 'PAWLOVE15' || cleanPromo === 'WELCOME15' || cleanPromo === 'PETCO15') {
-    promoDiscount = Number((discountedSubtotal * 0.15).toFixed(2));
-    appliedPromo = `${cleanPromo} (15% OFF)`;
+  // Busca o cupom dinamicamente na lista mantida no Admin
+  const availableCoupons = getSavedCoupons();
+  const matchedCoupon = availableCoupons.find(
+    (c) => c.active && c.code.trim().toUpperCase() === cleanPromo
+  );
+
+  if (matchedCoupon) {
+    const rawDiscount = (discountedSubtotal * (matchedCoupon.discountPercent / 100));
+    promoDiscount = Number(rawDiscount.toFixed(2));
+    appliedPromo = `${matchedCoupon.code} (${matchedCoupon.discountPercent}% OFF)`;
   } else if (cleanPromo === 'FREESHIP') {
-    appliedPromo = 'FREESHIP (FREE DELIVERY)';
+    appliedPromo = 'FREESHIP (FRETE GRÁTIS)';
+  }
+
+  // Trava de Segurança Financeira (Garante Margem Positiva Sem Prejuízos):
+  // O valor final dos produtos nunca pode ficar abaixo do Custo do Fornecedor + 10% de margem
+  const minSafeGoodsTotal = totalSupplierCost * 1.10;
+  if (discountedSubtotal - promoDiscount < minSafeGoodsTotal && totalSupplierCost > 0) {
+    const maxSafeDiscount = Math.max(0, discountedSubtotal - minSafeGoodsTotal);
+    promoDiscount = Number(maxSafeDiscount.toFixed(2));
   }
 
   const effectiveGoodsTotal = Math.max(0, discountedSubtotal - promoDiscount);
@@ -187,7 +200,7 @@ export function filterProducts<T extends { name: string; category?: string; bran
 }
 
 /**
- * Format order into dropshipping supplier fulfillment format (CJ Dropshipping / Zendrop compatible)
+ * Format order into dropshipping supplier fulfillment format
  */
 export function formatDropshippingOrderPayload(
   orderId: string,
@@ -214,7 +227,7 @@ export function formatDropshippingOrderPayload(
       sku: item.sku,
       title: item.name,
       variant: `${item.size} / ${item.color}`,
-      order_type: item.isRepeatDelivery ? 'REPEAT_DELIVERY_35_OFF' : 'ONE_TIME',
+      order_type: item.isRepeatDelivery ? 'REPEAT_DELIVERY' : 'ONE_TIME',
       quantity: item.quantity,
       unit_price: item.price,
       supplier_target_cost: item.supplierCost,

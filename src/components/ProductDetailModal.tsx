@@ -195,11 +195,22 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               <p className="text-xs text-[#766E65] mt-1.5 leading-relaxed">{product.tagline}</p>
             </div>
 
-            {/* Promo Code LING20 Callout */}
+            {/* Real-time Zendrop Stock Callout */}
+            <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-2xl flex items-center justify-between gap-2 text-xs text-emerald-900">
+              <div className="flex items-center gap-2 font-bold">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                <span>Em estoque em tempo real ({product.stockCount || 450} unidades) · Armazém EUA Zendrop</span>
+              </div>
+              <span className="text-[10px] uppercase font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                Envio em 24h
+              </span>
+            </div>
+
+            {/* Promo Code Callout */}
             <div className="bg-[#EDF3EC] border border-[#D5E4D4] p-3.5 rounded-2xl flex items-center justify-between gap-2 text-xs text-[#4E664D]">
               <div className="flex items-center gap-2 font-bold">
                 <Sparkles size={16} className="text-[#C86446]" />
-                <span>Use coupon <strong className="font-mono text-[#2C2724] bg-white px-2 py-0.5 rounded border border-[#DFD8CC]">LING20</strong> for 20% OFF!</span>
+                <span>Use o cupom <strong className="font-mono text-[#2C2724] bg-white px-2 py-0.5 rounded border border-[#DFD8CC]">LING20</strong> para 20% OFF!</span>
               </div>
             </div>
 

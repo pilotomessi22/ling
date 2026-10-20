@@ -62,8 +62,11 @@ import {
   SUPPLIER_AGENTS,
   Product,
   SupplierAgent,
+  Coupon,
   getSavedProducts,
   saveProductsToStorage,
+  getSavedCoupons,
+  saveCouponsToStorage,
 } from '../data/storeData.ts';
 import { formatCurrency } from '../utils/storeLogic.ts';
 import { checkAdminPassword } from '../utils/security.ts';
@@ -320,8 +323,65 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
   // Active section
   const [activeTab, setActiveTab] = useState<
-    'orders' | 'catalog' | 'suppliers' | 'gateway' | 'settings' | 'metrics' | 'viral-studio'
+    'orders' | 'catalog' | 'suppliers' | 'coupons' | 'gateway' | 'settings' | 'metrics' | 'viral-studio'
   >('orders');
+
+  // Coupon Management State
+  const [couponsList, setCouponsList] = useState<Coupon[]>(() => getSavedCoupons());
+  const [newCouponCode, setNewCouponCode] = useState('');
+  const [newCouponDiscount, setNewCouponDiscount] = useState<number>(20);
+  const [newCouponPartner, setNewCouponPartner] = useState('');
+  const [newCouponDesc, setNewCouponDesc] = useState('');
+  const [couponFeedback, setCouponFeedback] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
+
+  // Anti-loss margin simulator state
+  const [simProductPrice, setSimProductPrice] = useState<number>(35.00);
+  const [simSupplierCost, setSimSupplierCost] = useState<number>(14.00);
+  const [simQuantity, setSimQuantity] = useState<number>(3);
+  const [simCouponPercent, setSimCouponPercent] = useState<number>(20);
+
+  const handleCreateCoupon = (e: React.FormEvent) => {
+    e.preventDefault();
+    const codeClean = newCouponCode.trim().toUpperCase();
+    if (!codeClean) {
+      setCouponFeedback({ type: 'error', msg: 'Informe o código do cupom.' });
+      return;
+    }
+    if (couponsList.some((c) => c.code === codeClean)) {
+      setCouponFeedback({ type: 'error', msg: `O cupom ${codeClean} já existe.` });
+      return;
+    }
+    const newCp: Coupon = {
+      id: `cp-${Date.now()}`,
+      code: codeClean,
+      discountPercent: Number(newCouponDiscount),
+      partnerName: newCouponPartner.trim() || 'Parceria Especial',
+      description: newCouponDesc.trim() || `Cupom de ${newCouponDiscount}% OFF para parceria ${newCouponPartner}`,
+      active: true,
+      usageCount: 0,
+      createdAt: new Date().toISOString().split('T')[0],
+    };
+    const updated = [newCp, ...couponsList];
+    setCouponsList(updated);
+    saveCouponsToStorage(updated);
+    setNewCouponCode('');
+    setNewCouponPartner('');
+    setNewCouponDesc('');
+    setCouponFeedback({ type: 'success', msg: `Cupom ${codeClean} (${newCouponDiscount}% OFF) criado com sucesso!` });
+    setTimeout(() => setCouponFeedback(null), 5000);
+  };
+
+  const handleToggleCoupon = (id: string) => {
+    const updated = couponsList.map((c) => (c.id === id ? { ...c, active: !c.active } : c));
+    setCouponsList(updated);
+    saveCouponsToStorage(updated);
+  };
+
+  const handleDeleteCoupon = (id: string) => {
+    const updated = couponsList.filter((c) => c.id !== id);
+    setCouponsList(updated);
+    saveCouponsToStorage(updated);
+  };
 
   // Password change state
   const [currentPwdInput, setCurrentPwdInput] = useState('');
@@ -1571,7 +1631,22 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
               }`}
             >
               <Building2 size={14} />
-              <span>Fornecedores CJ</span>
+              <span>Fornecedores Zendrop</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('coupons')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                activeTab === 'coupons'
+                  ? 'bg-[#2563EB] text-white shadow-md'
+                  : 'text-blue-200 hover:bg-white/10 bg-white/5'
+              }`}
+            >
+              <Tag size={14} />
+              <span>Cupons & Parcerias</span>
+              <span className="bg-white/20 text-white text-[10px] font-black px-1.5 py-0.2 rounded-full">
+                {couponsList.filter((c) => c.active).length}
+              </span>
             </button>
 
             <button
@@ -3142,6 +3217,305 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
                   </tbody>
                 </table>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB: CUPONS & PARCERIAS (Criação de Cupons e Proteção de Margem) */}
+        {activeTab === 'coupons' && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            {/* Header */}
+            <div className="bg-white p-6 sm:p-7 rounded-3xl border border-gray-200 shadow-xs">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-blue-50 text-[#2563EB] flex items-center justify-center">
+                  <Tag size={22} />
+                </div>
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">
+                    Cupons de Desconto para Parcerias & Influenciadores
+                  </h2>
+                  <p className="text-xs sm:text-sm text-gray-500">
+                    Crie códigos promocionais para fechar parcerias com influenciadores do TikTok, Instagram e canais de pets.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Form to Create New Coupon */}
+            <div className="bg-white p-6 sm:p-7 rounded-3xl border border-gray-200 shadow-xs space-y-5">
+              <div className="flex items-center gap-2 border-b border-gray-100 pb-4">
+                <Plus size={18} className="text-[#2563EB]" />
+                <h3 className="text-base font-bold text-gray-900">Criar Novo Cupom de Parceria</h3>
+              </div>
+
+              {couponFeedback && (
+                <div
+                  className={`p-4 rounded-2xl text-xs font-bold flex items-center gap-2 ${
+                    couponFeedback.type === 'success'
+                      ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                      : 'bg-rose-50 text-rose-800 border border-rose-200'
+                  }`}
+                >
+                  <AlertCircle size={16} className="shrink-0" />
+                  <span>{couponFeedback.msg}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleCreateCoupon} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
+                    Código do Cupom *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={newCouponCode}
+                    onChange={(e) => setNewCouponCode(e.target.value)}
+                    placeholder="Ex: GABRIEL20"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-mono font-bold text-gray-900 uppercase focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
+                    Desconto (% OFF) *
+                  </label>
+                  <select
+                    value={newCouponDiscount}
+                    onChange={(e) => setNewCouponDiscount(Number(e.target.value))}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold text-gray-900 focus:outline-none focus:border-blue-500"
+                  >
+                    <option value={5}>5% OFF</option>
+                    <option value={10}>10% OFF</option>
+                    <option value={15}>15% OFF</option>
+                    <option value={20}>20% OFF (Recomendado)</option>
+                    <option value={25}>25% OFF</option>
+                    <option value={30}>30% OFF</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
+                    Nome da Parceria / Influencer
+                  </label>
+                  <input
+                    type="text"
+                    value={newCouponPartner}
+                    onChange={(e) => setNewCouponPartner(e.target.value)}
+                    placeholder="Ex: Gabriel TikTok Pet"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs text-gray-900 focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+
+                <div className="flex items-end">
+                  <button
+                    type="submit"
+                    className="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <Plus size={16} />
+                    <span>Criar Cupom</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* Coupons List */}
+            <div className="bg-white p-6 sm:p-7 rounded-3xl border border-gray-200 shadow-xs space-y-4">
+              <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+                <div className="flex items-center gap-2">
+                  <Tag size={18} className="text-[#2563EB]" />
+                  <h3 className="text-base font-bold text-gray-900">Cupons Ativos na Loja ({couponsList.length})</h3>
+                </div>
+                <span className="text-xs text-gray-400 font-medium">Reconhecidos automaticamente no Checkout</span>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-gray-100 text-gray-400 uppercase font-black text-[10px]">
+                      <th className="py-3 px-3">Código</th>
+                      <th className="py-3 px-3">Desconto</th>
+                      <th className="py-3 px-3">Parceria / Influencer</th>
+                      <th className="py-3 px-3 text-center">Usos</th>
+                      <th className="py-3 px-3 text-center">Status</th>
+                      <th className="py-3 px-3 text-right">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {couponsList.map((cp) => (
+                      <tr key={cp.id} className="hover:bg-gray-50/50 transition-colors">
+                        <td className="py-3 px-3 font-mono font-black text-gray-900 text-sm">
+                          <span className="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg border border-blue-200 inline-block">
+                            {cp.code}
+                          </span>
+                        </td>
+                        <td className="py-3 px-3 font-bold text-emerald-600 text-sm">
+                          {cp.discountPercent}% OFF
+                        </td>
+                        <td className="py-3 px-3 font-medium text-gray-800">
+                          <div>{cp.partnerName}</div>
+                          <div className="text-[10px] text-gray-400">{cp.description}</div>
+                        </td>
+                        <td className="py-3 px-3 text-center font-bold text-gray-700">
+                          {cp.usageCount}
+                        </td>
+                        <td className="py-3 px-3 text-center">
+                          <span
+                            className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase ${
+                              cp.active
+                                ? 'bg-emerald-100 text-emerald-800'
+                                : 'bg-gray-100 text-gray-500'
+                            }`}
+                          >
+                            {cp.active ? 'Ativo' : 'Inativo'}
+                          </span>
+                        </td>
+                        <td className="py-3 px-3 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleCoupon(cp.id)}
+                              className={`text-[11px] font-bold px-3 py-1.5 rounded-lg border cursor-pointer transition-all ${
+                                cp.active
+                                  ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
+                                  : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                              }`}
+                            >
+                              {cp.active ? 'Pausar' : 'Ativar'}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteCoupon(cp.id)}
+                              className="text-rose-600 hover:text-rose-800 p-1.5 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer"
+                              title="Excluir cupom"
+                            >
+                              <Trash2 size={15} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Anti-Loss Margin Simulator */}
+            <div className="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white p-6 sm:p-7 rounded-3xl border border-blue-900 shadow-xl space-y-5">
+              <div className="flex items-center gap-3 border-b border-blue-800/60 pb-4">
+                <Calculator size={22} className="text-emerald-400" />
+                <div>
+                  <h3 className="text-lg font-black text-white">
+                    Simulador Anti-Prejuízo: Comprar 3 Unidades + Cupom de 20%
+                  </h3>
+                  <p className="text-xs text-blue-200">
+                    Comprove que a margem da sua loja é 100% protegida e nunca resulta em prejuízo.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
+                <div>
+                  <label className="block font-bold text-blue-200 mb-1">Preço do Produto ($ USD)</label>
+                  <input
+                    type="number"
+                    value={simProductPrice}
+                    onChange={(e) => setSimProductPrice(Number(e.target.value))}
+                    className="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white font-mono font-bold focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-blue-200 mb-1">Custo Fornecedor Zendrop ($)</label>
+                  <input
+                    type="number"
+                    value={simSupplierCost}
+                    onChange={(e) => setSimSupplierCost(Number(e.target.value))}
+                    className="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white font-mono font-bold focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-blue-200 mb-1">Quantidade no Pedido</label>
+                  <select
+                    value={simQuantity}
+                    onChange={(e) => setSimQuantity(Number(e.target.value))}
+                    className="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white font-bold focus:outline-none"
+                  >
+                    <option value={1} className="text-gray-900">1 Unidade (0% Combo)</option>
+                    <option value={2} className="text-gray-900">2 Unidades (10% Combo)</option>
+                    <option value={3} className="text-gray-900">3 Unidades (15% Combo)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-blue-200 mb-1">Cupom de Parceria</label>
+                  <select
+                    value={simCouponPercent}
+                    onChange={(e) => setSimCouponPercent(Number(e.target.value))}
+                    className="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white font-bold focus:outline-none"
+                  >
+                    <option value={0} className="text-gray-900">Sem Cupom (0%)</option>
+                    <option value={15} className="text-gray-900">Cupom 15% OFF</option>
+                    <option value={20} className="text-gray-900">Cupom 20% OFF</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Simulation Result Calculation */}
+              {(() => {
+                const bundleDiscountPct = simQuantity >= 3 ? 15 : simQuantity >= 2 ? 10 : 0;
+                const grossTotal = simProductPrice * simQuantity;
+                const bundleSavings = grossTotal * (bundleDiscountPct / 100);
+                const afterBundle = grossTotal - bundleSavings;
+                const couponSavings = afterBundle * (simCouponPercent / 100);
+                const finalCustomerPrice = afterBundle - couponSavings;
+                const totalSupplierCost = simSupplierCost * simQuantity;
+                const netProfit = finalCustomerPrice - totalSupplierCost;
+                const marginPercent = finalCustomerPrice > 0 ? (netProfit / finalCustomerPrice) * 100 : 0;
+
+                return (
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5 space-y-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center border-b border-white/10 pb-4">
+                      <div>
+                        <span className="text-[10px] text-blue-300 uppercase block font-bold">Subtotal Sem Desconto</span>
+                        <span className="text-sm sm:text-base font-black font-mono text-gray-200">${grossTotal.toFixed(2)}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-blue-300 uppercase block font-bold">Desconto Combo + Cupom</span>
+                        <span className="text-sm sm:text-base font-black font-mono text-amber-400">-${(bundleSavings + couponSavings).toFixed(2)}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-blue-300 uppercase block font-bold">Pago pelo Cliente</span>
+                        <span className="text-sm sm:text-base font-black font-mono text-white">${finalCustomerPrice.toFixed(2)}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-blue-300 uppercase block font-bold">Custo Fornecedor Zendrop</span>
+                        <span className="text-sm sm:text-base font-black font-mono text-rose-300">${totalSupplierCost.toFixed(2)}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-emerald-500/20 border border-emerald-500/40 p-4 rounded-xl">
+                      <div className="flex items-center gap-3">
+                        <CheckCircle2 size={24} className="text-emerald-400 shrink-0" />
+                        <div>
+                          <div className="text-xs font-black text-emerald-300 uppercase tracking-wider">
+                            Lucro Líquido Lojista Protegido (Sem Prejuízo)
+                          </div>
+                          <div className="text-xs text-emerald-100">
+                            Comprando {simQuantity}x unidades e usando cupom de {simCouponPercent}%, seu lucro limpo no bolso é de <strong className="text-white">${netProfit.toFixed(2)} USD</strong>.
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="text-right shrink-0">
+                        <div className="text-xl font-black font-mono text-emerald-300">${netProfit.toFixed(2)}</div>
+                        <div className="text-[10px] font-bold text-emerald-200">{marginPercent.toFixed(1)}% Margem Líquida</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         )}
