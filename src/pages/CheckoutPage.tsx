@@ -42,10 +42,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
   });
 
   const [deliveryOption, setDeliveryOption] = useState<'usps_ground' | 'usps_priority'>('usps_ground');
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'apple_pay' | 'klarna' | 'cash_app' | 'link_stripe'>('card');
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardExpiry, setCardExpiry] = useState('');
-  const [cardCvc, setCardCvc] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<'apple_pay' | 'klarna' | 'cash_app' | 'link_stripe'>('apple_pay');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState('');
@@ -252,19 +249,22 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
 
           <div>
             <span className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">
-              Order Confirmed
+              Order Reservation Received
             </span>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0F2942] font-serif mt-1">
               Thank You, {confirmedCustomerName || address.fullName || "Valued Customer"}!
             </h1>
             <p className="text-sm text-[#64748B] mt-2 font-light">
-              Your order <strong className="text-[#0F2942]">#{orderId}</strong> has been received and routed to our nearest US fulfillment center.
+              Your order reservation <strong className="text-[#0F2942]">#{orderId}</strong> has been recorded in the store system.
             </p>
           </div>
 
           <div className="p-6 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] text-left space-y-3 text-xs">
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-[11px] leading-relaxed mb-1">
+              <strong>ℹ️ Note on Payment:</strong> Direct card processing is temporarily pending Stripe merchant account verification. No funds were charged or deducted. Your items have been reserved in our system.
+            </div>
             <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0]">
-              <span className="text-[#64748B]">USPS Tracking Number:</span>
+              <span className="text-[#64748B]">USPS Dispatch Tracking:</span>
               <strong className="text-[#2563EB] font-mono font-bold">9400 1118 9922 3849 10</strong>
             </div>
             <div className="flex items-center justify-between">
@@ -280,7 +280,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-[#64748B]">Total Paid:</span>
+              <span className="text-[#64748B]">Reserved Order Total:</span>
               <span className="font-bold text-[#0F2942]">{formatCurrency(confirmedPaidTotal || finalTotal)}</span>
             </div>
           </div>
@@ -546,73 +546,23 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                 <div className="relative py-2 flex items-center justify-center">
                   <div className="border-t border-[#E2E8F0] w-full" />
                   <span className="bg-white px-3 text-[10px] font-bold uppercase tracking-wider text-[#94A3B8] absolute">
-                    OR PAY WITH CREDIT CARD / OTHER
+                    EXPRESS GATEWAY PAYMENT
                   </span>
                 </div>
               </div>
 
+              {/* Stripe Notice Banner */}
+              <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl text-amber-900 text-xs space-y-1">
+                <div className="font-bold flex items-center gap-1.5 text-amber-950">
+                  <span>⚠️ Stripe Merchant Account Notice:</span>
+                </div>
+                <p className="text-[11px] leading-relaxed text-amber-800">
+                  Direct Credit Card entry has been disabled because merchant identity verification on Stripe is currently pending approval. Express checkout requests are recorded as reserved orders until your Stripe account is fully released.
+                </p>
+              </div>
+
               {/* Payment Selectors */}
               <div className="space-y-2.5">
-                {/* Option 1: Credit / Debit Card */}
-                <label
-                  onClick={() => setPaymentMethod('card')}
-                  className={`p-4 rounded-2xl border cursor-pointer block transition-all ${
-                    paymentMethod === 'card'
-                      ? 'border-[#2563EB] bg-[#EFF6FF]/40 ring-2 ring-[#2563EB]/20'
-                      : 'border-[#E2E8F0] hover:border-[#CBD5E1]'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2.5">
-                      <input
-                        type="radio"
-                        name="pay_method"
-                        checked={paymentMethod === 'card'}
-                        onChange={() => setPaymentMethod('card')}
-                        className="text-[#2563EB]"
-                      />
-                      <span className="text-xs font-bold text-[#0F2942]">Credit or Debit Card</span>
-                    </div>
-                    <span className="text-[10px] font-mono text-[#64748B]">Visa · MC · Amex · Discover</span>
-                  </div>
-
-                  {paymentMethod === 'card' && (
-                    <div className="mt-3 pt-3 border-t border-[#E2E8F0] space-y-2.5 text-xs animate-in fade-in">
-                      <div>
-                        <label className="block text-[#64748B] font-medium mb-1">Card Number</label>
-                        <input
-                          type="text"
-                          value={cardNumber}
-                          onChange={(e) => setCardNumber(e.target.value)}
-                          placeholder="4242 4242 4242 4242"
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] bg-white font-mono text-[#0F2942] focus:outline-hidden focus:border-[#2563EB]"
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-[#64748B] font-medium mb-1">Expires (MM/YY)</label>
-                          <input
-                            type="text"
-                            value={cardExpiry}
-                            onChange={(e) => setCardExpiry(e.target.value)}
-                            placeholder="12/28"
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] bg-white font-mono text-[#0F2942] focus:outline-hidden focus:border-[#2563EB]"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[#64748B] font-medium mb-1">CVC Code</label>
-                          <input
-                            type="text"
-                            value={cardCvc}
-                            onChange={(e) => setCardCvc(e.target.value)}
-                            placeholder="884"
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] bg-white font-mono text-[#0F2942] focus:outline-hidden focus:border-[#2563EB]"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </label>
 
                 {/* Option 2: Klarna Buy Now Pay Later */}
                 <label

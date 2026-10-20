@@ -48,7 +48,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     deliveryMethod: 'shipping',
   });
 
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'apple_pay' | 'paypal'>('card');
+  const [paymentMethod, setPaymentMethod] = useState<'apple_pay' | 'paypal'>('apple_pay');
   const [deliveryOption, setDeliveryOption] = useState<'usps_ground' | 'usps_priority'>('usps_ground');
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState('');
@@ -339,18 +339,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 <label className="text-xs font-black uppercase tracking-wider text-gray-700 block mb-2">
                   3. Payment Method
                 </label>
-                <div className="grid grid-cols-3 gap-2 text-xs">
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('card')}
-                    className={`p-2.5 rounded-xl border text-center font-bold cursor-pointer transition-all ${
-                      paymentMethod === 'card'
-                        ? 'border-[#002855] bg-blue-50 text-[#002855] ring-2 ring-[#002855]'
-                        : 'border-gray-200 text-gray-700 hover:border-gray-300'
-                    }`}
-                  >
-                    💳 Credit Card
-                  </button>
+                <div className="grid grid-cols-2 gap-2 text-xs">
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('apple_pay')}
