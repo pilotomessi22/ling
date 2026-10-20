@@ -1,0 +1,6 @@
+{
+  "name": "Ling Petshop",
+  "description": "Austin's favorite modern pet wellness brand. Vet-approved orthopedic calming beds, wireless water fountains, no-pull ergonomic harnesses and grooming solutions with fast US shipping.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
