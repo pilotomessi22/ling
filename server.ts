@@ -20,6 +20,68 @@ app.get('/api/health', (_req: Request, res: Response) => {
   });
 });
 
+// Automatic Stripe Checkout Session Creation Endpoint
+app.post('/api/create-checkout-session', async (req: Request, res: Response) => {
+  try {
+    const { items, customerEmail, customStripeKey, domainUrl } = req.body;
+    const stripeSecretKey =
+      customStripeKey ||
+      process.env.STRIPE_SECRET_KEY ||
+      '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';
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'Cart is empty' });
+    }
+
+    const host = domainUrl || `${req.protocol}://${req.get('host')}`;
+
+    // Construct x-www-form-urlencoded params for Stripe API v1/checkout/sessions
+    const params = new URLSearchParams();
+    params.append('mode', 'payment');
+    params.append('success_url', `${host}/checkout?status=success&session_id={CHECKOUT_SESSION_ID}`);
+    params.append('cancel_url', `${host}/checkout?status=cancelled`);
+
+    if (customerEmail) {
+      params.append('customer_email', customerEmail);
+    }
+
+    items.forEach((item: any, index: number) => {
+      const unitAmount = Math.round((item.price || 10) * 100);
+      params.append(`line_items[${index}][price_data][currency]`, 'usd');
+      params.append(`line_items[${index}][price_data][unit_amount]`, unitAmount.toString());
+      params.append(`line_items[${index}][price_data][product_data][name]`, item.name || 'Pet Product');
+      if (item.image) {
+        params.append(`line_items[${index}][price_data][product_data][images][0]`, item.image);
+      }
+      params.append(`line_items[${index}][quantity]`, (item.quantity || 1).toString());
+    });
+
+    const stripeRes = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${stripeSecretKey.trim()}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
+    });
+
+    const data = await stripeRes.json();
+
+    if (!stripeRes.ok) {
+      console.error('Stripe API Error:', data);
+      return res.status(stripeRes.status).json({
+        error: data.error?.message || 'Failed to create Stripe checkout session',
+        raw: data.error,
+      });
+    }
+
+    return res.json({ url: data.url, sessionId: data.id });
+  } catch (err: any) {
+    console.error('Server error creating checkout session:', err);
+    return res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+});
+
 // Serve compiled static assets from dist folder
 const distPath = path.resolve(__dirname, 'dist');
 app.use(express.static(distPath));
