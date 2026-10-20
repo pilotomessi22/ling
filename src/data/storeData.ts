@@ -156,7 +156,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: true,
     inStockAustin: true,
     stockCount: 540,
-    heroImage: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&q=85',
@@ -386,7 +386,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 310,
-    heroImage: 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&w=1200&q=85',
@@ -611,7 +611,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 395,
-    heroImage: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1596492784531-6e6eb5ea9993?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=1200&q=85',
@@ -724,7 +724,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 740,
-    heroImage: 'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1535930891776-0c2dfb7fda1a?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85',
@@ -780,7 +780,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 280,
-    heroImage: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85',
@@ -837,7 +837,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 910,
-    heroImage: 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1581888227599-779811939961?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&w=1200&q=85',
@@ -893,7 +893,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 460,
-    heroImage: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=85',
@@ -950,7 +950,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 320,
-    heroImage: 'https://images.unsplash.com/photo-1544568100-847a948585b9?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1522276498395-f4f68f7f8454?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1544568100-847a948585b9?auto=format&fit=crop&w=1200&q=85',
@@ -1006,7 +1006,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 580,
-    heroImage: 'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85',
@@ -1062,7 +1062,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 800,
-    heroImage: 'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1568640347023-a616a30bc3bd?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&w=1200&q=85',
@@ -1119,7 +1119,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 650,
-    heroImage: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=85',
@@ -1175,7 +1175,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: true,
     inStockAustin: true,
     stockCount: 1100,
-    heroImage: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=85',
@@ -1231,7 +1231,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 890,
-    heroImage: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1544568100-847a948585b9?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85',
@@ -1287,7 +1287,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 340,
-    heroImage: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&q=85',
@@ -1343,7 +1343,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 720,
-    heroImage: 'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1601758003122-53c40e686a19?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=85',
@@ -1399,7 +1399,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 260,
-    heroImage: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=85',
@@ -1456,7 +1456,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: true,
     inStockAustin: true,
     stockCount: 950,
-    heroImage: 'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1541364983171-a8ba01e95cfc?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&w=1200&q=85',
@@ -1512,7 +1512,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: true,
     inStockAustin: true,
     stockCount: 810,
-    heroImage: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1560807707-8cc77767d783?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85',
@@ -1568,7 +1568,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 430,
-    heroImage: 'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1535294435445-d7249524ef2e?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=85',
@@ -1625,7 +1625,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 310,
-    heroImage: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=85',
@@ -1681,7 +1681,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 570,
-    heroImage: 'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1527153857715-3908f2bae5e8?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85',
@@ -1793,7 +1793,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 410,
-    heroImage: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=85',
@@ -1849,7 +1849,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 530,
-    heroImage: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1561948955-570b270e7c36?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=85',
@@ -1905,7 +1905,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 1200,
-    heroImage: 'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=85',
@@ -1961,7 +1961,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 780,
-    heroImage: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=1200&q=85',
     secondaryImage: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=85',
     galleryImages: [
       'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85',
@@ -1998,9 +1998,9 @@ export const PRODUCTS: Product[] = DEFAULT_REAL_PRODUCTS;
 export function getSavedProducts(): Product[] {
   if (typeof window === 'undefined') return DEFAULT_REAL_PRODUCTS;
   try {
-    if (!localStorage.getItem('ling_catalog_zendrop_33_v4')) {
+    if (!localStorage.getItem('ling_catalog_zendrop_33_v5')) {
       localStorage.removeItem('ling_admin_products');
-      localStorage.setItem('ling_catalog_zendrop_33_v4', 'true');
+      localStorage.setItem('ling_catalog_zendrop_33_v5', 'true');
     }
     const saved = localStorage.getItem('ling_admin_products');
     if (saved !== null) {
