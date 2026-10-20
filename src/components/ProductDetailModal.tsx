@@ -83,7 +83,12 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
     }, 900);
   };
 
-  const images = [product.heroImage, product.secondaryImage].filter(Boolean) as string[];
+  const rawImages = (
+    product.galleryImages && product.galleryImages.length > 0
+      ? product.galleryImages
+      : [product.heroImage, product.secondaryImage]
+  ).filter(Boolean) as string[];
+  const images = Array.from(new Set(rawImages));
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-fade-in">

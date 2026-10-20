@@ -233,12 +233,9 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     heroImage: "https://file.zendrop.com/products/27/ce/5258638a4b9197f9dad3d50bfeca.jpeg",
-    secondaryImage: "https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85",
+    secondaryImage: "https://file.zendrop.com/products/27/ce/5258638a4b9197f9dad3d50bfeca.jpeg",
     galleryImages: [
-      "https://file.zendrop.com/products/27/ce/5258638a4b9197f9dad3d50bfeca.jpeg",
-      "https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=85",
-      "https://file.zendrop.com/products/84/c1/98fb0df34d80a13eb2205ec61718.jpeg"
+      "https://file.zendrop.com/products/27/ce/5258638a4b9197f9dad3d50bfeca.jpeg"
     ],
     description: "The Aspen Pet Oval Cuddler Pet Bed provides cozy comfort tailored to extra-small and toy breed dogs as well as cats. The soft raised bolster walls are generously filled with recycled high-loft polyester for cushioned joint comfort, while the nest-like circular design creates a soothing cocoon that eases separation anxiety. Ideal as a standalone bed in living rooms or as a plush liner for 20-inch crates and travel carriers.",
     keyFeatures: [
@@ -381,12 +378,9 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     heroImage: "https://file.zendrop.com/products/87/e1/c63523784fc396c4f2c6bd4c1c24.jpeg",
-    secondaryImage: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=85",
+    secondaryImage: "https://file.zendrop.com/products/87/e1/c63523784fc396c4f2c6bd4c1c24.jpeg",
     galleryImages: [
-      "https://file.zendrop.com/products/87/e1/c63523784fc396c4f2c6bd4c1c24.jpeg",
-      "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85",
-      "https://file.zendrop.com/products/84/c1/98fb0df34d80a13eb2205ec61718.jpeg"
+      "https://file.zendrop.com/products/87/e1/c63523784fc396c4f2c6bd4c1c24.jpeg"
     ],
     description: "The ultimate pet hair cleaning tool for pet parents tired of endless shedding. The ZepetZ utilizes an advanced electrostatic micro-bristle roller that grips and removes embedded dog and cat hair from couches, carpets, bedspreads, blankets, car seats, and clothing. No sticky tape refills, no batteries, and no mess. Simply roll back and forth, click the chamber button to pop open the lid, and empty the trapped hair clump directly into the trash.",
     keyFeatures: [
@@ -449,12 +443,9 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: true,
     inStockAustin: true,
     heroImage: "https://file.zendrop.com/products/e2/67/13ee6178492cbb4714ad09e346c8.jpeg",
-    secondaryImage: "https://file.zendrop.com/products/84/c1/98fb0df34d80a13eb2205ec61718.jpeg",
+    secondaryImage: "https://file.zendrop.com/products/e2/67/13ee6178492cbb4714ad09e346c8.jpeg",
     galleryImages: [
-      "https://file.zendrop.com/products/e2/67/13ee6178492cbb4714ad09e346c8.jpeg",
-      "https://file.zendrop.com/products/84/c1/98fb0df34d80a13eb2205ec61718.jpeg",
-      "https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=85"
+      "https://file.zendrop.com/products/e2/67/13ee6178492cbb4714ad09e346c8.jpeg"
     ],
     description: "Turn grooming into an intimate bonding massage that pets purr and wag for. Designed with 180+ gentle silicone massage nubs, this five-finger deshedding glove contours around hard-to-reach contours including tails, chests, bellies, and faces where scary metal combs cannot go. Loose hair clings to the silicone and peels off cleanly in one large continuous sheet. Includes an adjustable high-frequency ultrasonic dog whistle for recall training.",
     keyFeatures: [
@@ -514,12 +505,9 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     heroImage: "https://file.zendrop.com/products/84/c1/98fb0df34d80a13eb2205ec61718.jpeg",
-    secondaryImage: "https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85",
+    secondaryImage: "https://file.zendrop.com/products/84/c1/98fb0df34d80a13eb2205ec61718.jpeg",
     galleryImages: [
-      "https://file.zendrop.com/products/84/c1/98fb0df34d80a13eb2205ec61718.jpeg",
-      "https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85"
+      "https://file.zendrop.com/products/84/c1/98fb0df34d80a13eb2205ec61718.jpeg"
     ],
     description: "Keep your pets and toddlers safe with this heavy-duty, no-drill pressure-mounted safety gate. Engineered with a one-handed dual-lock walk-through door and auto-close mechanism. Includes modular expansion panels to easily fit openings between 29.5\" and 45.3\" (75 to 115 cm). Dispatched directly from Ling Petshop US Domestic Warehouse for rapid 3-5 day delivery.",
     keyFeatures: [
@@ -567,9 +555,9 @@ export const PRODUCTS: Product[] = DEFAULT_REAL_PRODUCTS;
 export function getSavedProducts(): Product[] {
   if (typeof window === 'undefined') return DEFAULT_REAL_PRODUCTS;
   try {
-    if (!localStorage.getItem('ling_catalog_v6_fresh')) {
+    if (!localStorage.getItem('ling_catalog_v8_fresh_hd')) {
       localStorage.removeItem('ling_admin_products');
-      localStorage.setItem('ling_catalog_v6_fresh', 'true');
+      localStorage.setItem('ling_catalog_v8_fresh_hd', 'true');
     }
     const saved = localStorage.getItem('ling_admin_products');
     if (saved !== null) {

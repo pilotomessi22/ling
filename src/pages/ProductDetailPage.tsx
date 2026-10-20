@@ -65,10 +65,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [product]);
 
-  const images =
+  const rawImages = (
     product.galleryImages && product.galleryImages.length > 0
       ? product.galleryImages
-      : ([product.heroImage, product.secondaryImage].filter(Boolean) as string[]);
+      : [product.heroImage, product.secondaryImage]
+  ).filter(Boolean) as string[];
+  const images = Array.from(new Set(rawImages));
 
   // Calculate volume discount based on quantity
   let discountMultiplier = 1;

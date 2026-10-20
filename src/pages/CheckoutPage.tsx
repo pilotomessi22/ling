@@ -93,6 +93,15 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
 
   const handleFast1ClickTestPurchase = () => {
     setIsSubmitting(true);
+    const amountToSave = finalTotal > 0 ? finalTotal : 498.95;
+    setConfirmedPaidTotal(amountToSave);
+    setConfirmedCustomerName(address.fullName || 'Express Customer');
+    setConfirmedAddressText(
+      address.streetAddress
+        ? `${address.streetAddress}, ${address.city}, ${address.state} ${address.zipCode}`
+        : 'United States Express Delivery Hub'
+    );
+
     setTimeout(() => {
       const generatedId = `LP-US-${Math.floor(100000 + Math.random() * 900000)}`;
       setOrderId(generatedId);
@@ -104,14 +113,14 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
           id: `ord-${Date.now()}`,
           orderNumber: generatedId,
           date: 'Hoje, agora mesmo',
-          customerName: address.fullName,
-          customerEmail: address.email,
-          customerPhone: address.phone,
+          customerName: address.fullName || 'Express Apple Pay Customer',
+          customerEmail: address.email || 'customer@lingpetshop.com',
+          customerPhone: address.phone || '+1 (555) 019-2831',
           shippingAddress: {
-            street: address.streetAddress + (address.aptOrSuite ? `, ${address.aptOrSuite}` : ''),
-            city: address.city,
-            state: address.state,
-            zip: address.zipCode,
+            street: (address.streetAddress || '102 Express Way') + (address.aptOrSuite ? `, ${address.aptOrSuite}` : ''),
+            city: address.city || 'Austin',
+            state: address.state || 'TX',
+            zip: address.zipCode || '78701',
             country: 'United States',
           },
           items: items.length > 0 ? items.map((it) => ({
@@ -127,22 +136,22 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
             supplierUrl: 'https://zendrop.com',
           })) : [
             {
-              sku: 'LP-BED-C9-M',
-              name: 'The Cloud9™ Orthopedic Calming Pet Bed',
-              size: 'Medium (30")',
-              color: 'Sage Green',
+              sku: 'ZD-FEED-LOCKER-WHT',
+              name: 'PawHut Elevated Pet Feeder Station & Food Storage Locker Cabinet',
+              size: 'Standard',
+              color: 'White',
               quantity: 1,
-              unitPrice: 44.95,
-              supplierCost: 15.5,
-              supplier: 'CJ Dropshipping' as const,
-              supplierSku: 'CJ-PET-BED901',
-              supplierUrl: 'https://cjdropshipping.com',
+              unitPrice: 498.95,
+              supplierCost: 174.46,
+              supplier: 'Zendrop' as const,
+              supplierSku: 'ZD-FEED-LOCKER-WHT',
+              supplierUrl: 'https://zendrop.com',
             }
           ],
-          totalUsd: finalTotal > 0 ? finalTotal : 44.95,
-          supplierCostUsd: 15.5,
-          profitUsd: 29.45,
-          paymentGateway: 'Stripe (Credit Card / Apple Pay)',
+          totalUsd: amountToSave,
+          supplierCostUsd: 174.46,
+          profitUsd: Math.max(0, amountToSave - 174.46),
+          paymentGateway: 'Stripe (1-Click Apple Pay / Vault)',
           paymentStatus: 'Paid',
           fulfillmentStatus: 'Aguardando Despacho',
           shippingMethod: deliveryOption === 'usps_priority' ? 'Express Delivery ($9.95 · 2 to 4 Days)' : 'Standard Delivery ($4.95 / Free · 3 to 5 Days)',
@@ -165,6 +174,14 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
 
   const handleSubmitOrder = (e: React.FormEvent) => {
     e.preventDefault();
+    const amountToSave = finalTotal > 0 ? finalTotal : 498.95;
+    setConfirmedPaidTotal(amountToSave);
+    setConfirmedCustomerName(address.fullName || 'Valued Customer');
+    setConfirmedAddressText(
+      address.streetAddress
+        ? `${address.streetAddress}, ${address.city}, ${address.state} ${address.zipCode}`
+        : 'United States Fulfillment Center'
+    );
     setIsSubmitting(true);
 
     setTimeout(() => {
@@ -201,9 +218,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
             supplierSku: it.sku,
             supplierUrl: 'https://zendrop.com',
           })),
-          totalUsd: finalTotal,
+          totalUsd: amountToSave,
           supplierCostUsd: items.reduce((acc, curr) => acc + curr.supplierCost * curr.quantity, 0),
-          profitUsd: Math.max(0, finalTotal - items.reduce((acc, curr) => acc + curr.supplierCost * curr.quantity, 0)),
+          profitUsd: Math.max(0, amountToSave - items.reduce((acc, curr) => acc + curr.supplierCost * curr.quantity, 0)),
           paymentGateway: 'Stripe (Credit Card / Apple Pay)',
           paymentStatus: 'Paid',
           fulfillmentStatus: 'Aguardando Despacho',
