@@ -483,8 +483,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const [isRechargeOpen, setIsRechargeOpen] = useState(false);
   const [rechargeSuccess, setRechargeSuccess] = useState(false);
   // Stripe API Keys & Live Verification State
-  const [stripePk, setStripePk] = useState(() => localStorage.getItem('ling_stripe_pk') || 'pk_live_51UQtVzRwbavjytNi1ajMHnOFzUposDMUAMHL6qqObc9DzN4dIznubUNBeBXVHLCylcMfQJL1NjDof2g7u5DHHBjv00uxSaMwUs');
-  const [stripeSk, setStripeSk] = useState(() => localStorage.getItem('ling_stripe_sk') || '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');
+  const [stripePk, setStripePk] = useState(() => localStorage.getItem('ling_stripe_pk') || '');
+  const [stripeSk, setStripeSk] = useState(() => localStorage.getItem('ling_stripe_sk') || '');
   const [stripeSaveMsg, setStripeSaveMsg] = useState(false);
   const [isTestingStripeFlow, setIsTestingStripeFlow] = useState(false);
   const [stripeVerifyStatus, setStripeVerifyStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('success');

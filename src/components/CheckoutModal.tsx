@@ -114,8 +114,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         totalUsd: finalTotal,
         supplierCostUsd: items.reduce((acc, curr) => acc + curr.supplierCost * curr.quantity, 0),
         paymentGateway: (() => {
-          const pk = localStorage.getItem('ling_stripe_pk') || 'pk_live_51UQtVzRwbavjytNi1ajMHnOFzUposDMUAMHL6qqObc9DzN4dIznubUNBeBXVHLCylcMfQJL1NjDof2g7u5DHHBjv00uxSaMwUs';
-          return 'Stripe Live Official (USD · lingpetshop.net)';
+          const pk = localStorage.getItem('ling_stripe_pk') || '';
+          return pk ? 'Stripe Official (USD · lingpetshop.com)' : 'Stripe Gateway (USD)';
         })(),
         paymentStatus: 'Paid (Stripe Live)',
         fulfillmentStatus: 'Aguardando Despacho',

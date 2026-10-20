@@ -52,13 +52,13 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
 
   // Live Stripe Configuration & Verification Check
   const [stripeConfig] = useState(() => {
-    const pk = localStorage.getItem('ling_stripe_pk') || 'pk_live_51UQtVzRwbavjytNi1ajMHnOFzUposDMUAMHL6qqObc9DzN4dIznubUNBeBXVHLCylcMfQJL1NjDof2g7u5DHHBjv00uxSaMwUs';
-    const sk = localStorage.getItem('ling_stripe_sk') || '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';
+    const pk = localStorage.getItem('ling_stripe_pk') || '';
+    const sk = localStorage.getItem('ling_stripe_sk') || '';
     const isConfigured = Boolean(sk.trim());
     return {
       isConfigured,
-      isVerified: true,
-      isLive: true,
+      isVerified: isConfigured,
+      isLive: sk.startsWith('sk_live_'),
     };
   });
 
