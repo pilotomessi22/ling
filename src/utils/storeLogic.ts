@@ -140,9 +140,9 @@ export function calculateOrderTotals(
     appliedPromo = 'FREESHIP (FRETE GRÁTIS)';
   }
 
-  // Trava de Segurança Financeira (Garante Margem Positiva Sem Prejuízos):
-  // O valor final dos produtos nunca pode ficar abaixo do Custo do Fornecedor + 10% de margem
-  const minSafeGoodsTotal = totalSupplierCost * 1.10;
+  // Trava de Segurança Financeira Anti-Prejuízo (Garante Margem Mínima Segura de 35%):
+  // Proteção contra perdas ao combinar Desconto em Lote (Comprar 3) + Cupom de 20% OFF
+  const minSafeGoodsTotal = totalSupplierCost * 1.35;
   if (discountedSubtotal - promoDiscount < minSafeGoodsTotal && totalSupplierCost > 0) {
     const maxSafeDiscount = Math.max(0, discountedSubtotal - minSafeGoodsTotal);
     promoDiscount = Number(maxSafeDiscount.toFixed(2));
