@@ -169,13 +169,13 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "repeatDeliveryEligible": true,
     "inStockAustin": true,
     "stockCount": 132,
-    "heroImage": "/assets/campaign/ultimate_cleanup_kit_cover.png",
-    "secondaryImage": "/assets/campaign/grooming_gloves.png",
+    "heroImage": "/assets/campaign/ultimate_cleanup_kit_cover.webp",
+    "secondaryImage": "/assets/campaign/grooming_gloves.webp",
     "galleryImages": [
-      "/assets/campaign/ultimate_cleanup_kit_cover.png",
-      "/assets/campaign/grooming_gloves.png",
-      "/assets/campaign/zepetz_hair_remover.png",
-      "/assets/campaign/paw_cleaner.png"
+      "/assets/campaign/ultimate_cleanup_kit_cover.webp",
+      "/assets/campaign/grooming_gloves.webp",
+      "/assets/campaign/zepetz_hair_remover.webp",
+      "/assets/campaign/paw_cleaner.webp"
     ],
     "description": "A Cleaner Home. A Happier Pet. A Better Everyday Routine.\n\nMeet the Ultimate Pet Cleanup Kit, a convenient bundle designed to make everyday pet care easier.\n\nKeep your pets fresh and your home cleaner with three practical essentials for grooming, removing loose fur, and cleaning muddy paws.\n\n### WHAT'S INCLUDED:\n\n1. Pet Grooming Gloves\nHelp remove loose fur while providing a gentle grooming experience for your dog or cat.\n\n2. Zepetz Pet Hair Remover\nRemove unwanted pet hair from sofas, upholstery, and other suitable fabric surfaces with a reusable cleaning tool.\n\n3. Pet Paw Cleaner\nHelp remove dirt and mud from your dog's paws after walks, outdoor adventures, and playtime.\n\n### WHY YOU'LL LOVE IT:\n- Help reduce loose pet hair around your home.\n- Make everyday pet grooming easier.\n- Help clean muddy paws after outdoor activities.\n- Enjoy three practical pet care essentials in one convenient bundle.\n\nLess Fur. Cleaner Paws. Happier Home.",
     "keyFeatures": [
@@ -201,7 +201,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
         "name": "1. Pet Grooming Gloves",
         "shortDesc": "Gently Removes Loose Fur For a Cleaner, Healthier Pet",
         "fullDesc": "Help remove loose fur while providing a gentle grooming experience for your dog or cat.",
-        "image": "/assets/campaign/grooming_gloves.png",
+        "image": "/assets/campaign/grooming_gloves.webp",
         "badge": "Essential 1 of 3",
         "features": [
           "Removes loose fur efficiently",
@@ -215,7 +215,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
         "name": "2. Zepetz Pet Hair Remover",
         "shortDesc": "Remove Pet Hair Quickly and Easily from Upholstery",
         "fullDesc": "Remove unwanted pet hair from sofas, upholstery, and other suitable fabric surfaces with a reusable cleaning tool.",
-        "image": "/assets/campaign/zepetz_hair_remover.png",
+        "image": "/assets/campaign/zepetz_hair_remover.webp",
         "badge": "Essential 2 of 3",
         "features": [
           "Works on furniture, car seats, and carpets",
@@ -229,7 +229,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
         "name": "3. Pet Paw Cleaner",
         "shortDesc": "Clean Paws in Seconds for a Cleaner Home",
         "fullDesc": "Help remove dirt and mud from your dog's paws after walks, outdoor adventures, and playtime.",
-        "image": "/assets/campaign/paw_cleaner.png",
+        "image": "/assets/campaign/paw_cleaner.webp",
         "badge": "Essential 3 of 3",
         "features": [
           "Quick and easy to use with water",

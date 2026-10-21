@@ -271,6 +271,14 @@ export const BestsellersGrid: React.FC<BestsellersGridProps> = ({
                       referrerPolicy="no-referrer"
                       className="w-full h-full object-cover transition-opacity duration-700 group-hover:opacity-0"
                       loading="lazy"
+                      decoding="async"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (!target.dataset.triedFallback && p.secondaryImage) {
+                          target.dataset.triedFallback = 'true';
+                          target.src = p.secondaryImage;
+                        }
+                      }}
                     />
 
                     {/* Secondary Lifestyle Image on Hover */}
@@ -280,6 +288,7 @@ export const BestsellersGrid: React.FC<BestsellersGridProps> = ({
                       referrerPolicy="no-referrer"
                       className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 scale-100 group-hover:scale-105 transition-all duration-700"
                       loading="lazy"
+                      decoding="async"
                     />
 
                     {/* Out of Stock Overlay Badge */}

@@ -263,6 +263,14 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                       alt={p.name}
                       className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
                       loading="lazy"
+                      decoding="async"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (!target.dataset.triedFallback && p.secondaryImage) {
+                          target.dataset.triedFallback = 'true';
+                          target.src = p.secondaryImage;
+                        }
+                      }}
                     />
 
                     {isOut && (

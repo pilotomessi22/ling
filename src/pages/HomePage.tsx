@@ -25,24 +25,24 @@ export const HomePage: React.FC<HomePageProps> = ({
     {
       title: 'Dogs',
       tagline: 'Orthopedic beds, zero-pull harnesses & durable play toys',
-      image: '/assets/dogs_collection.jpg',
-      fallback: '/assets/aistudio/dogs_collection.jpg',
+      image: '/assets/dogs_collection.webp',
+      fallback: '/assets/dogs_collection.jpg',
       cdnFallback: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=1000&q=80',
       category: 'Dogs',
     },
     {
       title: 'Cats',
       tagline: 'Whisper-quiet water fountains, scratching lounges & kickers',
-      image: '/assets/cats_collection.jpg',
-      fallback: '/assets/aistudio/cats_collection.jpg',
+      image: '/assets/cats_collection.webp',
+      fallback: '/assets/cats_collection.jpg',
       cdnFallback: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1000&q=80',
       category: 'Cats',
     },
     {
       title: 'Essential Gear',
       tagline: 'Elevated dining feeders, travel protectors & daily care',
-      image: '/assets/essential_gear_collection.jpg',
-      fallback: '/assets/aistudio/essential_gear_collection.jpg',
+      image: '/assets/essential_gear_collection.webp',
+      fallback: '/assets/essential_gear_collection.jpg',
       cdnFallback: 'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&w=1000&q=80',
       category: 'all',
     },
@@ -55,14 +55,21 @@ export const HomePage: React.FC<HomePageProps> = ({
         {/* Full-width Edge-to-Edge Background Layer */}
         <div className="absolute inset-0 w-full h-full pointer-events-none">
           <img
-            src="/assets/hero_pets_cozy_harmony.png"
+            src="/assets/hero_pets_cozy_harmony.webp"
             alt="Golden Retriever and Companion Cat"
             className="w-full h-full object-cover object-[82%_center] sm:object-[80%_center] lg:object-[78%_center]"
             loading="eager"
             fetchPriority="high"
+            decoding="async"
             onError={(e) => {
               const target = e.currentTarget;
-              if (!target.dataset.triedCdn) {
+              if (!target.dataset.triedJpg) {
+                target.dataset.triedJpg = 'true';
+                target.src = '/assets/hero_pets_cozy_harmony.jpg';
+              } else if (!target.dataset.triedPng) {
+                target.dataset.triedPng = 'true';
+                target.src = '/assets/hero_pets_cozy_harmony.png';
+              } else if (!target.dataset.triedCdn) {
                 target.dataset.triedCdn = 'true';
                 target.src = 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1600&q=85';
               }
@@ -138,9 +145,21 @@ export const HomePage: React.FC<HomePageProps> = ({
                   className="relative aspect-square rounded-2xl overflow-hidden bg-white border border-[#E2E8F0] shadow-sm cursor-pointer group"
                 >
                   <img
-                    src="/assets/campaign/ultimate_cleanup_kit_cover.png"
+                    src="/assets/campaign/ultimate_cleanup_kit_cover.webp"
                     alt="The Ultimate Pet Cleanup Kit"
                     className="w-full h-full object-contain p-2 group-hover:scale-102 transition-transform duration-500"
+                    loading="lazy"
+                    decoding="async"
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      if (!target.dataset.triedJpg) {
+                        target.dataset.triedJpg = 'true';
+                        target.src = '/assets/campaign/ultimate_cleanup_kit_cover.jpg';
+                      } else if (!target.dataset.triedPng) {
+                        target.dataset.triedPng = 'true';
+                        target.src = '/assets/campaign/ultimate_cleanup_kit_cover.png';
+                      }
+                    }}
                   />
                   <div className="absolute top-4 left-4 flex flex-col gap-1.5">
                     <span className="bg-[#0F2942] text-white text-[10px] sm:text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-xs">
