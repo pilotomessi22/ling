@@ -1,0 +1,1382 @@
+{
+  "1603576": {
+    "id": "1603576",
+    "name": "New Dog Paw Cleaner Cup Soft Silicone Combs Portable Outdoor Pet Foot Washer Paw Clean Brush Quickly Wash Foot Cleaning Bucket",
+    "totalStock": 16060,
+    "isOutOfStock": false,
+    "variantCount": 9,
+    "variants": [
+      {
+        "sku": "1603576_OF0JCIH",
+        "color": "Blue ",
+        "size": "L",
+        "inventory": 1000
+      },
+      {
+        "sku": "1603576_W8P4YV6",
+        "color": "Blue ",
+        "size": "S",
+        "inventory": 1000
+      },
+      {
+        "sku": "1603576_C1K09ND",
+        "color": "Orange",
+        "size": "S",
+        "inventory": 1000
+      },
+      {
+        "sku": "1603576_I0DG0FR",
+        "color": "Orange",
+        "size": "L",
+        "inventory": 1000
+      },
+      {
+        "sku": "1603576_NO0KROZ",
+        "color": "Green",
+        "size": "S",
+        "inventory": 1000
+      },
+      {
+        "sku": "1603576_ZVN7BNQ",
+        "color": "Green",
+        "size": "L",
+        "inventory": 1000
+      },
+      {
+        "sku": "RZZ6OEFBVD",
+        "color": "Blue",
+        "size": null,
+        "inventory": 10060
+      },
+      {
+        "sku": "FYAO3H4P9F",
+        "color": "Green",
+        "size": null,
+        "inventory": 0
+      },
+      {
+        "sku": "J3MSO2SOOO",
+        "color": "Orange",
+        "size": null,
+        "inventory": 0
+      }
+    ]
+  },
+  "2000777": {
+    "id": "2000777",
+    "name": "Pet Dog Bed",
+    "totalStock": 13,
+    "isOutOfStock": false,
+    "variantCount": 20,
+    "variants": [
+      {
+        "sku": "CJJJCWGY01138-Coffee-Bilateral-M",
+        "color": "Coffee / Bilateral",
+        "size": "M",
+        "inventory": 7
+      },
+      {
+        "sku": "CJJJCWGY01138-Grey-Unilateral-M",
+        "color": "Grey / Unilateral",
+        "size": "M",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGY01138-Coffee-Bilateral-XL",
+        "color": "Coffee / Bilateral",
+        "size": "XL",
+        "inventory": 6
+      },
+      {
+        "sku": "CJJJCWGY01138-Grey-Unilateral-XL",
+        "color": "Grey / Unilateral",
+        "size": "XL",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGY01138-Grey-Unilateral-L",
+        "color": "Grey / Unilateral",
+        "size": "L",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGY01138-Grey-Unilateral-S",
+        "color": "Grey / Unilateral",
+        "size": "S",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGY01138-Coffee-Bilateral-L",
+        "color": "Coffee / Bilateral",
+        "size": "L",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGY01138-Coffee-Unilateral-XL",
+        "color": "Coffee / Unilateral",
+        "size": "XL",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGY01138-Coffee-Unilateral-M",
+        "color": "Coffee / Unilateral",
+        "size": "M",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGY01138-Grey-Bilateral-L",
+        "color": "Grey / Bilateral",
+        "size": "L",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGY01138-Coffee-Unilateral-S",
+        "color": "Coffee / Unilateral",
+        "size": "S",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGY01138-Grey-Bilateral-XL",
+        "color": "Grey / Bilateral",
+        "size": "XL",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGY01138-Grey-Bilateral-M",
+        "color": "Grey / Bilateral",
+        "size": "M",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGY01138-Coffee-Unilateral-L",
+        "color": "Coffee / Unilateral",
+        "size": "L",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGY01138-Red-Bilateral-S",
+        "color": "Red / Bilateral",
+        "size": "S",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGY01138-Red-Bilateral-M",
+        "color": "Red / Bilateral",
+        "size": "M",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGY01138-Red-Bilateral-L",
+        "color": "Red / Bilateral",
+        "size": "L",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGY01138-Coffee-Bilateral-S",
+        "color": "Coffee / Bilateral",
+        "size": "S",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGY01138-Red-Bilateral-XL",
+        "color": "Red / Bilateral",
+        "size": "XL",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGY01138-Grey-Bilateral-S",
+        "color": "Grey / Bilateral",
+        "size": "S",
+        "inventory": 0
+      }
+    ]
+  },
+  "2000857": {
+    "id": "2000857",
+    "name": "Pet Feeder Station Lockers",
+    "totalStock": 88,
+    "isOutOfStock": false,
+    "variantCount": 1,
+    "variants": [
+      {
+        "sku": "CJFT219102201AZ",
+        "color": "White",
+        "size": null,
+        "inventory": 88
+      }
+    ]
+  },
+  "2001034": {
+    "id": "2001034",
+    "name": "Pet shoes wear dog shoes",
+    "totalStock": 49,
+    "isOutOfStock": false,
+    "variantCount": 14,
+    "variants": [
+      {
+        "sku": "CJJJCWGD00138-Black-1.",
+        "color": "Black",
+        "size": "1",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGD00138-Black-7.",
+        "color": "Black",
+        "size": "7",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGD00138-Black-8.",
+        "color": "Black",
+        "size": "8",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGD00138-black-5",
+        "color": "black",
+        "size": "5",
+        "inventory": 7
+      },
+      {
+        "sku": "CJJJCWGD00138-black-2",
+        "color": "black",
+        "size": "2",
+        "inventory": 25
+      },
+      {
+        "sku": "CJJJCWGD00138-black-3",
+        "color": "black",
+        "size": "3",
+        "inventory": 5
+      },
+      {
+        "sku": "CJJJCWGD00138-Black-No7",
+        "color": "Black",
+        "size": "No7",
+        "inventory": 8
+      },
+      {
+        "sku": "CJJJCWGD00138-Black-No8",
+        "color": "Black",
+        "size": "No8",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGD00138-black-4",
+        "color": "black",
+        "size": "4",
+        "inventory": 4
+      },
+      {
+        "sku": "CJJJCWGD00138-black-6",
+        "color": "black",
+        "size": "6",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGD00138-Black-1.",
+        "color": "Black",
+        "size": "1.",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGD00138-Black-7.",
+        "color": "Black",
+        "size": "7.",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGD00138-Black-No1",
+        "color": "Black",
+        "size": "No1",
+        "inventory": 0
+      },
+      {
+        "sku": "CJJJCWGD00138-Black-8.",
+        "color": "Black",
+        "size": "8.",
+        "inventory": 0
+      }
+    ]
+  },
+  "2001114": {
+    "id": "2001114",
+    "name": "Pet Water Dispenser",
+    "totalStock": 81,
+    "isOutOfStock": false,
+    "variantCount": 2,
+    "variants": [
+      {
+        "sku": "CJGY210850501AZ",
+        "color": null,
+        "size": "A",
+        "inventory": 0
+      },
+      {
+        "sku": "CJGY210850502BY",
+        "color": null,
+        "size": "B",
+        "inventory": 81
+      }
+    ]
+  },
+  "2038976": {
+    "id": "2038976",
+    "name": "Pet Dog Grooming Arm Accessories - Pet Dog Grooming Belly Straps with Connector Pet Dog Grooming Belly Support Band Dog Grooming Table Arm Supplies Pet Dog Grooming Loops Dog Loop Heart Pattern",
+    "totalStock": 50000,
+    "isOutOfStock": false,
+    "variantCount": 1,
+    "variants": [
+      {
+        "sku": "B0CRHNYTW4",
+        "color": "Color-2 (long)",
+        "size": "",
+        "inventory": 50000
+      }
+    ]
+  },
+  "2040471": {
+    "id": "2040471",
+    "name": "Puppy Pads XL Pee Pads for Dogs 28\"x34\" Pack of 30 homepads Puppy Pee Pads for Dogs Disposable Potty Training Pads New Leak-Proof Quick-Dry Design Pads for Dogs Cats Pets",
+    "totalStock": 0,
+    "isOutOfStock": true,
+    "variantCount": 1,
+    "variants": [
+      {
+        "sku": "B0CL6MVCMH",
+        "color": "",
+        "size": "28\" x 34\" 30-Count",
+        "inventory": 0
+      }
+    ]
+  },
+  "2040754": {
+    "id": "2040754",
+    "name": "Super-Absorbent Waterproof Dog and Puppy Pet Training Pad Housebreaking Pet PadBlue (28\"X30\"(100PCS))",
+    "totalStock": 50000,
+    "isOutOfStock": false,
+    "variantCount": 1,
+    "variants": [
+      {
+        "sku": "B0CWNR166T",
+        "color": "100 PCS",
+        "size": "28\"X30\"",
+        "inventory": 50000
+      }
+    ]
+  },
+  "2041862": {
+    "id": "2041862",
+    "name": "Petmate 290206 Aspen Pet Oval Cuddler Pet Bed 20\" x 16\" Chocolate Brown",
+    "totalStock": 50000,
+    "isOutOfStock": false,
+    "variantCount": 1,
+    "variants": [
+      {
+        "sku": "B0093Z7L78",
+        "color": "Chocolate Brown",
+        "size": "20.0\"L x 16.0\"W x 5.5\"Th",
+        "inventory": 50000
+      }
+    ]
+  },
+  "2042070": {
+    "id": "2042070",
+    "name": "Merry Pet MPS002 Wood Room with a View Pet House",
+    "totalStock": 50000,
+    "isOutOfStock": false,
+    "variantCount": 1,
+    "variants": [
+      {
+        "sku": "B000EGVZE0",
+        "color": "Wood Room with a View",
+        "size": "21\" x 29\" x 26\"",
+        "inventory": 50000
+      }
+    ]
+  },
+  "2044170": {
+    "id": "2044170",
+    "name": "homeika pro Dog Grooming Kit&Vacuum 3L Pet Grooming Vacuum 99% Pet Hair Suction 5 Pet Grooming Tools 5 Combs Quiet Pet Vacuum Groomer with Hair Roller Massage Nozzle for Shedding Dogs White",
+    "totalStock": 50000,
+    "isOutOfStock": false,
+    "variantCount": 1,
+    "variants": [
+      {
+        "sku": "B0D83N3J5Y",
+        "color": "White",
+        "size": "",
+        "inventory": 50000
+      }
+    ]
+  },
+  "2047664": {
+    "id": "2047664",
+    "name": "Plato Pet Treats Natural Pet Treats Chicken 22 oz",
+    "totalStock": 50000,
+    "isOutOfStock": false,
+    "variantCount": 1,
+    "variants": [
+      {
+        "sku": "B00IQCLXSW",
+        "color": "",
+        "size": "",
+        "inventory": 50000
+      }
+    ]
+  },
+  "2051156": {
+    "id": "2051156",
+    "name": "MYLUCKYTAG Service Dog Tag QR Code Stainless Steel Pet ID Tag Dog Tag Online Pet Profile Pet Location Alert Email Digital Pet Tag Durable Pet ID Dog Collar Tag Engraved Pet Tag",
+    "totalStock": 50000,
+    "isOutOfStock": false,
+    "variantCount": 1,
+    "variants": [
+      {
+        "sku": "B0BY48BSMQ",
+        "color": "Service Dog, Stainless Steel, Rose Glod",
+        "size": "",
+        "inventory": 50000
+      }
+    ]
+  },
+  "2053714": {
+    "id": "2053714",
+    "name": "ZepetZ Pet Hair Remover New Ergonomic Handle for Superior Grip – Ideal for Cleaning Furniture Carpets Car Seats and Bedding – Reusable Lint Roller for Versatile Multi-Surface Fur Removal. (White)",
+    "totalStock": 50000,
+    "isOutOfStock": false,
+    "variantCount": 1,
+    "variants": [
+      {
+        "sku": "B0DCC65HZT",
+        "color": "White",
+        "size": "",
+        "inventory": 50000
+      }
+    ]
+  },
+  "2058716": {
+    "id": "2058716",
+    "name": "Pet Grooming Glove - Gentle Deshedding Brush Glove - Efficient Pet Hair Remover Mitt - Massage Tool Enhanced Five Finger Design - Perfect for Dogs & Cats with Long & Short Fur with Training Whistle",
+    "totalStock": 50000,
+    "isOutOfStock": false,
+    "variantCount": 1,
+    "variants": [
+      {
+        "sku": "B0D186JJRY",
+        "color": "",
+        "size": "",
+        "inventory": 50000
+      }
+    ]
+  },
+  "2063694": {
+    "id": "2063694",
+    "name": "Disposable Pet Bath Towel10 PCS Portable Pet Grooming Towels19.6 x 21.6 inch Convenient Pet Cleaning Towel Pet Drying TowelsAbsorbent Bath Towel for Medium Dog",
+    "totalStock": 50000,
+    "isOutOfStock": false,
+    "variantCount": 1,
+    "variants": [
+      {
+        "sku": "B0D65H1V19",
+        "color": "",
+        "size": "Medium",
+        "inventory": 50000
+      }
+    ]
+  },
+  "2066233": {
+    "id": "2066233",
+    "name": "Pet Lodge® Water Tower Deluxe | Automatic Pet Waterer | Automatic Animal Water Dispenser | 16 Quart",
+    "totalStock": 50000,
+    "isOutOfStock": false,
+    "variantCount": 1,
+    "variants": [
+      {
+        "sku": "B00Q71EMRI",
+        "color": "",
+        "size": "",
+        "inventory": 50000
+      }
+    ]
+  },
+  "2066498": {
+    "id": "2066498",
+    "name": "Sharper Image Elevated Pet Bowls with Storage and 3 in 1 Pet Scooper Clip",
+    "totalStock": 50000,
+    "isOutOfStock": false,
+    "variantCount": 1,
+    "variants": [
+      {
+        "sku": "B07WTMKD4S",
+        "color": "",
+        "size": "",
+        "inventory": 50000
+      }
+    ]
+  },
+  "2069888": {
+    "id": "2069888",
+    "name": "CURMIO Pet Grooming Tote Bag Pet Grooming Supplies Organizer for Cat Dog grooming kit Pet Supplies Storage Bag for Dog Cat Clippers Brush Scissors or Other Pet Care Supplies Black (BAG ONLY)",
+    "totalStock": 50000,
+    "isOutOfStock": false,
+    "variantCount": 1,
+    "variants": [
+      {
+        "sku": "B0C9J8YTW5",
+        "color": "",
+        "size": "",
+        "inventory": 50000
+      }
+    ]
+  },
+  "2070193": {
+    "id": "2070193",
+    "name": "Pet Parents® Pet WiPees™ Dog All Purpose + Skin & Coat Pet Wipes Pet Wipes for Dogs Dog Wipes & Puppy Wipes Paw Wipes for Dogs (100 Count (Pack of 1) Calming)",
+    "totalStock": 50000,
+    "isOutOfStock": false,
+    "variantCount": 1,
+    "variants": [
+      {
+        "sku": "B0CHWNLGMK",
+        "color": "Calming",
+        "size": "100 Count (Pack of 1)",
+        "inventory": 50000
+      }
+    ]
+  },
+  "2072717": {
+    "id": "2072717",
+    "name": "BWOGUE Pet Bat Wings Costume for Cat & Dog Pet Apparel Clothes for Halloween Party Small",
+    "totalStock": 50000,
+    "isOutOfStock": false,
+    "variantCount": 1,
+    "variants": [
+      {
+        "sku": "B07H782H3Q",
+        "color": "Bat wings",
+        "size": "S(Neck:6-8.5\"Chest:11-13\")",
+        "inventory": 50000
+      }
+    ]
+  },
+  "2073024": {
+    "id": "2073024",
+    "name": "Begleys Pet Stain and Odor Remover - Pet Odor Eliminator for Home - Pet Urine Enzyme Cleaner - Pet Carpet Cleaner for Pets - Enzymatic Cleaner for Dog Urine Cat Pee Feces - 24 Ounce 2 Pack",
+    "totalStock": 50000,
+    "isOutOfStock": false,
+    "variantCount": 1,
+    "variants": [
+      {
+        "sku": "B00J5HN5WY",
+        "color": "",
+        "size": "24 Fl Oz (Pack of 2)",
+        "inventory": 50000
+      }
+    ]
+  },
+  "2601227": {
+    "id": "2601227",
+    "name": "Pet Mat Single Piece",
+    "totalStock": 100000,
+    "isOutOfStock": false,
+    "variantCount": 2,
+    "variants": [
+      {
+        "sku": "1842507882752049153",
+        "color": "L: 80*60*20 cm / 31.5*23.62*7.87 in",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1842507882752049155",
+        "color": "XL: 100*80*20 cm / 39.37*31.5*7.87 in",
+        "size": null,
+        "inventory": 50000
+      }
+    ]
+  },
+  "2608657": {
+    "id": "2608657",
+    "name": "Dog Wheelchair for Pets with Disabilities (One Set)",
+    "totalStock": 150000,
+    "isOutOfStock": false,
+    "variantCount": 3,
+    "variants": [
+      {
+        "sku": "1805179251792748544",
+        "color": "P",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1805179251792748545",
+        "color": "M",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1805179251792748546",
+        "color": "G",
+        "size": null,
+        "inventory": 50000
+      }
+    ]
+  },
+  "2626089": {
+    "id": "2626089",
+    "name": "Waterproof and Windproof Work Clothes Rush Suit",
+    "totalStock": 700000,
+    "isOutOfStock": false,
+    "variantCount": 14,
+    "variants": [
+      {
+        "sku": "1790337554260451335",
+        "color": "Mossy green / 5",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1790337554260451355",
+        "color": "Offwhite / 8",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1790337554260451351",
+        "color": "Offwhite / 6",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1790337554260451329",
+        "color": "Mossy green / 2",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1790337554260451347",
+        "color": "Offwhite / 4",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1790337554260451353",
+        "color": "Offwhite / 7",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1790337554260451331",
+        "color": "Mossy green / 3",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1790337554260451339",
+        "color": "Mossy green / 7",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1790337554260451343",
+        "color": "Offwhite / 2",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1790337554260451337",
+        "color": "Mossy green / 6",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1790337554260451349",
+        "color": "Offwhite / 5",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1790337554260451345",
+        "color": "Offwhite / 3",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1790337554260451333",
+        "color": "Mossy green / 4",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1790337554260451341",
+        "color": "Mossy green / 8",
+        "size": null,
+        "inventory": 50000
+      }
+    ]
+  },
+  "2631448": {
+    "id": "2631448",
+    "name": "Stainless Steel P Chain Dog Leash",
+    "totalStock": 600000,
+    "isOutOfStock": false,
+    "variantCount": 12,
+    "variants": [
+      {
+        "sku": "1790307435567407109",
+        "color": "Gold",
+        "size": "23MM*50CM",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790307435567407117",
+        "color": "Silver",
+        "size": "23mm*40CM",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790307435567407121",
+        "color": "Silver",
+        "size": "23MM*50CM",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790307435567407119",
+        "color": "Silver",
+        "size": "23mm*45CM",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790307435567407115",
+        "color": "Gold",
+        "size": "23MM*65CM",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790307435567407107",
+        "color": "Gold",
+        "size": "23mm*45CM",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790307435567407123",
+        "color": "Silver",
+        "size": "23MM*55CM",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790307435567407125",
+        "color": "Silver",
+        "size": "23MM*60CM",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790307435567407105",
+        "color": "Gold",
+        "size": "23mm*40CM",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790307435567407127",
+        "color": "Silver",
+        "size": "23MM*65CM",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790307435567407111",
+        "color": "Gold",
+        "size": "23MM*55CM",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790307435567407113",
+        "color": "Gold",
+        "size": "23MM*60CM",
+        "inventory": 50000
+      }
+    ]
+  },
+  "2632492": {
+    "id": "2632492",
+    "name": "Non-slip Stainless Steel Dog Bowl for Medium & Large Dogs",
+    "totalStock": 1000000,
+    "isOutOfStock": false,
+    "variantCount": 20,
+    "variants": [
+      {
+        "sku": "1790306647185051685",
+        "color": "Rose red bottom",
+        "size": "S",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790306647185051655",
+        "color": "BB green background",
+        "size": "XL",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790306647185051667",
+        "color": "Black background",
+        "size": "M",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790306647185051663",
+        "color": "BB orange bottom",
+        "size": "XL",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790306647185051669",
+        "color": "Black background",
+        "size": "S",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790306647185051653",
+        "color": "BB green background",
+        "size": "S",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790306647185051679",
+        "color": "Grass blue background",
+        "size": "XL",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790306647185051661",
+        "color": "BB orange bottom",
+        "size": "S",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790306647185051659",
+        "color": "BB orange bottom",
+        "size": "M",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790306647185051665",
+        "color": "Black background",
+        "size": "L",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790306647185051675",
+        "color": "Grass blue background",
+        "size": "M",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790306647185051651",
+        "color": "BB green background",
+        "size": "M",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790306647185051687",
+        "color": "Rose red bottom",
+        "size": "XL",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790306647185051681",
+        "color": "Rose red bottom",
+        "size": "L",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790306647185051673",
+        "color": "Grass blue background",
+        "size": "L",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790306647185051671",
+        "color": "Black background",
+        "size": "XL",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790306647185051657",
+        "color": "BB orange bottom",
+        "size": "L",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790306647185051649",
+        "color": "BB green background",
+        "size": "L",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790306647185051677",
+        "color": "Grass blue background",
+        "size": "S",
+        "inventory": 50000
+      },
+      {
+        "sku": "1790306647185051683",
+        "color": "Rose red bottom",
+        "size": "M",
+        "inventory": 50000
+      }
+    ]
+  },
+  "2640918": {
+    "id": "2640918",
+    "name": "Waterproof Thickened Dog Cushion for Car Rear",
+    "totalStock": 50000,
+    "isOutOfStock": false,
+    "variantCount": 1,
+    "variants": [
+      {
+        "sku": "1813814489083473922",
+        "color": "Black with net",
+        "size": "130X145X40cm",
+        "inventory": 50000
+      }
+    ]
+  },
+  "2650189": {
+    "id": "2650189",
+    "name": "Portable One-Shoulder Folding Pet Carrier Bag",
+    "totalStock": 150000,
+    "isOutOfStock": false,
+    "variantCount": 4,
+    "variants": [
+      {
+        "sku": "2650189_jqr001",
+        "color": "Grey with blue border",
+        "size": "46×28×28 cm",
+        "inventory": 50000
+      },
+      {
+        "sku": "2650189_jqr002",
+        "color": "Grey with green border",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "2650189_jqr003",
+        "color": "Grey with blue border",
+        "size": null,
+        "inventory": 0
+      },
+      {
+        "sku": "2650189_jqr004",
+        "color": "Grey with orange border",
+        "size": null,
+        "inventory": 50000
+      }
+    ]
+  },
+  "2658755": {
+    "id": "2658755",
+    "name": "Waterproof Windbreaker for Small Dogs - Chest & Back",
+    "totalStock": 750000,
+    "isOutOfStock": false,
+    "variantCount": 15,
+    "variants": [
+      {
+        "sku": "1789778151065002001",
+        "color": "Yellow",
+        "size": "2XL",
+        "inventory": 50000
+      },
+      {
+        "sku": "1789778151065001987",
+        "color": "Blue",
+        "size": "S",
+        "inventory": 50000
+      },
+      {
+        "sku": "1789778151060807683",
+        "color": "Blue",
+        "size": "L",
+        "inventory": 50000
+      },
+      {
+        "sku": "1789778151065001995",
+        "color": "Red",
+        "size": "M",
+        "inventory": 50000
+      },
+      {
+        "sku": "1789778151065001989",
+        "color": "Blue",
+        "size": "XL",
+        "inventory": 50000
+      },
+      {
+        "sku": "1789778151065001985",
+        "color": "Blue",
+        "size": "M",
+        "inventory": 50000
+      },
+      {
+        "sku": "1789778151065001991",
+        "color": "Red",
+        "size": "2XL",
+        "inventory": 50000
+      },
+      {
+        "sku": "1789778151065002003",
+        "color": "Yellow",
+        "size": "L",
+        "inventory": 50000
+      },
+      {
+        "sku": "1789778151065001997",
+        "color": "Red",
+        "size": "S",
+        "inventory": 50000
+      },
+      {
+        "sku": "1789778151060807681",
+        "color": "Blue",
+        "size": "2XL",
+        "inventory": 50000
+      },
+      {
+        "sku": "1789778151065002009",
+        "color": "Yellow",
+        "size": "XL",
+        "inventory": 50000
+      },
+      {
+        "sku": "1789778151065002005",
+        "color": "Yellow",
+        "size": "M",
+        "inventory": 50000
+      },
+      {
+        "sku": "1789778151065001999",
+        "color": "Red",
+        "size": "XL",
+        "inventory": 50000
+      },
+      {
+        "sku": "1789778151065002007",
+        "color": "Yellow",
+        "size": "S",
+        "inventory": 50000
+      },
+      {
+        "sku": "1789778151065001993",
+        "color": "Red",
+        "size": "L",
+        "inventory": 50000
+      }
+    ]
+  },
+  "2689252": {
+    "id": "2689252",
+    "name": "Titanium Stainless Steel Bull Dog Full Head Collar",
+    "totalStock": 100000,
+    "isOutOfStock": false,
+    "variantCount": 2,
+    "variants": [
+      {
+        "sku": "1788774631973068801",
+        "color": "Gold",
+        "size": "12inch",
+        "inventory": 50000
+      },
+      {
+        "sku": "1788774631973068817",
+        "color": "Silver",
+        "size": "12inch",
+        "inventory": 50000
+      }
+    ]
+  },
+  "2699708": {
+    "id": "2699708",
+    "name": "Cat Scratch Board with Sisal Toy and Nail Care",
+    "totalStock": 250000,
+    "isOutOfStock": false,
+    "variantCount": 5,
+    "variants": [
+      {
+        "sku": "1785285283185164290",
+        "color": "Green",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1785285283185164288",
+        "color": "Black",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1785285283185164291",
+        "color": "Red",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1785285283185164292",
+        "color": "GRAY",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1785285283185164293",
+        "color": "Blue",
+        "size": null,
+        "inventory": 50000
+      }
+    ]
+  },
+  "2873973": {
+    "id": "2873973",
+    "name": "Large Semi-Enclosed Cat Litter Box with Shovel",
+    "totalStock": 300000,
+    "isOutOfStock": false,
+    "variantCount": 6,
+    "variants": [
+      {
+        "sku": "1775133198995484674",
+        "color": "Small Pink",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1795441770910121990",
+        "color": "Big White",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1775133198995484672",
+        "color": "Big Pink",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1775133198995484673",
+        "color": "Big Green",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1795441770910121993",
+        "color": "Small White",
+        "size": null,
+        "inventory": 50000
+      },
+      {
+        "sku": "1775133198995484675",
+        "color": "Small Green",
+        "size": null,
+        "inventory": 50000
+      }
+    ]
+  },
+  "3090659": {
+    "id": "3090659",
+    "name": "Pet Intelligent Timing Quantitative Remote Automatic Pet Feeder",
+    "totalStock": 406359,
+    "isOutOfStock": false,
+    "variantCount": 32,
+    "variants": [
+      {
+        "sku": "CJYD212524914NM",
+        "color": "Black Button",
+        "size": "Eu",
+        "inventory": 14829
+      },
+      {
+        "sku": "CJYD212524915OL",
+        "color": "White WiFi",
+        "size": "Eu",
+        "inventory": 13596
+      },
+      {
+        "sku": "CJYD212524931EV",
+        "color": "White WiFi",
+        "size": "JP",
+        "inventory": 14349
+      },
+      {
+        "sku": "CJYD212524926ZA",
+        "color": "Black Button",
+        "size": "KR",
+        "inventory": 11467
+      },
+      {
+        "sku": "CJYD212524904DW",
+        "color": "Black WiFi",
+        "size": "No Adapter",
+        "inventory": 14804
+      },
+      {
+        "sku": "CJYD212524901AZ",
+        "color": "White Button Style",
+        "size": "No Adapter",
+        "inventory": 12582
+      },
+      {
+        "sku": "CJYD212524903CX",
+        "color": "White WiFi",
+        "size": "No Adapter",
+        "inventory": 13451
+      },
+      {
+        "sku": "CJYD212524918RI",
+        "color": "Black Button",
+        "size": "UK",
+        "inventory": 12608
+      },
+      {
+        "sku": "CJYD212524917QJ",
+        "color": "White Button Style",
+        "size": "UK",
+        "inventory": 10652
+      },
+      {
+        "sku": "CJYD212524906FU",
+        "color": "Black Button",
+        "size": "US",
+        "inventory": 13161
+      },
+      {
+        "sku": "CJYD212524908HS",
+        "color": "Black WiFi",
+        "size": "US",
+        "inventory": 10650
+      },
+      {
+        "sku": "CJYD212524907GT",
+        "color": "White WiFi",
+        "size": "US",
+        "inventory": 12786
+      },
+      {
+        "sku": "CJYD212524920TG",
+        "color": "Black WiFi",
+        "size": "UK",
+        "inventory": 11818
+      },
+      {
+        "sku": "CJYD212524923WD",
+        "color": "White WiFi",
+        "size": "AU",
+        "inventory": 12390
+      },
+      {
+        "sku": "CJYD212524928BY",
+        "color": "Black WiFi",
+        "size": "KR",
+        "inventory": 14183
+      },
+      {
+        "sku": "CJYD212524925YB",
+        "color": "White Button Style",
+        "size": "KR",
+        "inventory": 13282
+      },
+      {
+        "sku": "CJYD212524911KP",
+        "color": "White WiFi",
+        "size": "CN",
+        "inventory": 14588
+      },
+      {
+        "sku": "CJYD212524930DW",
+        "color": "Black Button",
+        "size": "JP",
+        "inventory": 14109
+      },
+      {
+        "sku": "CJYD212524924XC",
+        "color": "Black WiFi",
+        "size": "AU",
+        "inventory": 13051
+      },
+      {
+        "sku": "CJYD212524922VE",
+        "color": "Black Button",
+        "size": "AU",
+        "inventory": 10451
+      },
+      {
+        "sku": "CJYD212524919SH",
+        "color": "White WiFi",
+        "size": "UK",
+        "inventory": 13275
+      },
+      {
+        "sku": "CJYD212524905EV",
+        "color": "White Button Style",
+        "size": "US",
+        "inventory": 14105
+      },
+      {
+        "sku": "CJYD212524927AZ",
+        "color": "White WiFi",
+        "size": "KR",
+        "inventory": 12350
+      },
+      {
+        "sku": "CJYD212524909IR",
+        "color": "White Button Style",
+        "size": "CN",
+        "inventory": 12460
+      },
+      {
+        "sku": "CJYD212524921UF",
+        "color": "White Button Style",
+        "size": "AU",
+        "inventory": 13021
+      },
+      {
+        "sku": "CJYD212524916PK",
+        "color": "Black WiFi",
+        "size": "Eu",
+        "inventory": 10990
+      },
+      {
+        "sku": "CJYD212524913MN",
+        "color": "White Button Style",
+        "size": "Eu",
+        "inventory": 10547
+      },
+      {
+        "sku": "CJYD212524902BY",
+        "color": "Black Button",
+        "size": "No Adapter",
+        "inventory": 12597
+      },
+      {
+        "sku": "CJYD212524910JQ",
+        "color": "Black Button",
+        "size": "CN",
+        "inventory": 13408
+      },
+      {
+        "sku": "CJYD212524912LO",
+        "color": "Black WiFi",
+        "size": "CN",
+        "inventory": 10983
+      },
+      {
+        "sku": "CJYD212524932FU",
+        "color": "Black WiFi",
+        "size": "JP",
+        "inventory": 10192
+      },
+      {
+        "sku": "CJYD212524929CX",
+        "color": "White Button Style",
+        "size": "JP",
+        "inventory": 13624
+      }
+    ]
+  }
+}

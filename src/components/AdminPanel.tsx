@@ -1230,6 +1230,57 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const [isImporting, setIsImporting] = useState(false);
   const [importSuccessMsg, setImportSuccessMsg] = useState<string | null>(null);
 
+  // Real-time Zendrop Inventory Sync state
+  const [isSyncingInventory, setIsSyncingInventory] = useState(false);
+  const [syncInventoryFeedback, setSyncInventoryFeedback] = useState<string | null>(null);
+
+  const handleSyncZendropInventory = async () => {
+    setIsSyncingInventory(true);
+    setSyncInventoryFeedback(null);
+    try {
+      const res = await fetch('/api/zendrop/sync-all-inventory', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ force: true }),
+      });
+      const data = await res.json();
+      if (data.success && data.stocks) {
+        setActiveProducts((prev) => {
+          const updated = prev.map((p) => {
+            const zdId = p.id.replace('zendrop-', '');
+            const stockInfo = data.stocks[zdId];
+            if (stockInfo) {
+              return {
+                ...p,
+                stockCount: stockInfo.stockCount,
+                inStockAustin: stockInfo.inStock,
+              };
+            }
+            return p;
+          });
+          saveProductsToStorage(updated);
+          return updated;
+        });
+
+        const oosCount = data.outOfStockCount || 0;
+        const msg = `✅ Sincronização em tempo real concluída! ${data.syncedCount} produtos verificados na API do Zendrop. ${
+          oosCount > 0
+            ? `${oosCount} produto(s) identificado(s) como ESGOTADO(S) (ex: Puppy Pads XL Pee Pads com 0 un.).`
+            : 'Todos os produtos possuem unidades disponíveis em estoque nos EUA.'
+        }`;
+        setSyncInventoryFeedback(msg);
+        setImportSuccessMsg(msg);
+        setTimeout(() => setImportSuccessMsg(null), 8000);
+      } else {
+        setImportSuccessMsg('⚠️ Falha ao obter dados em tempo real da API Zendrop. Verifique a conexão.');
+      }
+    } catch (err: any) {
+      setImportSuccessMsg(`❌ Erro ao conectar com o serviço de sincronização: ${err.message}`);
+    } finally {
+      setIsSyncingInventory(false);
+    }
+  };
+
   const handleAutoImport = async (customTitle?: string) => {
     const rawText = (customTitle || autoFillInput || importInput || '').trim();
     if (!rawText) return;
@@ -1334,8 +1385,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
               isBestseller: true,
               isLingPick: true,
               repeatDeliveryEligible: false,
-              inStockAustin: true,
-              stockCount: apiProduct.stock || 250,
+              inStockAustin: typeof apiProduct.stock === 'number' ? apiProduct.stock > 0 : true,
+              stockCount: typeof apiProduct.stock === 'number' ? apiProduct.stock : 250,
               heroImage: images[0],
               secondaryImage: images[1] || images[0],
               galleryImages: images,
@@ -1549,6 +1600,42 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
     localStorage.setItem('ling_admin_orders', JSON.stringify(orders));
   }, [orders]);
 
+  // Background check for real-time Zendrop inventory on mount
+  useEffect(() => {
+    let isMounted = true;
+    fetch('/api/zendrop/sync-all-inventory')
+      .then((res) => res.json())
+      .then((data) => {
+        if (!isMounted || !data?.success || !data?.stocks) return;
+        setActiveProducts((prev) => {
+          let hasChanges = false;
+          const updated = prev.map((p) => {
+            const zdId = p.id.replace('zendrop-', '');
+            const stockInfo = data.stocks[zdId];
+            if (stockInfo && (p.stockCount !== stockInfo.stockCount || p.inStockAustin !== stockInfo.inStock)) {
+              hasChanges = true;
+              return {
+                ...p,
+                stockCount: stockInfo.stockCount,
+                inStockAustin: stockInfo.inStock,
+              };
+            }
+            return p;
+          });
+          if (hasChanges) {
+            saveProductsToStorage(updated);
+            return updated;
+          }
+          return prev;
+        });
+      })
+      .catch(() => {});
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
 
 
   const handleLogout = () => {
@@ -1665,9 +1752,15 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
   // Filtered & sorted catalog products
   const filteredCatalogProducts = enrichedCatalogProducts
     .filter((p) => {
-      if (catalogCategory === 'Dogs' && !(p.department === 'Dogs' || p.petType === 'Dog')) return false;
-      if (catalogCategory === 'Cats' && !(p.department === 'Cats' || p.petType === 'Cat')) return false;
-      if (
+      if (catalogCategory === 'out-of-stock') {
+        if (p.stockCount !== 0) return false;
+      } else if (catalogCategory === 'in-stock') {
+        if ((p.stockCount ?? 0) <= 0) return false;
+      } else if (catalogCategory === 'Dogs' && !(p.department === 'Dogs' || p.petType === 'Dog')) {
+        return false;
+      } else if (catalogCategory === 'Cats' && !(p.department === 'Cats' || p.petType === 'Cat')) {
+        return false;
+      } else if (
         catalogCategory !== 'all' &&
         catalogCategory !== 'Dogs' &&
         catalogCategory !== 'Cats' &&
@@ -2174,7 +2267,18 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+                <button
+                  type="button"
+                  onClick={handleSyncZendropInventory}
+                  disabled={isSyncingInventory}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs px-4 py-3.5 rounded-2xl shadow-md flex items-center gap-2 cursor-pointer transition-all hover:scale-102 active:scale-98 disabled:opacity-50"
+                  title="Consulta a API do Zendrop em tempo real para verificar estoques e atualizar status"
+                >
+                  <RefreshCw size={15} className={isSyncingInventory ? 'animate-spin' : ''} />
+                  <span>{isSyncingInventory ? 'Sincronizando...' : '🔄 Sincronizar Estoque Zendrop (Tempo Real)'}</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => setIsAddProductOpen(true)}
@@ -2202,12 +2306,21 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
                   </p>
                 </div>
 
-                <div className="shrink-0 bg-white/10 backdrop-blur-xs p-3 rounded-2xl border border-white/15 text-center min-w-[170px]">
+                <div className="shrink-0 bg-white/10 backdrop-blur-xs p-3 rounded-2xl border border-white/15 text-center min-w-[180px]">
                   <span className="text-[10px] uppercase font-bold text-blue-300 block">Status Conexão API Zendrop</span>
                   <span className="inline-flex items-center gap-1.5 text-emerald-300 font-black text-xs mt-1">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                     API Zendrop Conectada
                   </span>
+                  <button
+                    type="button"
+                    onClick={handleSyncZendropInventory}
+                    disabled={isSyncingInventory}
+                    className="mt-2 w-full bg-emerald-400 hover:bg-emerald-300 text-stone-950 font-black text-[11px] py-1.5 px-2 rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs disabled:opacity-50"
+                  >
+                    <RefreshCw size={12} className={isSyncingInventory ? 'animate-spin' : ''} />
+                    <span>{isSyncingInventory ? 'Sincronizando...' : 'Sincronizar Estoque Agora'}</span>
+                  </button>
                 </div>
               </div>
 
@@ -2320,11 +2433,15 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
 
               <div className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-200 shadow-xs">
                 <div className="flex items-center justify-between text-gray-500 mb-1">
-                  <span className="text-[11px] font-bold uppercase tracking-wider">Armazéns EUA CJ</span>
-                  <Truck size={18} className="text-amber-600" />
+                  <span className="text-[11px] font-bold uppercase tracking-wider">Estoque Real Zendrop</span>
+                  <Package size={18} className="text-blue-600" />
                 </div>
-                <p className="text-2xl font-black text-[#002244]">NJ & CA</p>
-                <p className="text-[11px] text-gray-500 mt-0.5">3–5 dias úteis via USPS</p>
+                <p className={`text-2xl font-black ${activeProducts.filter((p) => p.stockCount === 0).length > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                  {activeProducts.filter((p) => p.stockCount === 0).length > 0
+                    ? `${activeProducts.filter((p) => p.stockCount === 0).length} Esgotado(s)`
+                    : '100% Em Estoque'}
+                </p>
+                <p className="text-[11px] text-gray-500 mt-0.5">Sincronizado via Zendrop API</p>
               </div>
             </div>
 
@@ -2476,6 +2593,8 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
               <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1">
                 {[
                   { label: 'Todos os Produtos', value: 'all', count: activeProducts.length },
+                  { label: '🔴 Esgotados no Zendrop', value: 'out-of-stock', count: activeProducts.filter((p) => p.stockCount === 0).length },
+                  { label: '🟢 Em Estoque', value: 'in-stock', count: activeProducts.filter((p) => (p.stockCount ?? 0) > 0).length },
                   { label: '🐶 Cães', value: 'Dogs', count: activeProducts.filter((p) => p.department === 'Dogs' || p.petType === 'Dog').length },
                   { label: '🐱 Gatos', value: 'Cats', count: activeProducts.filter((p) => p.department === 'Cats' || p.petType === 'Cat').length },
                   { label: '🛏️ Caminhas', value: 'Beds', count: activeProducts.filter((p) => p.category === 'Beds').length },
@@ -2547,11 +2666,16 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
                           alt={p.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
-                        {p.badge && (
+                        {p.stockCount === 0 ? (
+                          <span className="absolute top-3 left-3 bg-red-600/95 backdrop-blur-xs text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-md flex items-center gap-1.5 animate-pulse">
+                            <span className="w-1.5 h-1.5 rounded-full bg-white"></span>
+                            ESGOTADO NO ZENDROP
+                          </span>
+                        ) : p.badge ? (
                           <span className="absolute top-3 left-3 bg-[#002244]/90 backdrop-blur-xs text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-xs">
                             {p.badge}
                           </span>
-                        )}
+                        ) : null}
 
                         <div className="absolute bottom-3 right-3 flex items-center gap-1.5">
                           <button
@@ -2638,14 +2762,18 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
                             <span className="text-gray-600 font-bold flex items-center gap-1">
                               <Package size={13} className="text-blue-600" /> Estoque Real Zendrop:
                             </span>
-                            <span className={`font-black px-2 py-0.5 rounded-full text-[10px] border flex items-center gap-1 ${
-                              (p.stockCount ?? 100) >= 50
+                            <span className={`font-black px-2.5 py-0.5 rounded-full text-[10px] border flex items-center gap-1 ${
+                              p.stockCount === 0
+                                ? 'bg-red-100 text-red-900 border-red-300 font-black'
+                                : (p.stockCount ?? 0) >= 50
                                 ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                                : (p.stockCount ?? 100) >= 10
-                                ? 'bg-amber-50 text-amber-800 border-amber-200'
-                                : 'bg-red-50 text-red-800 border-red-200'
+                                : 'bg-amber-50 text-amber-800 border-amber-200'
                             }`}>
-                              <span>{p.stockCount ?? 100} un. disponíveis</span>
+                              <span>
+                                {p.stockCount === 0
+                                  ? '🔴 ESGOTADO (0 un.)'
+                                  : `${(p.stockCount ?? 0).toLocaleString()} un. disponíveis`}
+                              </span>
                             </span>
                           </div>
                         </div>

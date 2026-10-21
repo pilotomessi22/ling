@@ -197,15 +197,27 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             </div>
 
             {/* Real-time Zendrop Stock Callout */}
-            <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-2xl flex items-center justify-between gap-2 text-xs text-emerald-900">
-              <div className="flex items-center gap-2 font-bold">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-                <span>Em estoque em tempo real ({product.stockCount || 450} unidades) · Armazém EUA Zendrop</span>
+            {product.stockCount === 0 ? (
+              <div className="bg-rose-50 border border-rose-200 p-3.5 rounded-2xl flex items-center justify-between gap-2 text-xs text-rose-900">
+                <div className="flex items-center gap-2 font-bold">
+                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0" />
+                  <span>Esgotado no Armazém Zendrop · Currently Out of Stock (0 un.)</span>
+                </div>
+                <span className="text-[10px] uppercase font-black text-rose-700 bg-rose-100 px-2.5 py-1 rounded-full">
+                  Sold Out
+                </span>
               </div>
-              <span className="text-[10px] uppercase font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
-                Envio em 24h
-              </span>
-            </div>
+            ) : (
+              <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-2xl flex items-center justify-between gap-2 text-xs text-emerald-900">
+                <div className="flex items-center gap-2 font-bold">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                  <span>Em estoque em tempo real ({product.stockCount.toLocaleString()} unidades) · Armazém EUA Zendrop</span>
+                </div>
+                <span className="text-[10px] uppercase font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                  Envio em 24h
+                </span>
+              </div>
+            )}
 
             {/* Promo Code Callout */}
             <div className="bg-[#EDF3EC] border border-[#D5E4D4] p-3.5 rounded-2xl flex items-center justify-between gap-2 text-xs text-[#4E664D]">
@@ -277,28 +289,38 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             </div>
 
             {/* Add to Cart CTA */}
-            <button
-              onClick={handleAdd}
-              className={`w-full py-4 rounded-full font-bold text-xs uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 shadow-md active:scale-98 ${
-                added
-                  ? 'bg-[#4E664D] text-white'
-                  : 'bg-[#C86446] hover:bg-[#B35539] text-white'
-              }`}
-            >
-              {added ? (
-                <>
-                  <Check size={18} />
-                  <span>Added to Shopping Bag!</span>
-                </>
-              ) : (
-                <>
-                  <ShoppingBag size={16} />
-                  <span>
-                    Add to Cart · {formatCurrency(effectivePrice * quantity)}
-                  </span>
-                </>
-              )}
-            </button>
+            {product.stockCount === 0 ? (
+              <button
+                disabled
+                className="w-full py-4 rounded-full font-bold text-xs uppercase tracking-wider bg-stone-200 text-stone-500 cursor-not-allowed flex items-center justify-center gap-2 shadow-none border border-stone-300"
+              >
+                <X size={16} />
+                <span>Esgotado no Momento · Out of Stock</span>
+              </button>
+            ) : (
+              <button
+                onClick={handleAdd}
+                className={`w-full py-4 rounded-full font-bold text-xs uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 shadow-md active:scale-98 ${
+                  added
+                    ? 'bg-[#4E664D] text-white'
+                    : 'bg-[#C86446] hover:bg-[#B35539] text-white'
+                }`}
+              >
+                {added ? (
+                  <>
+                    <Check size={18} />
+                    <span>Added to Shopping Bag!</span>
+                  </>
+                ) : (
+                  <>
+                    <ShoppingBag size={16} />
+                    <span>
+                      Add to Cart · {formatCurrency(effectivePrice * quantity)}
+                    </span>
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
       </div>

@@ -13,6 +13,7 @@ import {
   Leaf,
   ShoppingBag,
   SlidersHorizontal,
+  X,
 } from 'lucide-react';
 import { Product, PRODUCTS } from '../data/storeData.ts';
 import { formatCurrency, REPEAT_DELIVERY_DISCOUNT_PERCENT } from '../utils/storeLogic.ts';
@@ -281,6 +282,13 @@ export const BestsellersGrid: React.FC<BestsellersGridProps> = ({
                       loading="lazy"
                     />
 
+                    {/* Out of Stock Overlay Badge */}
+                    {p.stockCount === 0 && (
+                      <div className="absolute top-3 left-3 z-10 bg-black/85 backdrop-blur-xs text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border border-white/20 shadow-md">
+                        Sold Out
+                      </div>
+                    )}
+
                     {/* Wishlist Heart Button */}
                     <button
                       onClick={(e) => toggleWishlist(p.id, e)}
@@ -307,17 +315,28 @@ export const BestsellersGrid: React.FC<BestsellersGridProps> = ({
                         <span>Quick View</span>
                       </button>
 
-                      <button
-                        onClick={(e) => handleAdd(p, e)}
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-lg transition-all cursor-pointer active:scale-95 ${
-                          isAdded
-                            ? 'bg-[#4E664D] text-white'
-                            : 'bg-[#C86446] hover:bg-[#B35539] text-white'
-                        }`}
-                        title="Add directly to cart"
-                      >
-                        {isAdded ? <Check size={16} /> : <ShoppingBag size={15} />}
-                      </button>
+                      {p.stockCount === 0 ? (
+                        <button
+                          disabled
+                          onClick={(e) => e.stopPropagation()}
+                          className="w-10 h-10 rounded-xl flex items-center justify-center bg-stone-300 text-stone-600 cursor-not-allowed shadow-none"
+                          title="Currently Out of Stock"
+                        >
+                          <X size={15} />
+                        </button>
+                      ) : (
+                        <button
+                          onClick={(e) => handleAdd(p, e)}
+                          className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-lg transition-all cursor-pointer active:scale-95 ${
+                            isAdded
+                              ? 'bg-[#4E664D] text-white'
+                              : 'bg-[#C86446] hover:bg-[#B35539] text-white'
+                          }`}
+                          title="Add directly to cart"
+                        >
+                          {isAdded ? <Check size={16} /> : <ShoppingBag size={15} />}
+                        </button>
+                      )}
                     </div>
                   </div>
 
@@ -346,15 +365,23 @@ export const BestsellersGrid: React.FC<BestsellersGridProps> = ({
                         <span className="text-[10px] font-semibold tracking-widest text-[#8E867C] uppercase">
                           {p.brand || 'Ling Petshop'} · {p.petType}
                         </span>
-                        {p.badge && (
-                          <span className="bg-[#FAF7F2] text-[#2C2724] border border-[#E7DFD5] font-semibold text-[9px] px-2 py-0.5 rounded-full">
-                            {p.badge}
+                        {p.stockCount === 0 ? (
+                          <span className="bg-rose-50 text-rose-800 border border-rose-200 font-bold text-[9px] px-2 py-0.5 rounded-full">
+                            Sold Out
                           </span>
-                        )}
-                        {discountPct > 0 && (
-                          <span className="text-emerald-700 bg-emerald-50 border border-emerald-200/70 font-bold text-[9px] px-1.5 py-0.5 rounded">
-                            Save {discountPct}%
-                          </span>
+                        ) : (
+                          <>
+                            {p.badge && (
+                              <span className="bg-[#FAF7F2] text-[#2C2724] border border-[#E7DFD5] font-semibold text-[9px] px-2 py-0.5 rounded-full">
+                                {p.badge}
+                              </span>
+                            )}
+                            {discountPct > 0 && (
+                              <span className="text-emerald-700 bg-emerald-50 border border-emerald-200/70 font-bold text-[9px] px-1.5 py-0.5 rounded">
+                                Save {discountPct}%
+                              </span>
+                            )}
+                          </>
                         )}
                       </div>
 

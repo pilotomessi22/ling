@@ -153,7 +153,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": true,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 150,
+    "stockCount": 88,
     "heroImage": "https://file.zendrop.com/products/06/ee/b16863484e24800cd1e5d9553f50.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/06/ee/b16863484e24800cd1e5d9553f50_import.webp",
     "galleryImages": [
@@ -245,7 +245,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": false,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 173,
+    "stockCount": 50000,
     "heroImage": "https://file.zendrop.com/products/27/ce/5258638a4b9197f9dad3d50bfeca.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/27/ce/5258638a4b9197f9dad3d50bfeca_import.webp",
     "galleryImages": [
@@ -323,7 +323,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": false,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 196,
+    "stockCount": 16060,
     "heroImage": "https://file.zendrop.com/products/40/b1/574e46614f7482afe1aaac7320ca.png",
     "secondaryImage": "https://file.zendrop.com/products/40/b1/574e46614f7482afe1aaac7320ca_import.webp",
     "galleryImages": [
@@ -405,7 +405,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": true,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 219,
+    "stockCount": 50000,
     "heroImage": "https://file.zendrop.com/products/87/e1/c63523784fc396c4f2c6bd4c1c24.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/87/e1/c63523784fc396c4f2c6bd4c1c24_import.webp",
     "galleryImages": [
@@ -483,7 +483,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": false,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 242,
+    "stockCount": 50000,
     "heroImage": "https://file.zendrop.com/products/e2/67/13ee6178492cbb4714ad09e346c8.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/e2/67/13ee6178492cbb4714ad09e346c8_import.webp",
     "galleryImages": [
@@ -560,7 +560,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": false,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 265,
+    "stockCount": 300000,
     "heroImage": "https://file.zendrop.com/products/78/67/b3a2860443c0a48a043836b613ab.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/78/67/b3a2860443c0a48a043836b613ab_import.webp",
     "galleryImages": [
@@ -652,7 +652,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": true,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 288,
+    "stockCount": 1000000,
     "heroImage": "https://file.zendrop.com/products/5e/15/ca184d4c4c7faf6be52319848d23.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/5e/15/ca184d4c4c7faf6be52319848d23_import.webp",
     "galleryImages": [
@@ -755,7 +755,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": false,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 311,
+    "stockCount": 750000,
     "heroImage": "https://file.zendrop.com/products/a7/dd/8286c1cb449ba415ed6424df9eb1.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/a7/dd/8286c1cb449ba415ed6424df9eb1_import.webp",
     "galleryImages": [
@@ -857,7 +857,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": false,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 334,
+    "stockCount": 100000,
     "heroImage": "https://file.zendrop.com/products/a1/50/2214100e4ecc80ec74f6a3892caa.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/a1/50/2214100e4ecc80ec74f6a3892caa_import.webp",
     "galleryImages": [
@@ -942,7 +942,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": true,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 357,
+    "stockCount": 50000,
     "heroImage": "https://file.zendrop.com/products/ce/8f/f74e02694cf780d8ef585870064e.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/ce/8f/f74e02694cf780d8ef585870064e_import.webp",
     "galleryImages": [
@@ -1022,7 +1022,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": false,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 380,
+    "stockCount": 150000,
     "heroImage": "https://file.zendrop.com/products/8b/71/ea1b681b410991551a11f162b789.png",
     "secondaryImage": "https://file.zendrop.com/products/8b/71/ea1b681b410991551a11f162b789_import.webp",
     "galleryImages": [
@@ -1111,7 +1111,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": false,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 403,
+    "stockCount": 150000,
     "heroImage": "https://file.zendrop.com/products/69/a5/b0e36f26461f950d7ad2766974b9.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/69/a5/b0e36f26461f950d7ad2766974b9_import.webp",
     "galleryImages": [
@@ -1191,7 +1191,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": true,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 426,
+    "stockCount": 600000,
     "heroImage": "https://file.zendrop.com/products/5f/96/2e8f112d4063b96501825858e3da.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/5f/96/2e8f112d4063b96501825858e3da_import.webp",
     "galleryImages": [
@@ -1286,8 +1286,8 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isBestseller": false,
     "isLingPick": false,
     "repeatDeliveryEligible": false,
-    "inStockAustin": true,
-    "stockCount": 449,
+    "inStockAustin": false,
+    "stockCount": 0,
     "heroImage": "https://file.zendrop.com/products/2c/a8/7ab107c2430db481c9248382069d.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/2c/a8/7ab107c2430db481c9248382069d_import.webp",
     "galleryImages": [
@@ -1364,7 +1364,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": false,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 472,
+    "stockCount": 250000,
     "heroImage": "https://file.zendrop.com/products/40/d4/946348e947e7ac7692df7d9cf200.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/40/d4/946348e947e7ac7692df7d9cf200_import.webp",
     "galleryImages": [
@@ -1459,7 +1459,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": true,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 495,
+    "stockCount": 100000,
     "heroImage": "https://file.zendrop.com/products/8e/5f/db72a8d342c0ab6979229ea3e391.png",
     "secondaryImage": "https://file.zendrop.com/products/8e/5f/db72a8d342c0ab6979229ea3e391_import.webp",
     "galleryImages": [
@@ -1542,7 +1542,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": false,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 518,
+    "stockCount": 700000,
     "heroImage": "https://file.zendrop.com/products/bd/ec/fe182b5c48dca204ae6f8892d978.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/bd/ec/fe182b5c48dca204ae6f8892d978_import.webp",
     "galleryImages": [
@@ -1639,7 +1639,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": false,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 541,
+    "stockCount": 13,
     "heroImage": "https://file.zendrop.com/products/84/d4/b3216d7e42088dc6cb3d98d5b8f0.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/84/d4/b3216d7e42088dc6cb3d98d5b8f0_import.webp",
     "galleryImages": [
@@ -1747,7 +1747,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": true,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 164,
+    "stockCount": 50000,
     "heroImage": "https://file.zendrop.com/products/71/35/d62fab834d1794542641bd4a79b1.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/71/35/d62fab834d1794542641bd4a79b1_import.webp",
     "galleryImages": [
@@ -1824,7 +1824,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": false,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 187,
+    "stockCount": 50000,
     "heroImage": "https://file.zendrop.com/products/83/c8/2fc7eb1d4a1d8335fa1152252a70.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/83/c8/2fc7eb1d4a1d8335fa1152252a70_import.webp",
     "galleryImages": [
@@ -1902,7 +1902,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": false,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 210,
+    "stockCount": 50000,
     "heroImage": "https://file.zendrop.com/products/ee/2f/1a39c64d40549ad9cc8c389e7894.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/ee/2f/1a39c64d40549ad9cc8c389e7894_import.webp",
     "galleryImages": [
@@ -1979,7 +1979,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": true,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 233,
+    "stockCount": 50000,
     "heroImage": "https://file.zendrop.com/products/3f/e8/d48325cc45be8e7df72b6740b076.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/3f/e8/d48325cc45be8e7df72b6740b076_import.webp",
     "galleryImages": [
@@ -2056,7 +2056,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": false,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 256,
+    "stockCount": 406359,
     "heroImage": "https://file.zendrop.com/products/e3/1f/2e8bc4644e90bf052eecfd43704e.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/e3/1f/2e8bc4644e90bf052eecfd43704e_import.webp",
     "galleryImages": [
@@ -2170,7 +2170,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": false,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 279,
+    "stockCount": 81,
     "heroImage": "https://file.zendrop.com/products/a8/49/d2c8c981411586b81645852daf7a.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/a8/49/d2c8c981411586b81645852daf7a_import.webp",
     "galleryImages": [
@@ -2261,7 +2261,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": true,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 302,
+    "stockCount": 50000,
     "heroImage": "https://file.zendrop.com/products/75/f3/fe6ad2864bf1a0e5acd71059796c.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/75/f3/fe6ad2864bf1a0e5acd71059796c_import.webp",
     "galleryImages": [
@@ -2338,7 +2338,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": false,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 325,
+    "stockCount": 50000,
     "heroImage": "https://file.zendrop.com/products/ae/f8/c09a4ad04bd7a500aea2711e0c60.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/ae/f8/c09a4ad04bd7a500aea2711e0c60_import.webp",
     "galleryImages": [
@@ -2415,7 +2415,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": false,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 348,
+    "stockCount": 50000,
     "heroImage": "https://file.zendrop.com/products/a8/78/092ad92341c9a9584c9fb7049867.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/a8/78/092ad92341c9a9584c9fb7049867_import.webp",
     "galleryImages": [
@@ -2492,7 +2492,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": true,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 371,
+    "stockCount": 50000,
     "heroImage": "https://file.zendrop.com/products/f8/39/b51faf674ccab56176bf966595e6.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/f8/39/b51faf674ccab56176bf966595e6_import.webp",
     "galleryImages": [
@@ -2570,7 +2570,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": false,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 394,
+    "stockCount": 50000,
     "heroImage": "https://file.zendrop.com/products/1e/6c/cec604364493a87abc3b64af7bc0.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/1e/6c/cec604364493a87abc3b64af7bc0_import.webp",
     "galleryImages": [
@@ -2647,7 +2647,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": false,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 417,
+    "stockCount": 50000,
     "heroImage": "https://file.zendrop.com/products/d1/1b/457d8d2343b7abbdf49bb73440f3.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/d1/1b/457d8d2343b7abbdf49bb73440f3_import.webp",
     "galleryImages": [
@@ -2724,7 +2724,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": true,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 440,
+    "stockCount": 50000,
     "heroImage": "https://file.zendrop.com/products/9b/5c/7e49020f44faaf316ac083163c62.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/9b/5c/7e49020f44faaf316ac083163c62_import.webp",
     "galleryImages": [
@@ -2802,7 +2802,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": false,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 463,
+    "stockCount": 50000,
     "heroImage": "https://file.zendrop.com/products/eb/db/64de34084ce7ad95adfeae5fd9c9.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/eb/db/64de34084ce7ad95adfeae5fd9c9_import.webp",
     "galleryImages": [
@@ -2880,7 +2880,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": false,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 486,
+    "stockCount": 49,
     "heroImage": "https://file.zendrop.com/products/75/97/e69bf8834ed4baf63627ac731e10.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/75/97/e69bf8834ed4baf63627ac731e10_import.webp",
     "galleryImages": [
@@ -2989,7 +2989,7 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "isLingPick": true,
     "repeatDeliveryEligible": false,
     "inStockAustin": true,
-    "stockCount": 509,
+    "stockCount": 50000,
     "heroImage": "https://file.zendrop.com/products/87/9c/ec669b3a4f67a8ecb5a6be7b267d.jpeg",
     "secondaryImage": "https://file.zendrop.com/products/87/9c/ec669b3a4f67a8ecb5a6be7b267d_import.webp",
     "galleryImages": [
@@ -3051,9 +3051,9 @@ export function getSavedProducts(): Product[] {
   if (typeof window === 'undefined') return DEFAULT_REAL_PRODUCTS;
   try {
     // Reset to load official 34 Aligned Zendrop English products catalog v30
-    if (!localStorage.getItem('ling_catalog_zendrop_aligned_v33')) {
+    if (!localStorage.getItem('ling_catalog_zendrop_aligned_v34_realstock')) {
       localStorage.setItem('ling_admin_products', JSON.stringify(DEFAULT_REAL_PRODUCTS));
-      localStorage.setItem('ling_catalog_zendrop_aligned_v33', 'true');
+      localStorage.setItem('ling_catalog_zendrop_aligned_v34_realstock', 'true');
       return DEFAULT_REAL_PRODUCTS;
     }
     const saved = localStorage.getItem('ling_admin_products');

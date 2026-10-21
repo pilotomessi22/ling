@@ -161,6 +161,12 @@ app.post('/api/zendrop/fetch-product', async (req: Request, res: Response) => {
         }
       }
 
+      const variants = Array.isArray(p.product_variant) ? p.product_variant : [];
+      const totalStock = variants.reduce(
+        (sum: number, v: any) => sum + (Number(v.variant_inventory) || 0),
+        0
+      );
+
       return res.json({
         success: true,
         product: {
@@ -171,7 +177,9 @@ app.post('/api/zendrop/fetch-product', async (req: Request, res: Response) => {
           heroImage: images[0] || null,
           secondaryImage: images[1] || images[0] || null,
           supplierCost: p.base_cost_price || p.display_price || 0,
-          stock: p.product_variant?.[0]?.variant_inventory || 100,
+          stock: totalStock,
+          inStock: totalStock > 0,
+          variantCount: variants.length,
         },
       });
     }
@@ -179,6 +187,151 @@ app.post('/api/zendrop/fetch-product', async (req: Request, res: Response) => {
     return res.status(404).json({ error: `Produto ID ${cleanId} não encontrado no Zendrop.` });
   } catch (err: any) {
     return res.status(500).json({ error: err.message || 'Erro interno ao consultar produto no Zendrop.' });
+  }
+});
+
+// Real-time Single Product Zendrop Stock Endpoint
+app.get('/api/zendrop/stock/:id', async (req: Request, res: Response) => {
+  try {
+    const rawId = req.params.id;
+    const cleanId = String(rawId).replace(/[^0-9]/g, '');
+    if (!cleanId) {
+      return res.status(400).json({ error: 'ID de produto Zendrop inválido.' });
+    }
+
+    const zendropRes = await fetch('https://app.zendrop.com/api/get-product', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+      },
+      body: JSON.stringify({ product_id: cleanId, id: parseInt(cleanId) }),
+    });
+
+    const json = await zendropRes.json().catch(() => null);
+    if (json?.status === 'success' && json?.data?.product) {
+      const p = json.data.product;
+      const variants = Array.isArray(p.product_variant) ? p.product_variant : [];
+      const totalStock = variants.reduce(
+        (sum: number, v: any) => sum + (Number(v.variant_inventory) || 0),
+        0
+      );
+
+      return res.json({
+        success: true,
+        id: cleanId,
+        name: p.name,
+        stockCount: totalStock,
+        inStock: totalStock > 0,
+        variantCount: variants.length,
+        variants: variants.map((v: any) => ({
+          sku: v.variant_sku,
+          color: v.variant_color,
+          size: v.variant_size,
+          inventory: Number(v.variant_inventory) || 0,
+        })),
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    return res.status(404).json({ error: `Produto ${cleanId} não encontrado no Zendrop.` });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message || 'Erro ao consultar estoque no Zendrop.' });
+  }
+});
+
+// Cache for inventory sync to prevent throttling
+let inventoryCache: {
+  timestamp: number;
+  data: Record<string, { stockCount: number; inStock: boolean; name: string }>;
+} | null = null;
+
+// Real-time Batch Zendrop Stock Sync Endpoint
+app.all(['/api/zendrop/sync-all-inventory', '/api/zendrop/sync-inventory'], async (req: Request, res: Response) => {
+  try {
+    const defaultProductIds = [
+      '2000857', '2041862', '1603576', '2053714', '2058716', '2873973', '2632492', '2658755',
+      '2689252', '2640918', '2650189', '2608657', '2631448', '2040471', '2699708', '2601227',
+      '2626089', '2000777', '2042070', '2047664', '2051156', '2063694', '3090659', '2001114',
+      '2070193', '2069888', '2044170', '2066498', '2073024', '2040754', '2072717', '2066233',
+      '2001034', '2038976'
+    ];
+
+    const requestedIds: string[] = Array.isArray(req.body?.productIds)
+      ? req.body.productIds.map((id: any) => String(id).replace(/[^0-9]/g, '')).filter(Boolean)
+      : defaultProductIds;
+
+    const force = Boolean(req.body?.force || req.query.force === 'true');
+    const now = Date.now();
+
+    // 60-second cache unless force is requested
+    if (!force && inventoryCache && (now - inventoryCache.timestamp < 60000)) {
+      return res.json({
+        success: true,
+        cached: true,
+        timestamp: new Date(inventoryCache.timestamp).toISOString(),
+        syncedCount: Object.keys(inventoryCache.data).length,
+        stocks: inventoryCache.data,
+      });
+    }
+
+    const results: Record<string, { stockCount: number; inStock: boolean; name: string }> = {};
+
+    // Process in controlled batches of 6 concurrent requests to Zendrop
+    const batchSize = 6;
+    for (let i = 0; i < requestedIds.length; i += batchSize) {
+      const chunk = requestedIds.slice(i, i + batchSize);
+      await Promise.all(
+        chunk.map(async (cleanId) => {
+          try {
+            const zRes = await fetch('https://app.zendrop.com/api/get-product', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+              },
+              body: JSON.stringify({ product_id: cleanId, id: parseInt(cleanId) }),
+            });
+            const zJson = await zRes.json().catch(() => null);
+            if (zJson?.status === 'success' && zJson?.data?.product) {
+              const p = zJson.data.product;
+              const variants = Array.isArray(p.product_variant) ? p.product_variant : [];
+              const totalStock = variants.reduce(
+                (sum: number, v: any) => sum + (Number(v.variant_inventory) || 0),
+                0
+              );
+              results[cleanId] = {
+                stockCount: totalStock,
+                inStock: totalStock > 0,
+                name: p.name || `Produto #${cleanId}`,
+              };
+            }
+          } catch (e) {
+            // keep existing or zero on error
+          }
+        })
+      );
+    }
+
+    inventoryCache = {
+      timestamp: now,
+      data: results,
+    };
+
+    const outOfStockList = Object.entries(results)
+      .filter(([_, item]) => !item.inStock)
+      .map(([id, item]) => ({ id, name: item.name }));
+
+    return res.json({
+      success: true,
+      timestamp: new Date().toISOString(),
+      syncedCount: Object.keys(results).length,
+      outOfStockCount: outOfStockList.length,
+      outOfStockProducts: outOfStockList,
+      stocks: results,
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message || 'Erro ao sincronizar estoque com Zendrop.' });
   }
 });
 
@@ -245,15 +398,28 @@ app.post('/api/create-checkout-session', async (req: Request, res: Response) => 
   }
 });
 
-// Serve compiled static assets from dist folder
-const distPath = path.resolve(__dirname, 'dist');
-app.use(express.static(distPath));
+async function startServer() {
+  if (process.env.NODE_ENV !== 'production') {
+    const { createServer } = await import('vite');
+    const vite = await createServer({
+      server: { middlewareMode: true, hmr: process.env.DISABLE_HMR !== 'true' },
+      appType: 'spa',
+    });
+    app.use(vite.middlewares);
+  } else {
+    // Serve compiled static assets from dist folder
+    const distPath = path.resolve(__dirname, 'dist');
+    app.use(express.static(distPath));
 
-// Fallback to index.html for client-side routing
-app.get('*', (_req: Request, res: Response) => {
-  res.sendFile(path.join(distPath, 'index.html'));
-});
+    // Fallback to index.html for client-side routing
+    app.get('*', (_req: Request, res: Response) => {
+      res.sendFile(path.join(distPath, 'index.html'));
+    });
+  }
 
-app.listen(PORT, () => {
-  console.log(`Ling Petshop server running on port ${PORT}`);
-});
+  app.listen(PORT, () => {
+    console.log(`Ling Petshop server running on port ${PORT}`);
+  });
+}
+
+startServer();
