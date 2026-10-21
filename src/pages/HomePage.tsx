@@ -44,72 +44,71 @@ export const HomePage: React.FC<HomePageProps> = ({
 
   return (
     <div className="bg-white text-[#0F172A]">
-      {/* 1. Clean, Objective Hero Section (Royal Navy & Cobalt Blue) */}
-      <section className="relative overflow-hidden pt-12 pb-20 sm:pt-20 sm:pb-28 border-b border-[#E2E8F0] bg-gradient-to-b from-[#F8FAFC] to-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            {/* Left Copy */}
-            <div className="lg:col-span-6 space-y-6 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EFF6FF] border border-[#BFDBFE] text-[#2563EB] text-xs font-bold uppercase tracking-wider">
-                <Leaf size={14} />
-                <span>Nationwide US Delivery · 2–4 Business Days</span>
-              </div>
+      {/* 1. Immersive Full-Width Panoramic Hero Section (Fable Pets Style) */}
+      <section className="relative overflow-hidden w-full min-h-[580px] sm:min-h-[620px] lg:min-h-[660px] flex items-center border-b border-[#E2E8F0] bg-[#F8FAFC]">
+        {/* Full-bleed Absolute Panoramic Background Image */}
+        <div
+          className="absolute inset-0 w-full h-full bg-no-repeat pointer-events-none"
+          style={{
+            backgroundImage: "url('/assets/hero_pets_panoramic.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'right 45%',
+          }}
+        />
 
-              <h1 className="text-4xl sm:text-6xl font-extrabold text-[#0F2942] font-serif tracking-tight leading-[1.12]">
-                Everyday essentials for happy, healthy pets.
-              </h1>
+        {/* Smooth White-to-Transparent Gradient Overlay:
+            Ensures text readability on the left while keeping the golden retriever & cat clearly visible on the right */}
+        <div className="absolute inset-0 bg-gradient-to-r from-white via-white/95 to-transparent sm:via-white/85 sm:to-white/10 lg:via-white/75 lg:to-transparent pointer-events-none w-full lg:w-[72%]" />
 
-              <p className="text-base sm:text-lg text-[#64748B] font-light leading-relaxed max-w-xl mx-auto lg:mx-0">
-                Thoughtfully crafted pet goods designed to soothe anxiety, protect joints, and blend seamlessly into your home. Backed by our 30-day risk-free in-home trial.
-              </p>
+        {/* Mobile Contrast Gradient: Keeps pets visible while ensuring text is readable */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/90 via-white/55 to-white/90 sm:hidden pointer-events-none" />
 
-              <div className="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5">
-                <button
-                  onClick={() => onNavigateToShop('all')}
-                  className="w-full sm:w-auto px-8 py-4 rounded-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-lg hover:shadow-xl active:scale-98 flex items-center justify-center gap-2"
-                >
-                  <span>Shop All Essentials</span>
-                  <ArrowRight size={15} />
-                </button>
-
-                <button
-                  onClick={() => onNavigateToShop('Dogs')}
-                  className="w-full sm:w-auto px-6 py-4 rounded-full bg-white text-[#0F2942] border border-[#CBD5E1] hover:bg-[#F8FAFC] font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
-                >
-                  View Dog Gear
-                </button>
-              </div>
-
-              {/* Trust Callout Badges */}
-              <div className="pt-4 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-xs text-[#64748B]">
-                <div className="flex items-center gap-2">
-                  <ShieldCheck size={16} className="text-[#2563EB]" />
-                  <span>30-Day Risk-Free Trial</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Truck size={16} className="text-[#2563EB]" />
-                  <span>Ships in 24h via USPS</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Award size={16} className="text-[#2563EB]" />
-                  <span>Non-Toxic & Pet-Safe</span>
-                </div>
-              </div>
+        {/* Real HTML Content Layered Above Background */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 w-full">
+          <div className="max-w-xl lg:max-w-2xl space-y-6 text-center sm:text-left">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EFF6FF] border border-[#BFDBFE] text-[#2563EB] text-xs font-bold uppercase tracking-wider backdrop-blur-xs">
+              <Leaf size={14} />
+              <span>Nationwide US Delivery · 2–4 Business Days</span>
             </div>
 
-            {/* Right Hero Image (Attached Golden Retriever & Cat Panoramic Artwork) */}
-            <div className="lg:col-span-6 relative">
-              <div className="relative aspect-[4/3] sm:aspect-[16/11] lg:aspect-[5/4] rounded-3xl overflow-hidden shadow-2xl border border-[#E2E8F0] bg-white group">
-                <img
-                  src="/assets/hero_pets_artwork.png"
-                  alt="Happy golden retriever and companion cat resting comfortably on cozy sherpa blanket"
-                  className="w-full h-full object-cover object-center group-hover:scale-102 transition-transform duration-700"
-                  loading="eager"
-                  fetchPriority="high"
-                />
-                {/* Subtle soft gradient blend on the left for seamless desktop integration */}
-                <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white/40 via-white/10 to-transparent hidden lg:block pointer-events-none" />
-                <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/10 to-transparent pointer-events-none" />
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#0F2942] font-serif tracking-tight leading-[1.12]">
+              Everyday essentials for happy, healthy pets.
+            </h1>
+
+            <p className="text-base sm:text-lg text-[#475569] font-light leading-relaxed max-w-xl mx-auto sm:mx-0">
+              Thoughtfully crafted pet goods designed to soothe anxiety, protect joints, and blend seamlessly into your home. Backed by our 30-day risk-free in-home trial.
+            </p>
+
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-3.5">
+              <button
+                onClick={() => onNavigateToShop('all')}
+                className="w-full sm:w-auto px-8 py-4 rounded-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-lg hover:shadow-xl active:scale-98 flex items-center justify-center gap-2"
+              >
+                <span>Shop All Essentials</span>
+                <ArrowRight size={15} />
+              </button>
+
+              <button
+                onClick={() => onNavigateToShop('Dogs')}
+                className="w-full sm:w-auto px-6 py-4 rounded-full bg-white/90 hover:bg-white text-[#0F2942] border border-[#CBD5E1] font-bold text-xs uppercase tracking-wider transition-all cursor-pointer backdrop-blur-xs shadow-xs"
+              >
+                View Dog Gear
+              </button>
+            </div>
+
+            {/* Trust Callout Badges */}
+            <div className="pt-4 flex flex-wrap items-center justify-center sm:justify-start gap-6 text-xs text-[#475569]">
+              <div className="flex items-center gap-2 bg-white/60 sm:bg-transparent px-2.5 py-1 sm:p-0 rounded-full">
+                <ShieldCheck size={16} className="text-[#2563EB]" />
+                <span className="font-medium">30-Day Risk-Free Trial</span>
+              </div>
+              <div className="flex items-center gap-2 bg-white/60 sm:bg-transparent px-2.5 py-1 sm:p-0 rounded-full">
+                <Truck size={16} className="text-[#2563EB]" />
+                <span className="font-medium">Ships in 24h via USPS</span>
+              </div>
+              <div className="flex items-center gap-2 bg-white/60 sm:bg-transparent px-2.5 py-1 sm:p-0 rounded-full">
+                <Award size={16} className="text-[#2563EB]" />
+                <span className="font-medium">Non-Toxic & Pet-Safe</span>
               </div>
             </div>
           </div>
