@@ -25,22 +25,25 @@ export const HomePage: React.FC<HomePageProps> = ({
     {
       title: 'Dogs',
       tagline: 'Orthopedic beds, zero-pull harnesses & durable play toys',
-      image: '/assets/aistudio/dogs_collection.jpg',
-      fallback: '/assets/aistudio/Retriever_Dourado_Relaxado_no_Tapete_bb337bb9.png',
+      image: '/assets/dogs_collection.jpg',
+      fallback: '/assets/aistudio/dogs_collection.jpg',
+      cdnFallback: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=1000&q=80',
       category: 'Dogs',
     },
     {
       title: 'Cats',
       tagline: 'Whisper-quiet water fountains, scratching lounges & kickers',
-      image: '/assets/aistudio/cats_collection.jpg',
-      fallback: '/assets/aistudio/Gatos_aconchegados_no_cantinho_ensolarado_62c3595a.png',
+      image: '/assets/cats_collection.jpg',
+      fallback: '/assets/aistudio/cats_collection.jpg',
+      cdnFallback: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1000&q=80',
       category: 'Cats',
     },
     {
       title: 'Essential Gear',
       tagline: 'Elevated dining feeders, travel protectors & daily care',
-      image: '/assets/aistudio/essential_gear_collection.jpg',
-      fallback: '/assets/aistudio/Momento_Aconchegante_de_Alimenta__o_Canina_9419c806.png',
+      image: '/assets/essential_gear_collection.jpg',
+      fallback: '/assets/aistudio/essential_gear_collection.jpg',
+      cdnFallback: 'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&w=1000&q=80',
       category: 'all',
     },
   ];
@@ -57,6 +60,13 @@ export const HomePage: React.FC<HomePageProps> = ({
             className="w-full h-full object-cover object-[82%_center] sm:object-[80%_center] lg:object-[78%_center]"
             loading="eager"
             fetchPriority="high"
+            onError={(e) => {
+              const target = e.currentTarget;
+              if (!target.dataset.triedCdn) {
+                target.dataset.triedCdn = 'true';
+                target.src = 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1600&q=85';
+              }
+            }}
           />
           {/* Smooth White-to-Transparent Gradient on Left Side Only for Crisp Text Readability */}
           <div className="absolute inset-0 bg-gradient-to-r from-white via-white/95 sm:via-white/85 via-55% to-transparent w-full sm:w-[70%] lg:w-[60%]" />
@@ -242,8 +252,12 @@ export const HomePage: React.FC<HomePageProps> = ({
                   decoding="async"
                   onError={(e) => {
                     const target = e.currentTarget;
-                    if (col.fallback && target.src !== window.location.origin + col.fallback) {
+                    if (!target.dataset.triedLocal && col.fallback) {
+                      target.dataset.triedLocal = 'true';
                       target.src = col.fallback;
+                    } else if (!target.dataset.triedCdn && col.cdnFallback) {
+                      target.dataset.triedCdn = 'true';
+                      target.src = col.cdnFallback;
                     }
                   }}
                 />
