@@ -25,19 +25,22 @@ export const HomePage: React.FC<HomePageProps> = ({
     {
       title: 'Dogs',
       tagline: 'Orthopedic beds, zero-pull harnesses & durable play toys',
-      image: '/assets/aistudio/Retriever_Dourado_Relaxado_no_Tapete_bb337bb9.png',
+      image: '/assets/aistudio/dogs_collection.jpg',
+      fallback: '/assets/aistudio/Retriever_Dourado_Relaxado_no_Tapete_bb337bb9.png',
       category: 'Dogs',
     },
     {
       title: 'Cats',
       tagline: 'Whisper-quiet water fountains, scratching lounges & kickers',
-      image: '/assets/aistudio/Gatos_aconchegados_no_cantinho_ensolarado_62c3595a.png',
+      image: '/assets/aistudio/cats_collection.jpg',
+      fallback: '/assets/aistudio/Gatos_aconchegados_no_cantinho_ensolarado_62c3595a.png',
       category: 'Cats',
     },
     {
       title: 'Essential Gear',
       tagline: 'Elevated dining feeders, travel protectors & daily care',
-      image: '/assets/aistudio/Momento_Aconchegante_de_Alimenta__o_Canina_9419c806.png',
+      image: '/assets/aistudio/essential_gear_collection.jpg',
+      fallback: '/assets/aistudio/Momento_Aconchegante_de_Alimenta__o_Canina_9419c806.png',
       category: 'all',
     },
   ];
@@ -235,6 +238,14 @@ export const HomePage: React.FC<HomePageProps> = ({
                   src={col.image}
                   alt={col.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  loading="eager"
+                  decoding="async"
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    if (col.fallback && target.src !== window.location.origin + col.fallback) {
+                      target.src = col.fallback;
+                    }
+                  }}
                 />
               </div>
               <div className="p-6 sm:p-7 flex flex-col flex-1 justify-between">
