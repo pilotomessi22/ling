@@ -76,3 +76,20 @@ In compliance with the rule not to invent arbitrary prices or stock:
 
 5. **`src/components/Header.tsx`**:
    - Added `✨ Cleanup Kit Bundle` to the desktop and mobile navigation menus.
+
+---
+
+## 5. Homepage Hero Section Update & Restore Point
+
+- **Ponto de Restauração (Backup File):**
+  - Saved full prior version at: `src/pages/HomePage.restore-point-backup.tsx`
+  - To instantly rollback, simply copy `src/pages/HomePage.restore-point-backup.tsx` back to `src/pages/HomePage.tsx`.
+- **Hero Image Assets:**
+  - `public/assets/hero_pets_artwork.png` (Directly extracted at native resolution from the user's attached panoramic artwork, without mock text or UI overlays)
+  - `public/assets/hero_pets_panoramic.png` (Full untouched panoramic file)
+- **Component Updated:**
+  - `src/pages/HomePage.tsx`:
+    - Updated right-side image container with natural gradient edge blend (`from-white/40 via-white/10 to-transparent`).
+    - Responsive handling: `aspect-[4/3] sm:aspect-[16/11] lg:aspect-[5/4]`, `object-cover object-center`, and `rounded-3xl` with shadow.
+    - Preserved all live headlines, descriptions, CTAs, and trust badges as real HTML elements.
+

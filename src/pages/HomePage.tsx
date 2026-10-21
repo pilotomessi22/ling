@@ -97,14 +97,19 @@ export const HomePage: React.FC<HomePageProps> = ({
               </div>
             </div>
 
-            {/* Right Hero Image (Real dog in modern bright living room) */}
-            <div className="lg:col-span-6">
-              <div className="relative aspect-4/3 sm:aspect-5/4 rounded-3xl overflow-hidden shadow-2xl border border-[#E2E8F0] bg-[#F1F5F9]">
+            {/* Right Hero Image (Attached Golden Retriever & Cat Panoramic Artwork) */}
+            <div className="lg:col-span-6 relative">
+              <div className="relative aspect-[4/3] sm:aspect-[16/11] lg:aspect-[5/4] rounded-3xl overflow-hidden shadow-2xl border border-[#E2E8F0] bg-white group">
                 <img
-                  src="https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85"
-                  alt="Dog resting peacefully on calming bed"
-                  className="w-full h-full object-cover"
+                  src="/assets/hero_pets_artwork.png"
+                  alt="Happy golden retriever and companion cat resting comfortably on cozy sherpa blanket"
+                  className="w-full h-full object-cover object-center group-hover:scale-102 transition-transform duration-700"
+                  loading="eager"
+                  fetchPriority="high"
                 />
+                {/* Subtle soft gradient blend on the left for seamless desktop integration */}
+                <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white/40 via-white/10 to-transparent hidden lg:block pointer-events-none" />
+                <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/10 to-transparent pointer-events-none" />
               </div>
             </div>
           </div>
