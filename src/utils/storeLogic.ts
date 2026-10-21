@@ -140,10 +140,16 @@ export function calculateOrderTotals(
     appliedPromo = 'FREESHIP (FRETE GRÁTIS)';
   }
 
-  // Trava de Segurança Financeira Anti-Prejuízo (Garante Margem Mínima Segura de 35%):
-  // Proteção contra perdas ao combinar Desconto em Lote (Comprar 3) + Cupom de 20% OFF
-  const minSafeGoodsTotal = totalSupplierCost * 1.35;
-  if (discountedSubtotal - promoDiscount < minSafeGoodsTotal && totalSupplierCost > 0) {
+  // Cálculo do Custo de Envio Real do Fornecedor Zendrop (USPS Express):
+  // Base de $4.95 + $1.50 por item adicional enviado do armazém
+  const totalItemQty = items.reduce((acc, i) => acc + i.quantity, 0);
+  const estimatedSupplierShippingCost = totalItemQty > 0 ? 4.95 + Math.max(0, totalItemQty - 1) * 1.50 : 0;
+  const totalBaseCostWithShipping = totalSupplierCost + estimatedSupplierShippingCost;
+
+  // Trava de Segurança Financeira Anti-Prejuízo (Garante Margem Mínima Segura de 35% LÍQUIDA):
+  // Proteção contra perdas ao combinar Desconto em Lote (Comprar 3) + Cupom de 20% OFF + Frete Grátis
+  const minSafeGoodsTotal = totalBaseCostWithShipping * 1.35;
+  if (discountedSubtotal - promoDiscount < minSafeGoodsTotal && totalBaseCostWithShipping > 0) {
     const maxSafeDiscount = Math.max(0, discountedSubtotal - minSafeGoodsTotal);
     promoDiscount = Number(maxSafeDiscount.toFixed(2));
   }
@@ -163,7 +169,7 @@ export function calculateOrderTotals(
 
   const total = Number((effectiveGoodsTotal + shipping).toFixed(2));
   const totalEstimatedProfit = Number(
-    Math.max(0, effectiveGoodsTotal - totalSupplierCost).toFixed(2)
+    Math.max(0, effectiveGoodsTotal - totalBaseCostWithShipping).toFixed(2)
   );
 
   return {
