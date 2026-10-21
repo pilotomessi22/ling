@@ -124,8 +124,10 @@ export const SUPPLIER_AGENTS: SupplierAgent[] = [
   },
 ];
 
-// Complete 33 Zendrop Product Catalog with 60% Margin & Real-Time Stock Tracking
-export const DEFAULT_REAL_PRODUCTS: Product[] = [
+// Clean product catalog - empty state
+export const DEFAULT_REAL_PRODUCTS: Product[] = [];
+
+const RAW_UNLINKED_ITEMS: Product[] = [
   {
     id: 'zendrop-2000857',
     sku: 'ZD-2000857',
@@ -3882,25 +3884,25 @@ export const PRODUCT_SUPPLIER_CATALOG: Record<string, any> = {};
 export const PRODUCTS: Product[] = DEFAULT_REAL_PRODUCTS;
 
 export function getSavedProducts(): Product[] {
-  if (typeof window === 'undefined') return DEFAULT_REAL_PRODUCTS;
+  if (typeof window === 'undefined') return [];
   try {
-    // Force reset to initialize full 33 Zendrop products catalog
-    if (!localStorage.getItem('ling_catalog_zendrop_33_v16')) {
-      localStorage.setItem('ling_admin_products', JSON.stringify(DEFAULT_REAL_PRODUCTS));
-      localStorage.setItem('ling_catalog_zendrop_33_v16', 'true');
-      return DEFAULT_REAL_PRODUCTS;
+    // Clean slate reset requested by user
+    if (!localStorage.getItem('ling_empty_catalog_reset_v20')) {
+      localStorage.setItem('ling_admin_products', JSON.stringify([]));
+      localStorage.setItem('ling_empty_catalog_reset_v20', 'true');
+      return [];
     }
     const saved = localStorage.getItem('ling_admin_products');
     if (saved !== null) {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) {
+      if (Array.isArray(parsed)) {
         return parsed;
       }
     }
   } catch (e) {
     console.error('Error loading saved products:', e);
   }
-  return DEFAULT_REAL_PRODUCTS;
+  return [];
 }
 
 export function saveProductsToStorage(products: Product[]): void {
