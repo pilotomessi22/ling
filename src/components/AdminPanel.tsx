@@ -1364,17 +1364,20 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
         }
 
         if (newItemsToAdd.length > 0) {
-          setActiveProducts(currentList);
-          saveProductsToStorage(currentList);
+          const reorderedList = [...newItemsToAdd, ...activeProducts.filter((p) => !newItemsToAdd.some((n) => n.id === p.id))];
+          setActiveProducts(reorderedList);
+          saveProductsToStorage(reorderedList);
+          setCatalogCategory('all');
+          setCatalogSearch('');
         }
 
         setAutoFillInput('');
         setImportInput('');
 
         if (addedCount > 0 && duplicateCount === 0) {
-          setImportSuccessMsg(`✓ ${addedCount} produto(s) importado(s) e adicionado(s) com sucesso ao seu catálogo!`);
+          setImportSuccessMsg(`✓ ${addedCount} produto(s) importado(s) e adicionado(s) com sucesso no topo do seu catálogo!`);
         } else if (addedCount > 0 && duplicateCount > 0) {
-          setImportSuccessMsg(`✓ ${addedCount} novo(s) produto(s) importado(s)! (${duplicateCount} produto(s) já existiam e foram ignorados para evitar duplicatas).`);
+          setImportSuccessMsg(`✓ ${addedCount} novo(s) produto(s) importado(s)! (${duplicateCount} produto(s) já existiam no catálogo e foram ignorados).`);
         } else if (addedCount === 0 && duplicateCount > 0) {
           setImportSuccessMsg(`⚠️ O produto ID/URL informado já se encontra cadastrado no seu catálogo!`);
         } else {
@@ -2195,6 +2198,23 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
                   <span>{isImporting ? 'Importando do Zendrop...' : '⚡ Sincronizar Produto Zendrop'}</span>
                 </button>
               </div>
+
+              {/* Success / Info Feedback Banner */}
+              {importSuccessMsg && (
+                <div className="p-3.5 bg-emerald-500/25 border-2 border-emerald-400 text-emerald-100 text-xs sm:text-sm font-extrabold rounded-2xl flex items-center justify-between shadow-lg animate-fadeIn">
+                  <div className="flex items-center gap-2.5">
+                    <CheckCircle2 size={20} className="text-emerald-400 shrink-0" />
+                    <span>{importSuccessMsg}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setImportSuccessMsg(null)}
+                    className="text-emerald-300 hover:text-white font-black text-xs px-2 py-1 rounded-lg bg-emerald-950/40 hover:bg-emerald-950/80 transition-colors"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
 
               {/* Guarantees & Info */}
               <div className="flex flex-wrap items-center justify-between text-[11px] text-blue-200/90 pt-1 gap-2">
