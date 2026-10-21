@@ -44,71 +44,69 @@ export const HomePage: React.FC<HomePageProps> = ({
 
   return (
     <div className="bg-white text-[#0F172A]">
-      {/* 1. Hero Section with Attached Clean Artwork */}
-      <section className="relative overflow-hidden w-full border-b border-[#E2E8F0] bg-gradient-to-b from-[#F8FAFC] via-[#F8FAFC] to-white pt-10 pb-12 sm:pt-16 sm:pb-20 lg:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            {/* Left Column: Real HTML Content */}
-            <div className="lg:col-span-6 space-y-6 text-center sm:text-left z-10">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EFF6FF] border border-[#BFDBFE] text-[#2563EB] text-xs font-bold uppercase tracking-wider">
-                <Leaf size={14} />
-                <span>Nationwide US Delivery · 2–4 Business Days</span>
-              </div>
+      {/* 1. Hero Section - Edge-to-Edge Full-Bleed Background Image */}
+      <section className="relative overflow-hidden w-full min-h-[560px] sm:min-h-[620px] lg:min-h-[680px] flex items-center border-b border-[#E2E8F0] bg-[#F8FAFC]">
+        {/* Full-width Edge-to-Edge Background Layer */}
+        <div className="absolute inset-0 w-full h-full pointer-events-none">
+          <img
+            src="/assets/hero_pets_cozy_harmony.png"
+            alt="Golden Retriever and Companion Cat"
+            className="w-full h-full object-cover object-[82%_center] sm:object-[80%_center] lg:object-[78%_center]"
+            loading="eager"
+            fetchPriority="high"
+          />
+          {/* Smooth White-to-Transparent Gradient on Left Side Only for Crisp Text Readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/95 sm:via-white/85 via-55% to-transparent w-full sm:w-[70%] lg:w-[60%]" />
+          {/* Subtle bottom gradient for a smooth section divider */}
+          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white/80 to-transparent" />
+        </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#0F2942] font-serif tracking-tight leading-[1.12]">
-                Everyday essentials for happy, healthy pets.
-              </h1>
-
-              <p className="text-base sm:text-lg text-[#475569] font-light leading-relaxed max-w-xl mx-auto sm:mx-0">
-                Thoughtfully crafted pet goods designed to soothe anxiety, protect joints, and blend seamlessly into your home. Backed by our 30-day risk-free in-home trial.
-              </p>
-
-              <div className="pt-2 flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-3.5">
-                <button
-                  onClick={() => onNavigateToShop('all')}
-                  className="w-full sm:w-auto px-8 py-4 rounded-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-lg hover:shadow-xl active:scale-98 flex items-center justify-center gap-2"
-                >
-                  <span>Shop All Essentials</span>
-                  <ArrowRight size={15} />
-                </button>
-
-                <button
-                  onClick={() => onNavigateToShop('Dogs')}
-                  className="w-full sm:w-auto px-6 py-4 rounded-full bg-white text-[#0F2942] border border-[#CBD5E1] hover:bg-[#F8FAFC] font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-xs"
-                >
-                  View Dog Gear
-                </button>
-              </div>
-
-              {/* Trust Callout Badges */}
-              <div className="pt-4 flex flex-wrap items-center justify-center sm:justify-start gap-6 text-xs text-[#475569]">
-                <div className="flex items-center gap-2">
-                  <ShieldCheck size={16} className="text-[#2563EB]" />
-                  <span className="font-medium">30-Day Risk-Free Trial</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Truck size={16} className="text-[#2563EB]" />
-                  <span className="font-medium">Ships in 24h via USPS</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Award size={16} className="text-[#2563EB]" />
-                  <span className="font-medium">Non-Toxic & Pet-Safe</span>
-                </div>
-              </div>
+        {/* Foreground Content Container */}
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+          <div className="max-w-xl lg:max-w-2xl space-y-6 text-left">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EFF6FF]/95 backdrop-blur-xs border border-[#BFDBFE] text-[#2563EB] text-xs font-bold uppercase tracking-wider shadow-xs">
+              <Leaf size={14} />
+              <span>Nationwide US Delivery · 2–4 Business Days</span>
             </div>
 
-            {/* Right Column: Complete Clean Artwork (Golden Retriever & Cat) */}
-            <div className="lg:col-span-6 relative flex justify-center lg:justify-end items-center">
-              <div className="relative w-full max-w-2xl overflow-hidden">
-                <img
-                  src="/assets/hero_pets_cozy_harmony.png"
-                  alt="Golden retriever and companion cat in cozy home"
-                  className="w-full h-auto object-contain object-right max-h-[460px] sm:max-h-[520px] lg:max-h-[580px] rounded-2xl sm:rounded-3xl"
-                  loading="eager"
-                  fetchPriority="high"
-                />
-                {/* Subtle soft white gradient blend on the left edge only */}
-                <div className="absolute inset-y-0 left-0 w-16 sm:w-24 bg-gradient-to-r from-[#F8FAFC] via-[#F8FAFC]/50 to-transparent pointer-events-none" />
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#0F2942] font-serif tracking-tight leading-[1.12]">
+              Everyday essentials for happy, healthy pets.
+            </h1>
+
+            <p className="text-base sm:text-lg text-[#334155] font-normal leading-relaxed max-w-xl">
+              Thoughtfully crafted pet goods designed to soothe anxiety, protect joints, and blend seamlessly into your home. Backed by our 30-day risk-free in-home trial.
+            </p>
+
+            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-start gap-3.5">
+              <button
+                onClick={() => onNavigateToShop('all')}
+                className="px-8 py-4 rounded-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-lg hover:shadow-xl active:scale-98 flex items-center justify-center gap-2"
+              >
+                <span>Shop All Essentials</span>
+                <ArrowRight size={15} />
+              </button>
+
+              <button
+                onClick={() => onNavigateToShop('Dogs')}
+                className="px-6 py-4 rounded-full bg-white/90 hover:bg-white text-[#0F2942] border border-[#CBD5E1] font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-xs backdrop-blur-xs flex items-center justify-center"
+              >
+                View Dog Gear
+              </button>
+            </div>
+
+            {/* Trust Callout Badges */}
+            <div className="pt-4 flex flex-wrap items-center justify-start gap-6 text-xs text-[#334155] font-medium">
+              <div className="flex items-center gap-2">
+                <ShieldCheck size={16} className="text-[#2563EB]" />
+                <span>30-Day Risk-Free Trial</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Truck size={16} className="text-[#2563EB]" />
+                <span>Ships in 24h via USPS</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Award size={16} className="text-[#2563EB]" />
+                <span>Non-Toxic & Pet-Safe</span>
               </div>
             </div>
           </div>
