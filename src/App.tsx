@@ -255,16 +255,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] flex flex-col font-['Plus_Jakarta_Sans',sans-serif] selection:bg-[#2563EB] selection:text-white w-full max-w-full overflow-x-hidden relative">
-      {/* 1. Nationwide US Announcement Bar in Royal Navy */}
-      <TopAnnouncementBar
-        onApplyPromo={(code) => {
-          setAppliedPromo(code);
-          handleNavigate('cart');
-        }}
-        onOpenTracking={() => setIsTrackingOpen(true)}
-      />
-
-      {/* 2. Fable Pets Style Multi-Page Floating Header (Royal Navy & Cobalt Blue) */}
+      {/* Main Floating Header */}
       <Header
         currentPage={currentPage}
         onNavigate={handleNavigate}

@@ -138,57 +138,6 @@ export const HomePage: React.FC<HomePageProps> = ({
                     </span>
                   </div>
                 </div>
-
-                {/* 3 mini product image thumbnails */}
-                <div className="grid grid-cols-3 gap-3 mt-4">
-                  <div
-                    onClick={() => onOpenCampaign?.()}
-                    className="bg-white p-2 rounded-xl border border-[#E2E8F0] cursor-pointer hover:border-[#2563EB] transition-colors text-center"
-                  >
-                    <div className="aspect-square rounded-lg overflow-hidden bg-white mb-1.5">
-                      <img
-                        src="/assets/campaign/grooming_gloves.png"
-                        alt="Pet Grooming Gloves"
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                    <span className="text-[10px] font-bold text-[#0F2942] line-clamp-1 block">
-                      1. Grooming Gloves
-                    </span>
-                  </div>
-
-                  <div
-                    onClick={() => onOpenCampaign?.()}
-                    className="bg-white p-2 rounded-xl border border-[#E2E8F0] cursor-pointer hover:border-[#2563EB] transition-colors text-center"
-                  >
-                    <div className="aspect-square rounded-lg overflow-hidden bg-white mb-1.5">
-                      <img
-                        src="/assets/campaign/zepetz_hair_remover.png"
-                        alt="Zepetz Pet Hair Remover"
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                    <span className="text-[10px] font-bold text-[#0F2942] line-clamp-1 block">
-                      2. Zepetz Hair Remover
-                    </span>
-                  </div>
-
-                  <div
-                    onClick={() => onOpenCampaign?.()}
-                    className="bg-white p-2 rounded-xl border border-[#E2E8F0] cursor-pointer hover:border-[#2563EB] transition-colors text-center"
-                  >
-                    <div className="aspect-square rounded-lg overflow-hidden bg-white mb-1.5">
-                      <img
-                        src="/assets/campaign/paw_cleaner.png"
-                        alt="Pet Paw Cleaner"
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                    <span className="text-[10px] font-bold text-[#0F2942] line-clamp-1 block">
-                      3. Pet Paw Cleaner
-                    </span>
-                  </div>
-                </div>
               </div>
 
               {/* Right Column: Copy & Order Action */}
@@ -210,24 +159,21 @@ export const HomePage: React.FC<HomePageProps> = ({
                   </p>
                 </div>
 
-                <div className="space-y-2 pt-1 border-t border-[#F1F5F9]">
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#0F2942] block">
-                    What's Included:
-                  </span>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-                    <div className="p-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
-                      <span className="font-bold text-[#0F2942] block text-[11px]">1. Grooming Gloves</span>
-                      <span className="text-[#64748B] text-[10px]">Gentle fur removal</span>
-                    </div>
-                    <div className="p-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
-                      <span className="font-bold text-[#0F2942] block text-[11px]">2. Zepetz Remover</span>
-                      <span className="text-[#64748B] text-[10px]">Reusable sofa tool</span>
-                    </div>
-                    <div className="p-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
-                      <span className="font-bold text-[#0F2942] block text-[11px]">3. Paw Cleaner</span>
-                      <span className="text-[#64748B] text-[10px]">Removes mud & dirt</span>
-                    </div>
-                  </div>
+                <div className="pt-2 border-t border-[#F1F5F9]">
+                  <ul className="space-y-2 text-xs font-medium text-[#334155]">
+                    <li className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB]"></span>
+                      <strong className="text-[#0F2942]">Pet Grooming Gloves:</strong> Gentle fur removal & comforting massage
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB]"></span>
+                      <strong className="text-[#0F2942]">Zepetz Hair Remover:</strong> Reusable sofa & upholstery cleaner
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB]"></span>
+                      <strong className="text-[#0F2942]">Pet Paw Cleaner:</strong> Soft silicone bristles for muddy paws
+                    </li>
+                  </ul>
                 </div>
 
                 {/* Price & Purchase Actions */}
