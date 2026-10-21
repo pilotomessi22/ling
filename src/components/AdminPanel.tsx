@@ -537,7 +537,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const [cjUserId, setCjUserId] = useState(() => localStorage.getItem('ling_cj_user_id') || 'CJ5954420');
   const [cjAccountName, setCjAccountName] = useState(() => localStorage.getItem('ling_cj_account_name') || 'Ling Petshop');
   const [cjApiKey, setCjApiKey] = useState(() => localStorage.getItem('ling_cj_api_key') || '');
-  const [zendropToken, setZendropToken] = useState(() => localStorage.getItem('ling_zendrop_token') || 'nFYmv6V78pTJS56VxyOpQ0jre14PPXPASHKfv4moFGW1hFx06iSTIArNNfJLPFAX');
+  const [zendropToken, setZendropToken] = useState(() => localStorage.getItem('ling_zendrop_token') || 'UUUvotHLOYoGQopIgxXnfpIFjD4BoQfUW7EisDnPqI9KHQHl2aD8G72eKRiVRbqN');
   const [apiPingStatus, setApiPingStatus] = useState<'idle' | 'testing' | 'connected'>('connected');
   const [cjSaveSuccess, setCjSaveSuccess] = useState(false);
   const [isRechargeOpen, setIsRechargeOpen] = useState(false);

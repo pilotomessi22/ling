@@ -55,6 +55,105 @@ app.get('/api/stripe-status', async (_req: Request, res: Response) => {
   }
 });
 
+// Zendrop API Status Endpoint
+app.post('/api/zendrop/status', async (req: Request, res: Response) => {
+  try {
+    const apiKey =
+      req.body?.apiKey ||
+      process.env.ZENDROP_API_KEY ||
+      'UUUvotHLOYoGQopIgxXnfpIFjD4BoQfUW7EisDnPqI9KHQHl2aD8G72eKRiVRbqN';
+    if (!apiKey || apiKey.trim() === '') {
+      return res.json({
+        connected: false,
+        status: 'disconnected',
+        message: 'Nenhuma chave API do Zendrop foi informada. Insira sua Zendrop API Key no painel admin para ativar a sincronização real.',
+      });
+    }
+
+    // Call Zendrop API endpoint to verify key
+    const zendropRes = await fetch('https://api.zendrop.com/v1/user', {
+      headers: {
+        Authorization: `Bearer ${apiKey.trim()}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (zendropRes.ok) {
+      const userData = await zendropRes.json().catch(() => ({}));
+      return res.json({
+        connected: true,
+        status: 'active',
+        message: 'Conexão com a API do Zendrop estabelecida e autenticada com sucesso!',
+        user: userData,
+      });
+    } else {
+      return res.json({
+        connected: false,
+        status: 'invalid_key',
+        message: `Chave API recusada pelo Zendrop (HTTP ${zendropRes.status}). Verifique se a chave gerada no painel do Zendrop está correta.`,
+      });
+    }
+  } catch (err: any) {
+    return res.status(500).json({
+      connected: false,
+      status: 'error',
+      message: `Erro ao conectar com servidor do Zendrop: ${err.message}`,
+    });
+  }
+});
+
+// Zendrop Fetch Product Details & HD Images Endpoint
+app.post('/api/zendrop/fetch-product', async (req: Request, res: Response) => {
+  try {
+    const { productId, apiKey: providedApiKey } = req.body;
+    const apiKey =
+      providedApiKey ||
+      process.env.ZENDROP_API_KEY ||
+      'UUUvotHLOYoGQopIgxXnfpIFjD4BoQfUW7EisDnPqI9KHQHl2aD8G72eKRiVRbqN';
+
+    if (!productId) {
+      return res.status(400).json({ error: 'ID do produto é obrigatório.' });
+    }
+
+    if (!apiKey) {
+      return res.status(400).json({
+        error: 'Chave API do Zendrop não configurada. Insira sua Zendrop API Key no painel admin para importar produtos e fotos originais.',
+      });
+    }
+
+    const cleanId = String(productId).replace(/[^0-9]/g, '');
+    const zendropRes = await fetch(`https://api.zendrop.com/v1/products/${cleanId}`, {
+      headers: {
+        Authorization: `Bearer ${apiKey.trim()}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = await zendropRes.json().catch(() => null);
+
+    if (!zendropRes.ok || !data) {
+      return res.status(zendropRes.status || 404).json({
+        error: data?.message || `Produto ID ${cleanId} não encontrado no Zendrop ou chave sem permissão.`,
+      });
+    }
+
+    return res.json({
+      success: true,
+      product: {
+        id: data.id || cleanId,
+        name: data.title || data.name,
+        description: data.description,
+        images: data.images || (data.image ? [data.image] : []),
+        variants: data.variants || [],
+        stock: data.stock || data.total_quantity || 100,
+        supplierCost: data.price || data.cost || 0,
+      },
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message || 'Erro interno ao consultar produto no Zendrop.' });
+  }
+});
+
 // Automatic Stripe Checkout Session Creation Endpoint
 app.post('/api/create-checkout-session', async (req: Request, res: Response) => {
   try {
