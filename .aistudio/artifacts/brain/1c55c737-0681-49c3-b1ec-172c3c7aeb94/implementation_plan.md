@@ -1,96 +1,78 @@
-# Plano de Estratégia de Frete e Faturamento de Pedidos
+# Implementation Report: The Ultimate Pet Cleanup Kit Campaign
 
-Este plano estrutura a nova arquitetura do sistema de **Frete e Despacho de Pedidos** para a **Ling Petshop USA**, garantindo uma experiência minimalista, limpa e profissional no checkout do cliente e o gerenciamento estratégico interno no Painel Admin.
-
----
-
-## Decisões Confirmadas do Lojista (Phase 1)
-
-> [!IMPORTANT]
-> As escolhas abaixo foram confirmadas pelo lojista para a estratégia de frete:
-
-- **1. Nomes Limpos, Valores e Prazos no Checkout**:
-  - **Standard Delivery (3–5 Days)**: **$4,95** (ou **FREE** para pedidos de $45,00+).
-  - **Express Delivery (2–4 Days)**: **$9,95** (sempre cobrado).
-- **2. Sigilo da Estratégia de Despacho (Segredo do Lojista)**:
-  - **Visão do Cliente**: Nomes minimalistas e diretos sem termos pesados ("Standard Delivery" e "Express Delivery").
-  - **Visão do Lojista (Painel Admin)**: Cada pedido recebido exibe uma **Etiqueta de Prioridade de Despacho**:
-    - Pedidos **Express Delivery ($9,95)**: Destaque **"URGENTE: Confirmar com Fornecedor em até 2 horas"**.
-    - Pedidos **Standard Delivery ($4,95 ou Free)**: Destaque **"PADRÃO: Confirmar com Fornecedor após 24 horas"** (Janela de segurança contra cancelamentos).
+The campaign bundle **"The Ultimate Pet Cleanup Kit"** has been integrated into the existing e-commerce store while preserving all visual identity, colors, typography, navigation, shopping bag logic, and existing checkout functionality.
 
 ---
 
-## 1. Visão Geral & Experiência do Cliente
+## 1. Campaign Details & Specifications
 
-### A. Fluxo de Seleção no Checkout (`CheckoutPage.tsx`)
-- Ao chegar na etapa de frete do Checkout, o cliente vê apenas o essencial de forma limpa e minimalista:
-  - **Standard Delivery (3 to 5 Days)**
-    - Preço: **FREE** (se o pedido for de $45+) ou **$4.95**.
-  - **Express Delivery (2 to 4 Days)**
-    - Preço: **$9.95**.
-- Sem textos longos ou burocráticos. Cálculo direto sem acumular nem somar taxas.
-
-### B. Confirmação do Pedido (`CheckoutPage.tsx`)
-- O comprovante do pedido exibe exatamente o método escolhido ("Standard Delivery - 3 to 5 Days" ou "Express Delivery - 2 to 4 Days").
-
----
-
-## 2. Visão do Lojista no Painel Admin (`AdminPanel.tsx`)
-
-Na aba **Pedidos & Vendas (Orders)** do Painel Admin:
-
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│                        Painel Admin - Pedidos                          │
-├────────────────────────────────────────────────────────────────────────┤
-│ Pedido #LP-US-892104                                                   │
-│ Cliente: John Smith (Florida)                                          │
-│ Frete: Express Delivery ($9.95 · 2 to 4 Days)                          │
-│ 🚨 AÇÃO: URGENTE - Confirmar no Zendrop em até 2 horas!                 │
-├────────────────────────────────────────────────────────────────────────┤
-│ Pedido #LP-US-741902                                                   │
-│ Cliente: Sarah Jenkins (Texas)                                         │
-│ Frete: Standard Delivery ($4.95 / Free · 3 to 5 Days)                  │
-│ ⏳ AÇÃO: PADRÃO - Aguardar 24h antes de confirmar no Zendrop            │
-└────────────────────────────────────────────────────────────────────────┘
-```
+- **Campaign Name:** The Ultimate Pet Cleanup Kit
+- **Product Title:** The Ultimate Pet Cleanup Kit – Grooming Gloves, Pet Hair Remover & Paw Cleaner
+- **Short Description:** Less Fur. Cleaner Paws. Happier Home.
+  - *Keep your pets fresh and your home cleaner with three practical essentials for grooming, removing loose fur, and cleaning muddy paws.*
+- **Full Product Description:**
+  - *A Cleaner Home. A Happier Pet. A Better Everyday Routine.*
+  - *Meet the Ultimate Pet Cleanup Kit, a convenient bundle designed to make everyday pet care easier.*
+  - **What's Included:**
+    1. **Pet Grooming Gloves:** Help remove loose fur while providing a gentle grooming experience for your dog or cat.
+    2. **Zepetz Pet Hair Remover:** Remove unwanted pet hair from sofas, upholstery, and other suitable fabric surfaces with a reusable cleaning tool.
+    3. **Pet Paw Cleaner:** Help remove dirt and mud from your dog's paws after walks, outdoor adventures, and playtime.
+  - **Why You'll Love It:**
+    - Help reduce loose pet hair around your home.
+    - Make everyday pet grooming easier.
+    - Help clean muddy paws after outdoor activities.
+    - Enjoy three practical pet care essentials in one convenient bundle.
+  - **Tagline:** Less Fur. Cleaner Paws. Happier Home.
 
 ---
 
-## 3. Arquitetura Técnica & Lógica de Negócios
+## 2. Image Asset Mapping (Zero Generation, 100% Attached Images Preserved)
 
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│                          Checkout System                               │
-├───────────────────────────────────┬────────────────────────────────────┤
-│ Standard Delivery ($4.95 / Free)  │      Express Delivery ($9.95)       │
-│        (3 to 5 Days)              │            (2 to 4 Days)           │
-└─────────────────┬─────────────────┴──────────────────┬─────────────────┘
-                  │                                    │
-                  ▼                                    ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│                        Order Calculation Logic                         │
-│   shippingCost = option === 'express' ? 9.95 : baseShipping            │
-└───────────────────────────────────┬────────────────────────────────────┤
-                                    │
-                                    ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│                      Admin Order Management                            │
-│   tag = option === 'express' ? '2h Urgent' : '24h Standard'            │
-└────────────────────────────────────────────────────────────────────────┘
-```
+The promotional campaign images were preserved in their original resolution and aspect ratios:
+
+| Section | Image File | Display Treatment |
+| :--- | :--- | :--- |
+| **Hero Bundle Cover** | `ultimate_cleanup_kit_cover.png` | Primary bundle hero banner, 1:1 square, `object-contain` to avoid stretching/cropping |
+| **Essential 1: Pet Grooming Gloves** | `grooming_gloves.png` | Dedicated showcase block with original promo art & benefit list |
+| **Essential 2: Zepetz Hair Remover** | `zepetz_hair_remover.png` | Dedicated showcase block with original promo art & benefit list |
+| **Essential 3: Pet Paw Cleaner** | `paw_cleaner.png` | Dedicated showcase block with original promo art & benefit list |
 
 ---
 
-## 4. Plano de Execução & Alterações nos Arquivos
+## 3. Real Inventory & Pricing Alignment
 
-1. **`src/utils/storeLogic.ts`**:
-   - Definir `EXPRESS_SHIPPING_FEE = 9.95` e manter frete padrão ($4.95 ou $0 para $45+).
-2. **`src/pages/CheckoutPage.tsx`**:
-   - Simplificar as opções de frete para "Standard Delivery (3 to 5 Days)" e "Express Delivery (2 to 4 Days)".
-   - Remover descrições burocráticas mantendo a interface ultra clean.
-   - Salvar a tag de despacho correspondente no pedido (`express` -> 2h urgente; `standard` -> 24h padrão).
-3. **`src/components/AdminPanel.tsx`**:
-   - Exibir o alerta de despacho rápido (2h) vs normal (24h) na lista de pedidos.
-4. **Verificação & Compilação**:
-   - Executar `compile_applet` e `lint_applet` para validar que não há erros no build.
+In compliance with the rule not to invent arbitrary prices or stock:
+- **Constituent Items in Catalog:**
+  1. `ZD-1603576` (Paw Cleaner Cup): $14.99 retail ($3.99 supplier cost)
+  2. `ZD-2053714` (ZepetZ Hair Remover): $29.99 retail ($14.99 supplier cost)
+  3. `ZD-2058716` (Grooming Glove): $22.99 retail ($8.99 supplier cost)
+- **Bundle Price Calculation:**
+  - Retail Bundle Price: **$67.97**
+  - Compare-At Value: **$95.17** (Total combined MSRP)
+  - Customer Savings: **$27.20 (29% Off)**
+  - Supplier Cost: **$27.97**
+  - Real In-Stock Count: **132 units** (governed by the lowest supplier stock level)
+
+---
+
+## 4. Modified & Added Files
+
+1. **`src/data/storeData.ts`**:
+   - Added `BundleIncludedItem` interface and `bundleItems`, `isCampaignBundle`, `campaignName` to `Product`.
+   - Registered `ultimate-pet-cleanup-kit` bundle with all 4 campaign graphics, exact copy, and structured specs.
+   - Updated storage key to immediately load the new catalog for shoppers.
+
+2. **`src/pages/ProductDetailPage.tsx`**:
+   - Configured `aspect-square bg-white object-contain` for bundle promo artwork so no text or graphics are cropped.
+   - Added rich **"Included in This Bundle"** breakdown featuring all 3 products with their images and bullet points in exact sequence.
+   - Added **"Why You'll Love It"** section with checkmarks and direct purchase CTA.
+
+3. **`src/pages/HomePage.tsx`**:
+   - Added a **Campaign Spotlight** card directly between the Hero and Collections with the bundle hero image, the 3 mini previews, pricing, and "View Campaign Kit" action.
+
+4. **`src/App.tsx`**:
+   - Added hash routing for `#campaign`, `#cleanup-kit`, and `#bundle`.
+   - Connected `onOpenCampaign` to smoothly navigate to the kit's PDP.
+
+5. **`src/components/Header.tsx`**:
+   - Added `✨ Cleanup Kit Bundle` to the desktop and mobile navigation menus.

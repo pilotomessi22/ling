@@ -49,6 +49,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const mainPages = [
     { label: 'Shop All', page: 'shop', category: 'all' },
+    { label: '✨ Cleanup Kit Bundle', page: 'campaign' },
     { label: 'Walk & Travel', page: 'shop', category: 'Walk & Travel' },
     { label: 'Sleep & Beds', page: 'shop', category: 'Beds' },
     { label: 'Toys & Play', page: 'shop', category: 'Toys' },

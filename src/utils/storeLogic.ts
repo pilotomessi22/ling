@@ -80,6 +80,8 @@ export function getItemUnitPrice(
   return Number(total.toFixed(2));
 }
 
+import { calculatePreciseShipping, ShippingRateCalculation } from './shippingCalculator.ts';
+
 export interface OrderCalculationResult {
   subtotal: number;
   bundleDiscount: number;
@@ -91,15 +93,27 @@ export interface OrderCalculationResult {
   amountNeededForFreeShipping: number;
   appliedPromo: string | null;
   totalEstimatedProfit: number;
+  shippingDetails?: {
+    zone: number;
+    zoneName: string;
+    groundFee: number;
+    priorityFee: number;
+    estimatedDays: string;
+    isRemote: boolean;
+    transitDescription: string;
+  };
 }
 
 /**
- * Calculate complete order totals with dynamic coupons and anti-loss profit protection
+ * Calculate complete order totals with dynamic coupons, precise customer address shipping, and anti-loss profit protection
  */
 export function calculateOrderTotals(
   items: CartItem[],
   promoCode?: string | null,
-  deliveryMethod?: string
+  deliveryMethod?: string,
+  stateCode: string = 'FL',
+  zipCode: string = '',
+  deliveryOption: 'usps_ground' | 'usps_priority' = 'usps_ground'
 ): OrderCalculationResult {
   let subtotal = 0;
   let bundleDiscount = 0;
@@ -129,7 +143,7 @@ export function calculateOrderTotals(
 
   const discountedSubtotal = Math.max(0, subtotal - bundleDiscount - repeatDeliverySavings);
 
-  // Busca o cupom dinamicamente na lista mantida no Admin
+  // Dynamic coupon lookup
   const availableCoupons = getSavedCoupons();
   const matchedCoupon = availableCoupons.find(
     (c) => c.active && c.code.trim().toUpperCase() === cleanPromo
@@ -143,14 +157,25 @@ export function calculateOrderTotals(
     appliedPromo = 'FREESHIP (FRETE GRÁTIS)';
   }
 
-  // Cálculo do Custo de Envio Real do Fornecedor Zendrop (USPS Express):
-  // Base de $4.95 + $1.50 por item adicional enviado do armazém
+  // Precise shipping calculation based on customer destination address (State & ZIP)
+  const hasFreeShipCoupon = cleanPromo === 'FREESHIP';
+  const shippingCalculation: ShippingRateCalculation = calculatePreciseShipping(
+    stateCode,
+    zipCode,
+    discountedSubtotal,
+    deliveryOption,
+    hasFreeShipCoupon
+  );
+
+  const shipping = items.length === 0 ? 0 : shippingCalculation.effectiveFee;
+  const freeShippingQualified = shippingCalculation.freeShippingQualified;
+
+  // Supplier shipping cost tracking for financial margin safeguarding
   const totalItemQty = items.reduce((acc, i) => acc + i.quantity, 0);
   const estimatedSupplierShippingCost = totalItemQty > 0 ? 4.95 + Math.max(0, totalItemQty - 1) * 1.50 : 0;
   const totalBaseCostWithShipping = totalSupplierCost + estimatedSupplierShippingCost;
 
-  // Trava de Segurança Financeira Anti-Prejuízo (Garante Margem Mínima Segura de 35% LÍQUIDA):
-  // Proteção contra perdas ao combinar Desconto em Lote (Comprar 3) + Cupom de 20% OFF + Frete Grátis
+  // Margin protection lock
   const minSafeGoodsTotal = totalBaseCostWithShipping * 1.35;
   if (discountedSubtotal - promoDiscount < minSafeGoodsTotal && totalBaseCostWithShipping > 0) {
     const maxSafeDiscount = Math.max(0, discountedSubtotal - minSafeGoodsTotal);
@@ -158,12 +183,6 @@ export function calculateOrderTotals(
   }
 
   const effectiveGoodsTotal = Math.max(0, discountedSubtotal - promoDiscount);
-  const freeShippingQualified =
-    discountedSubtotal >= FREE_SHIPPING_THRESHOLD ||
-    cleanPromo === 'FREESHIP';
-
-  const shipping =
-    items.length === 0 || freeShippingQualified ? 0 : STANDARD_US_SHIPPING_FEE;
 
   const amountNeededForFreeShipping = Math.max(
     0,
@@ -186,6 +205,15 @@ export function calculateOrderTotals(
     amountNeededForFreeShipping,
     appliedPromo,
     totalEstimatedProfit,
+    shippingDetails: {
+      zone: shippingCalculation.zone,
+      zoneName: shippingCalculation.zoneName,
+      groundFee: shippingCalculation.groundFee,
+      priorityFee: shippingCalculation.priorityFee,
+      estimatedDays: shippingCalculation.estimatedDays,
+      isRemote: shippingCalculation.isRemoteOrIslands,
+      transitDescription: shippingCalculation.transitDescription,
+    },
   };
 }
 

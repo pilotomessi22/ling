@@ -7,15 +7,19 @@ import {
   Leaf,
   ChevronRight,
   Award,
+  Sparkles,
+  CheckCircle2,
 } from 'lucide-react';
 
 interface HomePageProps {
   onNavigateToShop: (category?: string) => void;
   onOpenPromo?: (code: string) => void;
+  onOpenCampaign?: () => void;
 }
 
 export const HomePage: React.FC<HomePageProps> = ({
   onNavigateToShop,
+  onOpenCampaign,
 }) => {
   const collections = [
     {
@@ -107,7 +111,157 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
       </section>
 
-      {/* 2. Exactly 3 Clean Collection Blocks (Direct, uncluttered navigation) */}
+      {/* 2. Campaign Spotlight: The Ultimate Pet Cleanup Kit */}
+      <section className="py-12 sm:py-16 bg-[#F8FAFC] border-b border-[#E2E8F0]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-3xl p-6 sm:p-10 lg:p-12 border border-[#E2E8F0] shadow-sm overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+              {/* Left Column: Image with badges */}
+              <div className="lg:col-span-6">
+                <div
+                  onClick={() => onOpenCampaign?.()}
+                  className="relative aspect-square rounded-2xl overflow-hidden bg-white border border-[#E2E8F0] shadow-sm cursor-pointer group"
+                >
+                  <img
+                    src="/assets/campaign/ultimate_cleanup_kit_cover.png"
+                    alt="The Ultimate Pet Cleanup Kit"
+                    className="w-full h-full object-contain p-2 group-hover:scale-102 transition-transform duration-500"
+                  />
+                  <div className="absolute top-4 left-4 flex flex-col gap-1.5">
+                    <span className="bg-[#0F2942] text-white text-[10px] sm:text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-xs">
+                      Special Campaign Bundle
+                    </span>
+                    <span className="bg-[#16A34A] text-white text-[10px] sm:text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-xs">
+                      Save $27.20
+                    </span>
+                  </div>
+                </div>
+
+                {/* 3 mini product image thumbnails */}
+                <div className="grid grid-cols-3 gap-3 mt-4">
+                  <div
+                    onClick={() => onOpenCampaign?.()}
+                    className="bg-white p-2 rounded-xl border border-[#E2E8F0] cursor-pointer hover:border-[#2563EB] transition-colors text-center"
+                  >
+                    <div className="aspect-square rounded-lg overflow-hidden bg-white mb-1.5">
+                      <img
+                        src="/assets/campaign/grooming_gloves.png"
+                        alt="Pet Grooming Gloves"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <span className="text-[10px] font-bold text-[#0F2942] line-clamp-1 block">
+                      1. Grooming Gloves
+                    </span>
+                  </div>
+
+                  <div
+                    onClick={() => onOpenCampaign?.()}
+                    className="bg-white p-2 rounded-xl border border-[#E2E8F0] cursor-pointer hover:border-[#2563EB] transition-colors text-center"
+                  >
+                    <div className="aspect-square rounded-lg overflow-hidden bg-white mb-1.5">
+                      <img
+                        src="/assets/campaign/zepetz_hair_remover.png"
+                        alt="Zepetz Pet Hair Remover"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <span className="text-[10px] font-bold text-[#0F2942] line-clamp-1 block">
+                      2. Zepetz Hair Remover
+                    </span>
+                  </div>
+
+                  <div
+                    onClick={() => onOpenCampaign?.()}
+                    className="bg-white p-2 rounded-xl border border-[#E2E8F0] cursor-pointer hover:border-[#2563EB] transition-colors text-center"
+                  >
+                    <div className="aspect-square rounded-lg overflow-hidden bg-white mb-1.5">
+                      <img
+                        src="/assets/campaign/paw_cleaner.png"
+                        alt="Pet Paw Cleaner"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <span className="text-[10px] font-bold text-[#0F2942] line-clamp-1 block">
+                      3. Pet Paw Cleaner
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Copy & Order Action */}
+              <div className="lg:col-span-6 space-y-5">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EFF6FF] border border-[#BFDBFE] text-[#2563EB] text-xs font-bold uppercase tracking-wider">
+                  <Sparkles size={14} />
+                  <span>The Ultimate Pet Cleanup Kit</span>
+                </div>
+
+                <div>
+                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#0F2942] font-serif leading-tight">
+                    The Ultimate Pet Cleanup Kit – Grooming Gloves, Pet Hair Remover & Paw Cleaner
+                  </h2>
+                  <p className="text-sm sm:text-base font-semibold text-[#2563EB] mt-2">
+                    Less Fur. Cleaner Paws. Happier Home.
+                  </p>
+                  <p className="text-xs sm:text-sm text-[#64748B] mt-2 leading-relaxed">
+                    Keep your pets fresh and your home cleaner with three practical essentials for grooming, removing loose fur, and cleaning muddy paws.
+                  </p>
+                </div>
+
+                <div className="space-y-2 pt-1 border-t border-[#F1F5F9]">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#0F2942] block">
+                    What's Included:
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                    <div className="p-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+                      <span className="font-bold text-[#0F2942] block text-[11px]">1. Grooming Gloves</span>
+                      <span className="text-[#64748B] text-[10px]">Gentle fur removal</span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+                      <span className="font-bold text-[#0F2942] block text-[11px]">2. Zepetz Remover</span>
+                      <span className="text-[#64748B] text-[10px]">Reusable sofa tool</span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+                      <span className="font-bold text-[#0F2942] block text-[11px]">3. Paw Cleaner</span>
+                      <span className="text-[#64748B] text-[10px]">Removes mud & dirt</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Price & Purchase Actions */}
+                <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#F8FAFC] p-4 rounded-2xl border border-[#E2E8F0]">
+                  <div>
+                    <div className="flex items-baseline gap-2.5">
+                      <span className="text-3xl font-black text-[#0F2942]">
+                        $67.97
+                      </span>
+                      <span className="text-sm line-through text-[#94A3B8]">
+                        $95.17
+                      </span>
+                      <span className="text-xs font-bold text-[#16A34A] bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
+                        29% Off Bundle
+                      </span>
+                    </div>
+                    <span className="text-[11px] text-[#64748B] block mt-0.5">
+                      Includes all 3 essentials · Ships in 24h via USPS
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={() => onOpenCampaign?.()}
+                    className="px-6 py-3.5 rounded-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md hover:shadow-lg active:scale-98 flex items-center justify-center gap-2 whitespace-nowrap"
+                  >
+                    <span>View Campaign Kit</span>
+                    <ArrowRight size={15} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. Exactly 3 Clean Collection Blocks (Direct, uncluttered navigation) */}
       <section className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-12">
           <span className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">

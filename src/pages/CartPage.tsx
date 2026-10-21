@@ -43,6 +43,7 @@ export const CartPage: React.FC<CartPageProps> = ({
   const discount = calc.bundleDiscount + calc.repeatDeliverySavings + calc.promoDiscount;
   const isFreeShipping = calc.freeShippingQualified;
 
+  const hasOutOfStock = items.some((i) => i.stockCount === 0 || i.inStock === false);
   const totalCount = items.reduce((acc, curr) => acc + curr.quantity, 0);
 
   const handleApplyPromo = (e: React.FormEvent) => {
@@ -158,8 +159,13 @@ export const CartPage: React.FC<CartPageProps> = ({
                       <div className="flex flex-wrap items-center gap-3 text-xs text-[#64748B] mt-1">
                         {item.size && <span>Size: <strong className="text-[#0F2942]">{item.size}</strong></span>}
                         {item.color && <span>Color: <strong className="text-[#0F2942]">{item.color}</strong></span>}
-
                       </div>
+
+                      {(item.stockCount === 0 || item.inStock === false) && (
+                        <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[11px] font-bold">
+                          <span>⚠️ Esgotado no fornecedor Zendrop (0 un.) — Remova para prosseguir</span>
+                        </div>
+                      )}
 
                       {/* Controls and Price */}
                       <div className="mt-4 flex items-center justify-between">
@@ -258,13 +264,27 @@ export const CartPage: React.FC<CartPageProps> = ({
                   </span>
                 </div>
 
+                {hasOutOfStock && (
+                  <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 text-xs space-y-1">
+                    <span className="font-extrabold text-rose-950 block">⚠️ Item Esgotado no Carrinho</span>
+                    <p className="text-[11px] text-rose-700 leading-relaxed">
+                      Existe item com estoque zerado no seu carrinho. Para prosseguir com o pagamento e cálculo de frete, remova os produtos esgotados.
+                    </p>
+                  </div>
+                )}
+
                 {/* Big Checkout CTA Button */}
                 <button
                   onClick={onProceedToCheckout}
-                  className="w-full py-4 rounded-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-lg hover:shadow-xl active:scale-98 flex items-center justify-center gap-2"
+                  disabled={hasOutOfStock}
+                  className={`w-full py-4 rounded-full font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${
+                    hasOutOfStock
+                      ? 'bg-slate-200 text-slate-500 cursor-not-allowed border border-slate-300'
+                      : 'bg-[#2563EB] hover:bg-[#1D4ED8] text-white cursor-pointer shadow-lg hover:shadow-xl active:scale-98'
+                  }`}
                 >
                   <Lock size={15} />
-                  <span>Proceed to Checkout</span>
+                  <span>{hasOutOfStock ? 'Remova Itens Esgotados para Continuar' : 'Proceed to Checkout'}</span>
                   <ArrowRight size={15} />
                 </button>
 

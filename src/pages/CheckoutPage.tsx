@@ -13,6 +13,7 @@ import {
 import { CartItem, calculateOrderTotals, ShippingAddress, EXPRESS_SHIPPING_FEE } from '../utils/storeLogic.ts';
 import { formatCurrency } from '../utils/storeLogic.ts';
 import { US_STATES } from '../data/storeData.ts';
+import { getStateFromZip } from '../utils/shippingCalculator.ts';
 
 interface CheckoutPageProps {
   items: CartItem[];
@@ -62,12 +63,29 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
     };
   });
 
-  const calc = calculateOrderTotals(items, appliedPromo);
-  const { subtotal, shipping: baseShipping, total: calcTotal } = calc;
+  const hasOutOfStock = items.some((i) => i.stockCount === 0 || i.inStock === false);
+
+  const calc = calculateOrderTotals(
+    items,
+    appliedPromo,
+    'shipping',
+    address.state,
+    address.zipCode,
+    deliveryOption
+  );
+  const { subtotal, shipping: shippingCost, total: finalTotal, shippingDetails } = calc;
   const discount = calc.bundleDiscount + calc.repeatDeliverySavings + calc.promoDiscount;
 
-  const shippingCost = deliveryOption === 'usps_priority' ? EXPRESS_SHIPPING_FEE : baseShipping;
-  const finalTotal = subtotal - discount + shippingCost;
+  const handleZipChange = (val: string) => {
+    const clean = val.replace(/[^0-9-]/g, '').slice(0, 10);
+    const prefix5 = clean.slice(0, 5);
+    const autoState = prefix5.length === 5 ? getStateFromZip(prefix5) : null;
+    if (autoState) {
+      setAddress((prev) => ({ ...prev, zipCode: clean, state: autoState }));
+    } else {
+      setAddress((prev) => ({ ...prev, zipCode: clean }));
+    }
+  };
 
   const playNotificationSound = () => {
     try {
@@ -89,6 +107,10 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
   };
 
   const handleFast1ClickTestPurchase = () => {
+    if (hasOutOfStock) {
+      alert('Não é possível concluir o pedido: um ou mais itens no seu carrinho estão esgotados no fornecedor Zendrop. Por favor, remova-os da sacola para continuar.');
+      return;
+    }
     setIsSubmitting(true);
     const amountToSave = finalTotal > 0 ? finalTotal : 498.95;
     setConfirmedPaidTotal(amountToSave);
@@ -171,6 +193,10 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
 
   const handleSubmitOrder = (e: React.FormEvent) => {
     e.preventDefault();
+    if (hasOutOfStock) {
+      alert('Não é possível concluir o pedido: um ou mais itens no seu carrinho estão esgotados no fornecedor Zendrop. Por favor, remova-os da sacola para continuar.');
+      return;
+    }
     const amountToSave = finalTotal > 0 ? finalTotal : 498.95;
     setConfirmedPaidTotal(amountToSave);
     setConfirmedCustomerName(address.fullName || 'Valued Customer');
@@ -419,8 +445,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                   <input
                     type="text"
                     required
+                    placeholder="e.g. 78701 or 90210"
                     value={address.zipCode}
-                    onChange={(e) => setAddress({ ...address, zipCode: e.target.value })}
+                    onChange={(e) => handleZipChange(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F2942] focus:outline-hidden focus:border-[#2563EB]"
                   />
                 </div>
@@ -429,14 +456,28 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
 
             {/* Step 2: Delivery Option */}
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-[#E2E8F0] shadow-sm space-y-4">
-              <div className="flex items-center gap-3 pb-4 border-b border-[#F1F5F9]">
-                <div className="w-8 h-8 rounded-full bg-[#EFF6FF] text-[#2563EB] font-bold text-xs flex items-center justify-center">
-                  2
+              <div className="flex items-center justify-between pb-4 border-b border-[#F1F5F9]">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-[#EFF6FF] text-[#2563EB] font-bold text-xs flex items-center justify-center">
+                    2
+                  </div>
+                  <h2 className="text-lg font-bold font-serif text-[#0F2942]">
+                    Shipping Method
+                  </h2>
                 </div>
-                <h2 className="text-lg font-bold font-serif text-[#0F2942]">
-                  Shipping Method
-                </h2>
+
+                {shippingDetails && (
+                  <span className="text-[11px] font-bold text-[#2563EB] bg-[#EFF6FF] px-3 py-1 rounded-full border border-[#BFDBFE]">
+                    USPS Zona {shippingDetails.zone} ({shippingDetails.zoneName})
+                  </span>
+                )}
               </div>
+
+              {shippingDetails?.isRemote && (
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl text-amber-900 text-xs flex items-center gap-2">
+                  <span>🏝️ <strong>Território / Ilha ({address.state}):</strong> Frete inclui sobretaxa aérea do USPS Zona 9 calculada para o destino.</span>
+                </div>
+              )}
 
               <div className="space-y-3">
                 <label
@@ -456,12 +497,20 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                       className="text-[#2563EB]"
                     />
                     <div>
-                      <p className="text-xs font-bold text-[#0F2942]">Standard Delivery (3 to 5 Days)</p>
-                      <p className="text-[11px] text-[#64748B]">Standard tracked US delivery</p>
+                      <p className="text-xs font-bold text-[#0F2942]">
+                        USPS Ground Advantage ({shippingDetails?.estimatedDays || '3 to 5 Days'})
+                      </p>
+                      <p className="text-[11px] text-[#64748B]">
+                        Tarifa precisa para {address.state} {address.zipCode ? `· CEP ${address.zipCode}` : ''}
+                      </p>
                     </div>
                   </div>
                   <span className="text-xs font-bold text-[#0F2942]">
-                    {baseShipping === 0 ? <span className="text-[#16A34A]">FREE</span> : formatCurrency(baseShipping)}
+                    {calc.freeShippingQualified ? (
+                      <span className="text-[#16A34A] font-extrabold">FREE</span>
+                    ) : (
+                      formatCurrency(shippingDetails?.groundFee || 4.95)
+                    )}
                   </span>
                 </label>
 
@@ -482,11 +531,13 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                       className="text-[#2563EB]"
                     />
                     <div>
-                      <p className="text-xs font-bold text-[#0F2942]">Express Delivery (2 to 4 Days)</p>
-                      <p className="text-[11px] text-[#64748B]">Priority expedited US delivery</p>
+                      <p className="text-xs font-bold text-[#0F2942]">USPS Priority Mail Express (1 to 3 Days)</p>
+                      <p className="text-[11px] text-[#64748B]">Despacho expresso prioritário em 24h para {address.state}</p>
                     </div>
                   </div>
-                  <span className="text-xs font-bold text-[#0F2942]">{formatCurrency(EXPRESS_SHIPPING_FEE)}</span>
+                  <span className="text-xs font-bold text-[#0F2942]">
+                    {formatCurrency(shippingDetails?.priorityFee || 8.95)}
+                  </span>
                 </label>
               </div>
             </div>
@@ -509,6 +560,20 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                 </span>
               </div>
 
+              {hasOutOfStock && (
+                <div className="p-4 rounded-2xl bg-rose-50 border border-rose-300 text-rose-950 text-xs flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-full bg-rose-200 text-rose-800 font-black flex items-center justify-center flex-shrink-0 text-sm">
+                    ✕
+                  </span>
+                  <div>
+                    <span className="font-extrabold text-sm block text-rose-900">Itens Indisponíveis no Pedido</span>
+                    <span className="text-rose-700 text-[11px] leading-relaxed">
+                      O fornecedor Zendrop registrou estoque 0 para um ou mais produtos no carrinho. O checkout está bloqueado para proteger sua compra contra cancelamentos. Remova os itens esgotados para prosseguir.
+                    </span>
+                  </div>
+                </div>
+              )}
+
               {/* Express Checkout Bar */}
               <div className="space-y-2">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] block">
@@ -517,15 +582,25 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                 <div className="grid grid-cols-3 gap-2">
                   <button
                     type="button"
+                    disabled={hasOutOfStock}
                     onClick={() => handleFast1ClickTestPurchase()}
-                    className="py-3.5 px-3 bg-black hover:bg-gray-800 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-transform active:scale-98"
+                    className={`py-3.5 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition-transform ${
+                      hasOutOfStock
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-black hover:bg-gray-800 text-white cursor-pointer active:scale-98 font-bold text-xs'
+                    }`}
                   >
                     <span className="text-sm"> Pay</span>
                   </button>
                   <button
                     type="button"
+                    disabled={hasOutOfStock}
                     onClick={() => handleFast1ClickTestPurchase()}
-                    className="py-3.5 px-3 bg-white hover:bg-gray-50 border border-gray-300 text-gray-800 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-transform active:scale-98"
+                    className={`py-3.5 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition-transform ${
+                      hasOutOfStock
+                        ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+                        : 'bg-white hover:bg-gray-50 border border-gray-300 text-gray-800 cursor-pointer active:scale-98 font-bold text-xs'
+                    }`}
                   >
                     <span className="text-sm font-black text-[#4285F4]">G</span>
                     <span className="text-sm font-black text-[#EA4335]">o</span>
@@ -537,8 +612,13 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                   </button>
                   <button
                     type="button"
+                    disabled={hasOutOfStock}
                     onClick={() => handleFast1ClickTestPurchase()}
-                    className="py-3.5 px-3 bg-[#FFB3C7] hover:bg-[#ffa0b8] text-black font-extrabold text-xs rounded-xl flex items-center justify-center gap-1 cursor-pointer shadow-xs transition-transform active:scale-98"
+                    className={`py-3.5 px-3 rounded-xl flex items-center justify-center gap-1 shadow-xs transition-transform ${
+                      hasOutOfStock
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-[#FFB3C7] hover:bg-[#ffa0b8] text-black font-extrabold text-xs cursor-pointer active:scale-98'
+                    }`}
                   >
                     <span>Klarna.</span>
                   </button>
@@ -651,11 +731,17 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
               {/* Complete Order CTA */}
               <button
                 type="submit"
-                disabled={isSubmitting || items.length === 0}
-                className="w-full py-4 rounded-full bg-[#2563EB] hover:bg-[#1D4ED8] disabled:bg-[#94A3B8] text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-lg active:scale-98 flex items-center justify-center gap-2 mt-4"
+                disabled={isSubmitting || items.length === 0 || hasOutOfStock}
+                className={`w-full py-4 rounded-full font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 mt-4 shadow-lg ${
+                  hasOutOfStock
+                    ? 'bg-slate-300 text-slate-500 cursor-not-allowed border border-slate-300'
+                    : 'bg-[#2563EB] hover:bg-[#1D4ED8] disabled:bg-[#94A3B8] text-white cursor-pointer active:scale-98'
+                }`}
               >
                 {isSubmitting ? (
                   <span>Authorizing secure payment...</span>
+                ) : hasOutOfStock ? (
+                  <span>Remova Itens Esgotados para Concluir Pedido</span>
                 ) : (
                   <>
                     <Lock size={15} />
@@ -674,16 +760,22 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
               </h2>
 
               <div className="max-h-64 overflow-y-auto divide-y divide-[#F1F5F9] pr-1">
-                {items.map((i) => (
-                  <div key={i.id} className="py-3 flex items-center gap-3">
-                    <img src={i.image} alt={i.name} className="w-12 h-12 rounded-xl object-cover border border-[#E2E8F0]" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold text-[#0F2942] truncate font-serif">{i.name}</p>
-                      <p className="text-[11px] text-[#64748B]">Qty: {i.quantity} {i.size ? `· ${i.size}` : ''}</p>
+                {items.map((i) => {
+                  const isItemOut = i.stockCount === 0 || i.inStock === false;
+                  return (
+                    <div key={i.id} className="py-3 flex items-center gap-3">
+                      <img src={i.image} alt={i.name} className="w-12 h-12 rounded-xl object-cover border border-[#E2E8F0]" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-[#0F2942] truncate font-serif">{i.name}</p>
+                        <p className="text-[11px] text-[#64748B]">Qty: {i.quantity} {i.size ? `· ${i.size}` : ''}</p>
+                        {isItemOut && (
+                          <span className="text-[10px] font-bold text-rose-600 block mt-0.5">⚠️ Esgotado no fornecedor</span>
+                        )}
+                      </div>
+                      <span className="text-xs font-bold text-[#0F2942]">{formatCurrency(i.price * i.quantity)}</span>
                     </div>
-                    <span className="text-xs font-bold text-[#0F2942]">{formatCurrency(i.price * i.quantity)}</span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               <div className="space-y-2.5 text-xs text-[#64748B] pt-3 border-t border-[#F1F5F9]">

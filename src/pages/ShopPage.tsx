@@ -84,6 +84,10 @@ export const ShopPage: React.FC<ShopPageProps> = ({
 
   const handleAdd = (p: Product, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (p.stockCount === 0 || p.inStockAustin === false) {
+      alert(`O produto "${p.name}" está esgotado no fornecedor e indisponível para compra.`);
+      return;
+    }
     onQuickAdd(p, false);
     setAddedId(p.id);
     setTimeout(() => setAddedId(null), 1800);
@@ -244,12 +248,13 @@ export const ShopPage: React.FC<ShopPageProps> = ({
               const repeatPrice = p.price * (1 - REPEAT_DELIVERY_DISCOUNT_PERCENT / 100);
               const isAdded = addedId === p.id;
               const isWished = Boolean(wishlist[p.id]);
+              const isOut = p.stockCount === 0 || p.inStockAustin === false;
 
               return (
                 <div
                   key={p.id}
                   onClick={() => onSelectProduct(p)}
-                  className="group flex flex-col cursor-pointer transition-all duration-300"
+                  className={`group flex flex-col cursor-pointer transition-all duration-300 ${isOut ? 'opacity-85' : ''}`}
                 >
                   {/* Clean Single Image (No dual image flip) */}
                   <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-[#F1F5F9] mb-3.5 shadow-2xs group-hover:shadow-xl transition-all duration-300 border border-[#E2E8F0]">
@@ -259,6 +264,12 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                       className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
                       loading="lazy"
                     />
+
+                    {isOut && (
+                      <div className="absolute inset-x-0 bottom-0 py-1.5 bg-rose-600/90 backdrop-blur-xs text-white text-[10px] font-black uppercase tracking-wider text-center z-10 shadow-xs">
+                        Sold Out · Indisponível
+                      </div>
+                    )}
 
                     {/* Wishlist Heart */}
                     <button
@@ -274,17 +285,26 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                     </button>
 
                     {/* Quick Add Button overlay */}
-                    <button
-                      onClick={(e) => handleAdd(p, e)}
-                      className={`absolute bottom-3 right-3 z-10 p-2.5 rounded-full shadow-lg transition-all cursor-pointer active:scale-90 ${
-                        isAdded
-                          ? 'bg-[#16A34A] text-white'
-                          : 'bg-[#0F2942] hover:bg-[#2563EB] text-white'
-                      }`}
-                      title="Quick Add to Bag"
-                    >
-                      {isAdded ? <Check size={16} /> : <ShoppingBag size={15} />}
-                    </button>
+                    {isOut ? (
+                      <div
+                        className="absolute bottom-3 right-3 z-10 px-2.5 py-1 rounded-full bg-slate-200/95 text-slate-600 font-bold text-[10px] uppercase tracking-wider shadow-sm border border-slate-300"
+                        title="Esgotado no fornecedor"
+                      >
+                        Esgotado
+                      </div>
+                    ) : (
+                      <button
+                        onClick={(e) => handleAdd(p, e)}
+                        className={`absolute bottom-3 right-3 z-10 p-2.5 rounded-full shadow-lg transition-all cursor-pointer active:scale-90 ${
+                          isAdded
+                            ? 'bg-[#16A34A] text-white'
+                            : 'bg-[#0F2942] hover:bg-[#2563EB] text-white'
+                        }`}
+                        title="Quick Add to Bag"
+                      >
+                        {isAdded ? <Check size={16} /> : <ShoppingBag size={15} />}
+                      </button>
+                    )}
                   </div>
 
                   {/* Product Metadata */}
@@ -312,11 +332,15 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                         <span className="text-[10px] font-bold tracking-widest text-[#94A3B8] uppercase">
                           {p.brand || 'Ling Petshop'} · {p.petType}
                         </span>
-                        {p.badge && (
+                        {isOut ? (
+                          <span className="bg-rose-50 text-rose-700 border border-rose-300 font-bold text-[9px] px-2 py-0.5 rounded-full">
+                            Sem Estoque (0 un.)
+                          </span>
+                        ) : p.badge ? (
                           <span className="bg-[#F1F5F9] text-[#0F2942] border border-[#CBD5E1] font-semibold text-[9px] px-2 py-0.5 rounded-full">
                             {p.badge}
                           </span>
-                        )}
+                        ) : null}
                         {discountPct > 0 && (
                           <span className="text-emerald-700 bg-emerald-50 border border-emerald-200/70 font-bold text-[9px] px-1.5 py-0.5 rounded">
                             Save {discountPct}%

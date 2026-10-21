@@ -50,7 +50,7 @@ export default function App() {
             ? {
                 ...item,
                 stockCount: fresh.stockCount,
-                inStock: fresh.inStockAustin,
+                inStock: fresh.stockCount > 0 && fresh.inStockAustin !== false,
                 productId: fresh.id,
               }
             : item;
@@ -65,6 +65,9 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState<string>(() => {
     if (typeof window !== 'undefined') {
       const hash = window.location.hash.replace('#', '');
+      if (['campaign', 'cleanup-kit', 'bundle'].includes(hash)) {
+        return 'product';
+      }
       if (['shop', 'cart', 'checkout', 'about', 'shipping-faq', 'faq', 'story'].includes(hash)) {
         if (hash === 'faq') return 'shipping-faq';
         if (hash === 'story') return 'about';
@@ -75,7 +78,17 @@ export default function App() {
   });
 
   const [activeCategory, setActiveCategory] = useState<string>('all');
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(() => getSavedProducts()[0] || PRODUCTS[0] || null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(() => {
+    const list = getSavedProducts();
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash.replace('#', '');
+      if (['campaign', 'cleanup-kit', 'bundle'].includes(hash)) {
+        const bundle = list.find((p) => p.isCampaignBundle || p.id === 'ultimate-pet-cleanup-kit');
+        if (bundle) return bundle;
+      }
+    }
+    return list[0] || PRODUCTS[0] || null;
+  });
 
   // Cart items state - start with fresh empty cart for real shoppers
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -119,6 +132,12 @@ export default function App() {
       const hash = window.location.hash.replace('#', '');
       if (hash === 'admin') {
         setIsAdminOpen(true);
+      } else if (hash === 'campaign' || hash === 'cleanup-kit' || hash === 'bundle') {
+        const bundle = products.find((p) => p.isCampaignBundle || p.id === 'ultimate-pet-cleanup-kit');
+        if (bundle) {
+          setSelectedProduct(bundle);
+          setCurrentPage('product');
+        }
       } else if (hash === 'shop') {
         setCurrentPage('shop');
       } else if (hash === 'cart') {
@@ -135,10 +154,18 @@ export default function App() {
     };
     window.addEventListener('hashchange', handleHash);
     return () => window.removeEventListener('hashchange', handleHash);
-  }, []);
+  }, [products]);
 
   // Multi-Page Navigation Handler
   const handleNavigate = (page: string, category?: string) => {
+    if (page === 'campaign') {
+      const bundle = products.find((p) => p.isCampaignBundle || p.id === 'ultimate-pet-cleanup-kit');
+      if (bundle) {
+        handleSelectProduct(bundle);
+        window.location.hash = 'campaign';
+        return;
+      }
+    }
     setCurrentPage(page);
     if (category) {
       setActiveCategory(category);
@@ -170,7 +197,14 @@ export default function App() {
     isRepeatDelivery?: boolean;
     image: string;
     supplierCost: number;
+    stockCount?: number;
+    inStock?: boolean;
+    productId?: string;
   }) => {
+    if (newItem.stockCount === 0 || newItem.inStock === false) {
+      alert(`O produto "${newItem.name}" está esgotado no armazém central e indisponível para compra.`);
+      return;
+    }
     setCartItems((prev) => {
       const existing = prev.find(
         (i) =>
@@ -355,7 +389,11 @@ export default function App() {
           <ShopPage
             products={products}
             onSelectProduct={handleSelectProduct}
-            onQuickAdd={(p) =>
+            onQuickAdd={(p) => {
+              if (p.stockCount === 0 || p.inStockAustin === false) {
+                alert(`O produto "${p.name}" está temporariamente esgotado no fornecedor Zendrop e indisponível para compra.`);
+                return;
+              }
               handleAddToCart({
                 sku: p.sku,
                 name: p.name,
@@ -366,8 +404,11 @@ export default function App() {
                 isRepeatDelivery: false,
                 image: p.heroImage,
                 supplierCost: p.supplierCost,
-              })
-            }
+                stockCount: p.stockCount,
+                inStock: p.stockCount > 0,
+                productId: p.id,
+              });
+            }}
             initialCategory={activeCategory}
           />
         ) : currentPage === 'product' && selectedProduct ? (
@@ -395,6 +436,13 @@ export default function App() {
             onOpenPromo={(code) => {
               setAppliedPromo(code);
               handleNavigate('cart');
+            }}
+            onOpenCampaign={() => {
+              const bundle = products.find((p) => p.isCampaignBundle || p.id === 'ultimate-pet-cleanup-kit');
+              if (bundle) {
+                handleSelectProduct(bundle);
+                window.location.hash = 'campaign';
+              }
             }}
           />
         )}

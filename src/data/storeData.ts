@@ -75,6 +75,19 @@ export interface Product {
   sizes?: { name: string; weightLabel: string }[];
   colors?: { name: string; hex: string; class: string }[];
   addOns?: { name: string; price: number; description: string }[];
+  isCampaignBundle?: boolean;
+  campaignName?: string;
+  bundleItems?: BundleIncludedItem[];
+}
+
+export interface BundleIncludedItem {
+  id: string;
+  name: string;
+  shortDesc: string;
+  fullDesc: string;
+  image: string;
+  badge?: string;
+  features?: string[];
 }
 
 export interface CustomerReview {
@@ -127,6 +140,134 @@ export const SUPPLIER_AGENTS: SupplierAgent[] = [
 
 // Complete 34 Aligned Zendrop Product Catalog with 60% Margin & Real-Time Stock Tracking
 export const DEFAULT_REAL_PRODUCTS: Product[] = [
+  {
+    "id": "ultimate-pet-cleanup-kit",
+    "sku": "KIT-CLEANUP-3IN1",
+    "name": "The Ultimate Pet Cleanup Kit – Grooming Gloves, Pet Hair Remover & Paw Cleaner",
+    "brand": "Ling Petshop Select",
+    "campaignName": "The Ultimate Pet Cleanup Kit",
+    "isCampaignBundle": true,
+    "tagline": "Less Fur. Cleaner Paws. Happier Home.",
+    "petType": "All Pets",
+    "category": "Grooming",
+    "department": "Grooming",
+    "supplierCost": 27.97,
+    "price": 67.97,
+    "compareAt": 95.17,
+    "netProfit": 40.00,
+    "profitMarginPercent": 59,
+    "supplier": "Zendrop",
+    "supplierSku": "ZD-BUNDLE-CLEANUP-3IN1",
+    "supplierUrl": "https://app.zendrop.com",
+    "supplierWarehouse": "US Central Express (Zendrop)",
+    "supplierShippingTime": "2-4 business days",
+    "rating": 4.9,
+    "reviewsCount": 246,
+    "badge": "Special Campaign Bundle",
+    "isBestseller": true,
+    "isLingPick": true,
+    "repeatDeliveryEligible": true,
+    "inStockAustin": true,
+    "stockCount": 132,
+    "heroImage": "/assets/campaign/ultimate_cleanup_kit_cover.png",
+    "secondaryImage": "/assets/campaign/grooming_gloves.png",
+    "galleryImages": [
+      "/assets/campaign/ultimate_cleanup_kit_cover.png",
+      "/assets/campaign/grooming_gloves.png",
+      "/assets/campaign/zepetz_hair_remover.png",
+      "/assets/campaign/paw_cleaner.png"
+    ],
+    "description": "A Cleaner Home. A Happier Pet. A Better Everyday Routine.\n\nMeet the Ultimate Pet Cleanup Kit, a convenient bundle designed to make everyday pet care easier.\n\nKeep your pets fresh and your home cleaner with three practical essentials for grooming, removing loose fur, and cleaning muddy paws.\n\n### WHAT'S INCLUDED:\n\n1. Pet Grooming Gloves\nHelp remove loose fur while providing a gentle grooming experience for your dog or cat.\n\n2. Zepetz Pet Hair Remover\nRemove unwanted pet hair from sofas, upholstery, and other suitable fabric surfaces with a reusable cleaning tool.\n\n3. Pet Paw Cleaner\nHelp remove dirt and mud from your dog's paws after walks, outdoor adventures, and playtime.\n\n### WHY YOU'LL LOVE IT:\n- Help reduce loose pet hair around your home.\n- Make everyday pet grooming easier.\n- Help clean muddy paws after outdoor activities.\n- Enjoy three practical pet care essentials in one convenient bundle.\n\nLess Fur. Cleaner Paws. Happier Home.",
+    "keyFeatures": [
+      "Help reduce loose pet hair around your home.",
+      "Make everyday pet grooming easier.",
+      "Help clean muddy paws after outdoor activities.",
+      "Enjoy three practical pet care essentials in one convenient bundle.",
+      "Complete 3-in-1 Kit: 1x Grooming Gloves, 1x Zepetz Hair Remover & 1x Paw Cleaner Cup"
+    ],
+    "specifications": {
+      "material": "Pet-Safe Non-Toxic Silicone Bristles, Durable ABS Body & Breathable 3D Mesh",
+      "dimensions": "Universal Fit Grooming Gloves + 7.5\" Hair Remover + Portable Paw Washer Cup",
+      "weight": "1.2 lbs (Total 3-Piece Kit)",
+      "inTheBox": "1x Pet Grooming Gloves, 1x Zepetz Pet Hair Remover, 1x Pet Paw Cleaner Cup",
+      "care": "Rinse paw cleaner with water; empty hair chamber with one click; wash gloves with soap and air dry",
+      "warranty": "30-Day Risk-Free In-Home Trial Guarantee",
+      "warehouse": "US Central Express Hub",
+      "shippingEstimate": "2-4 business days"
+    },
+    "bundleItems": [
+      {
+        "id": "bundle-item-gloves",
+        "name": "1. Pet Grooming Gloves",
+        "shortDesc": "Gently Removes Loose Fur For a Cleaner, Healthier Pet",
+        "fullDesc": "Help remove loose fur while providing a gentle grooming experience for your dog or cat.",
+        "image": "/assets/campaign/grooming_gloves.png",
+        "badge": "Essential 1 of 3",
+        "features": [
+          "Removes loose fur efficiently",
+          "Gentle and soothing on pet skin",
+          "Promotes a healthier, cleaner coat",
+          "Perfect for daily dry petting or warm bath time"
+        ]
+      },
+      {
+        "id": "bundle-item-remover",
+        "name": "2. Zepetz Pet Hair Remover",
+        "shortDesc": "Remove Pet Hair Quickly and Easily from Upholstery",
+        "fullDesc": "Remove unwanted pet hair from sofas, upholstery, and other suitable fabric surfaces with a reusable cleaning tool.",
+        "image": "/assets/campaign/zepetz_hair_remover.png",
+        "badge": "Essential 2 of 3",
+        "features": [
+          "Works on furniture, car seats, and carpets",
+          "100% Reusable & eco-friendly",
+          "No sticky rollers or tape refills needed",
+          "Quick-empty catchment chamber"
+        ]
+      },
+      {
+        "id": "bundle-item-cleaner",
+        "name": "3. Pet Paw Cleaner",
+        "shortDesc": "Clean Paws in Seconds for a Cleaner Home",
+        "fullDesc": "Help remove dirt and mud from your dog's paws after walks, outdoor adventures, and playtime.",
+        "image": "/assets/campaign/paw_cleaner.png",
+        "badge": "Essential 3 of 3",
+        "features": [
+          "Quick and easy to use with water",
+          "Removes dirt, mud, and sand in seconds",
+          "Soft, safe silicone bristles protect sensitive pads",
+          "Keeps outdoor dirt away from carpets and floors"
+        ]
+      }
+    ],
+    "volumeTiers": [
+      {
+        "qty": 1,
+        "discountPercent": 0,
+        "pricePerUnit": 67.97,
+        "total": 67.97,
+        "savings": 27.20,
+        "netProfit": 40.00
+      },
+      {
+        "qty": 2,
+        "discountPercent": 15,
+        "pricePerUnit": 57.77,
+        "total": 115.54,
+        "savings": 74.80,
+        "netProfit": 59.60,
+        "badge": "POPULAR"
+      },
+      {
+        "qty": 3,
+        "discountPercent": 25,
+        "pricePerUnit": 50.98,
+        "total": 152.94,
+        "savings": 132.57,
+        "netProfit": 69.03,
+        "badge": "BEST DEAL"
+      }
+    ]
+  },
   {
     "id": "zendrop-2000857",
     "sku": "ZD-2000857",
@@ -3050,10 +3191,10 @@ export const PRODUCTS: Product[] = DEFAULT_REAL_PRODUCTS;
 export function getSavedProducts(): Product[] {
   if (typeof window === 'undefined') return DEFAULT_REAL_PRODUCTS;
   try {
-    // Reset to load official 34 Aligned Zendrop English products catalog v30
-    if (!localStorage.getItem('ling_catalog_zendrop_aligned_v34_realstock')) {
+    // Reset to load official catalog including The Ultimate Pet Cleanup Kit campaign bundle
+    if (!localStorage.getItem('ling_catalog_zendrop_aligned_v36_cleanupkit')) {
       localStorage.setItem('ling_admin_products', JSON.stringify(DEFAULT_REAL_PRODUCTS));
-      localStorage.setItem('ling_catalog_zendrop_aligned_v34_realstock', 'true');
+      localStorage.setItem('ling_catalog_zendrop_aligned_v36_cleanupkit', 'true');
       return DEFAULT_REAL_PRODUCTS;
     }
     const saved = localStorage.getItem('ling_admin_products');

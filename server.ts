@@ -354,6 +354,27 @@ app.post('/api/create-checkout-session', async (req: Request, res: Response) => 
       return res.status(400).json({ error: 'Cart is empty' });
     }
 
+    // Strict inventory verification: reject payment session if any item is out of stock (stockCount === 0)
+    for (const item of items) {
+      if (item.stockCount === 0 || item.inStock === false) {
+        return res.status(400).json({
+          error: `O produto "${item.name}" está sem estoque no fornecedor Zendrop (0 unidades disponíveis). Não é possível processar o pagamento para produtos indisponíveis.`,
+          outOfStock: true,
+          item: item.name,
+        });
+      }
+      if (inventoryCache?.data && item.productId) {
+        const cached = inventoryCache.data[String(item.productId)];
+        if (cached && (cached.stockCount === 0 || !cached.inStock)) {
+          return res.status(400).json({
+            error: `O produto "${item.name}" está esgotado no armazém central Zendrop. Remova-o para continuar.`,
+            outOfStock: true,
+            item: item.name,
+          });
+        }
+      }
+    }
+
     const host = domainUrl || `${req.protocol}://${req.get('host')}`;
     const selectedCurrency = (currency || 'usd').toLowerCase();
 

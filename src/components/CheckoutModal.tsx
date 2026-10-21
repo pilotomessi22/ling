@@ -56,21 +56,26 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   if (!isOpen) return null;
 
-  const baseCalculations = calculateOrderTotals(items, appliedPromo, 'shipping');
+  const hasOutOfStock = items.some((i) => i.stockCount === 0 || i.inStock === false);
 
-  const shippingCost =
-    deliveryOption === 'usps_priority'
-      ? 9.95
-      : baseCalculations.freeShippingQualified
-      ? 0
-      : baseCalculations.shipping;
-
-  const finalTotal = Number(
-    (baseCalculations.total - baseCalculations.shipping + shippingCost).toFixed(2)
+  const baseCalculations = calculateOrderTotals(
+    items,
+    appliedPromo,
+    'shipping',
+    address.state,
+    address.zipCode,
+    deliveryOption
   );
+
+  const shippingCost = baseCalculations.shipping;
+  const finalTotal = baseCalculations.total;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (hasOutOfStock) {
+      alert('Não é possível concluir o pedido: um ou mais itens no carrinho estão esgotados no fornecedor Zendrop.');
+      return;
+    }
     const newOrderId = `LP-AUS-${Math.floor(100000 + Math.random() * 900000)}`;
     setOrderId(newOrderId);
 
@@ -403,9 +408,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
               <button
                 type="submit"
-                className="w-full bg-[#E31837] hover:bg-[#c9142e] text-white font-black text-sm py-4 rounded-full shadow-lg transition-transform hover:scale-[1.01] active:scale-[0.99] cursor-pointer uppercase tracking-wider"
+                disabled={hasOutOfStock}
+                className={`w-full font-black text-sm py-4 rounded-full shadow-lg transition-transform uppercase tracking-wider ${
+                  hasOutOfStock
+                    ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                    : 'bg-[#E31837] hover:bg-[#c9142e] text-white cursor-pointer hover:scale-[1.01] active:scale-[0.99]'
+                }`}
               >
-                Place Order · {formatCurrency(finalTotal)}
+                {hasOutOfStock ? 'Remova Itens Esgotados para Comprar' : `Place Order · ${formatCurrency(finalTotal)}`}
               </button>
             </form>
           </div>

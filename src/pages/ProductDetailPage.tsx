@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   ArrowLeft,
   Check,
+  CheckCircle2,
   ShieldCheck,
   Truck,
   RotateCcw,
@@ -28,6 +29,9 @@ interface ProductDetailPageProps {
     isRepeatDelivery?: boolean;
     image: string;
     supplierCost: number;
+    stockCount?: number;
+    inStock?: boolean;
+    productId?: string;
   }) => void;
   onNavigateToCart?: () => void;
 }
@@ -81,7 +85,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   const baseUnitPrice = purchaseType === 'repeat' ? repeatPrice : product.price * discountMultiplier;
   const effectivePrice = Number(baseUnitPrice.toFixed(2));
 
+  const isOutOfStock = product.stockCount === 0 || product.inStockAustin === false;
+
   const handleAdd = () => {
+    if (isOutOfStock) return;
     onAddToCart({
       sku: `${product.sku}-${selectedSize.slice(0, 3).replace(/\s/g, '')}`,
       name: product.name,
@@ -92,6 +99,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       isRepeatDelivery: purchaseType === 'repeat',
       image: activeImage,
       supplierCost: product.supplierCost,
+      stockCount: product.stockCount,
+      inStock: !isOutOfStock,
+      productId: product.id,
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 3000);
@@ -124,29 +134,29 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           {/* Left Column: Gallery (7 Cols) */}
           <div className="lg:col-span-7 space-y-4">
-            {/* Primary Large Stage Image (Real dog/cat in modern interior) */}
-            <div className="relative aspect-[4/5] rounded-3xl overflow-hidden bg-[#F1F5F9] shadow-sm border border-[#E2E8F0]">
+            {/* Primary Large Stage Image */}
+            <div className={`relative ${product.isCampaignBundle ? 'aspect-square bg-white' : 'aspect-[4/5] bg-[#F1F5F9]'} rounded-3xl overflow-hidden shadow-sm border border-[#E2E8F0]`}>
               <img
                 src={activeImage}
                 alt={product.name}
-                className="w-full h-full object-cover transition-all duration-300"
+                className={`w-full h-full ${product.isCampaignBundle ? 'object-contain' : 'object-cover'} transition-all duration-300`}
               />
             </div>
 
             {/* Thumbnail Selectors */}
             {images.length > 1 && (
-              <div className="flex items-center gap-3 pt-1">
+              <div className="flex items-center gap-3 pt-1 overflow-x-auto no-scrollbar pb-1">
                 {images.map((img, i) => (
                   <button
                     key={i}
                     onClick={() => setActiveImage(img)}
-                    className={`relative aspect-square w-24 rounded-2xl overflow-hidden border-2 transition-all cursor-pointer ${
+                    className={`relative aspect-square w-24 rounded-2xl overflow-hidden border-2 transition-all cursor-pointer bg-white flex-shrink-0 ${
                       activeImage === img
                         ? 'border-[#2563EB] ring-2 ring-[#2563EB]/25 scale-102 shadow-xs'
                         : 'border-[#E2E8F0] opacity-70 hover:opacity-100'
                     }`}
                   >
-                    <img src={img} alt="Angle view" className="w-full h-full object-cover" />
+                    <img src={img} alt="Angle view" className="w-full h-full object-contain" />
                   </button>
                 ))}
               </div>
@@ -195,6 +205,28 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 <span className="text-xs font-bold text-[#2563EB] bg-[#EFF6FF] px-2.5 py-0.5 rounded-full">
                   Save {formatCurrency(product.compareAt - effectivePrice)}
                 </span>
+              </div>
+
+              {/* Real-time Supplier Stock Banner */}
+              <div className="mt-3 pt-3 border-t border-[#F1F5F9]">
+                {isOutOfStock ? (
+                  <div className="bg-rose-50 border border-rose-200 p-3.5 rounded-2xl flex items-center gap-3 text-xs text-rose-800">
+                    <span className="w-7 h-7 rounded-full bg-rose-200 text-rose-800 font-black flex items-center justify-center flex-shrink-0 text-sm">
+                      ✕
+                    </span>
+                    <div>
+                      <span className="font-extrabold text-rose-950 block">Produto Temporariamente Indisponível</span>
+                      <span className="text-[11px] text-rose-700">
+                        Esgotado no fornecedor Zendrop (0 unidades em estoque). Compras bloqueadas até reposição no armazém central.
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 text-xs text-emerald-800 font-bold bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full w-fit">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>Em Estoque · {product.stockCount} unidades no Armazém Central Zendrop</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -321,9 +353,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
             {/* Quantity Selector & Add to Bag CTA */}
             <div className="pt-2 flex items-center gap-3">
-              <div className="flex items-center border border-[#CBD5E1] rounded-full bg-white px-3 py-3">
+              <div className={`flex items-center border border-[#CBD5E1] rounded-full bg-white px-3 py-3 ${isOutOfStock ? 'opacity-40 pointer-events-none' : ''}`}>
                 <button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  disabled={isOutOfStock}
                   className="px-2 font-bold text-[#475569] hover:text-[#0F2942] cursor-pointer"
                 >
                   -
@@ -331,34 +364,44 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 <span className="w-8 text-center text-xs font-bold text-[#0F2942]">{quantity}</span>
                 <button
                   onClick={() => setQuantity((q) => q + 1)}
+                  disabled={isOutOfStock}
                   className="px-2 font-bold text-[#475569] hover:text-[#0F2942] cursor-pointer"
                 >
                   +
                 </button>
               </div>
 
-              <button
-                onClick={handleAdd}
-                className={`flex-1 py-4 px-6 rounded-full font-bold text-xs uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 shadow-md active:scale-98 ${
-                  added
-                    ? 'bg-[#16A34A] text-white'
-                    : 'bg-[#2563EB] hover:bg-[#1D4ED8] text-white'
-                }`}
-              >
-                {added ? (
-                  <>
-                    <Check size={18} />
-                    <span>Added to Bag!</span>
-                  </>
-                ) : (
-                  <>
-                    <ShoppingBag size={16} />
-                    <span>
-                      Add to Bag · {formatCurrency(effectivePrice * quantity)}
-                    </span>
-                  </>
-                )}
-              </button>
+              {isOutOfStock ? (
+                <button
+                  disabled
+                  className="flex-1 py-4 px-6 rounded-full font-bold text-xs uppercase tracking-wider bg-slate-200 text-slate-500 cursor-not-allowed flex items-center justify-center gap-2 border border-slate-300 shadow-none"
+                >
+                  <span>❌ Produto Indisponível (Sem Estoque)</span>
+                </button>
+              ) : (
+                <button
+                  onClick={handleAdd}
+                  className={`flex-1 py-4 px-6 rounded-full font-bold text-xs uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 shadow-md active:scale-98 ${
+                    added
+                      ? 'bg-[#16A34A] text-white'
+                      : 'bg-[#2563EB] hover:bg-[#1D4ED8] text-white'
+                  }`}
+                >
+                  {added ? (
+                    <>
+                      <Check size={18} />
+                      <span>Added to Bag!</span>
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingBag size={16} />
+                      <span>
+                        Add to Bag · {formatCurrency(effectivePrice * quantity)}
+                      </span>
+                    </>
+                  )}
+                </button>
+              )}
             </div>
 
             {/* If Added: Direct One-Click Navigation to Cart or Checkout */}
@@ -499,6 +542,152 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Dedicated Bundle Included Items & Campaign Showcase */}
+        {product.bundleItems && product.bundleItems.length > 0 && (
+          <div className="mt-20 pt-16 border-t border-[#E2E8F0]">
+            <div className="text-center max-w-3xl mx-auto mb-14">
+              <span className="text-xs font-bold uppercase tracking-widest text-[#2563EB] bg-[#EFF6FF] border border-[#BFDBFE] px-4 py-1.5 rounded-full inline-block mb-3">
+                Included in This Bundle
+              </span>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0F2942] font-serif tracking-tight leading-tight">
+                A Cleaner Home. A Happier Pet. A Better Everyday Routine.
+              </h2>
+              <p className="text-sm sm:text-base text-[#64748B] mt-3 font-light max-w-2xl mx-auto leading-relaxed">
+                Meet the Ultimate Pet Cleanup Kit, a convenient bundle designed to make everyday pet care easier.
+              </p>
+            </div>
+
+            {/* 3 Individual Products Displayed in Correct Order with Original Promos */}
+            <div className="space-y-12">
+              {product.bundleItems.map((item, idx) => {
+                const isEven = idx % 2 === 1;
+                return (
+                  <div
+                    key={item.id}
+                    className="bg-white rounded-3xl p-6 sm:p-10 border border-[#E2E8F0] shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center"
+                  >
+                    {/* Image Column */}
+                    <div className={`lg:col-span-6 ${isEven ? 'lg:order-2' : 'lg:order-1'}`}>
+                      <div className="relative aspect-square rounded-2xl overflow-hidden bg-white border border-[#E2E8F0] shadow-sm group">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-full h-full object-contain p-2 group-hover:scale-102 transition-transform duration-500"
+                        />
+                        {item.badge && (
+                          <span className="absolute top-4 left-4 bg-[#0F2942] text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-xs">
+                            {item.badge}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Content Column */}
+                    <div className={`lg:col-span-6 space-y-4 ${isEven ? 'lg:order-1' : 'lg:order-2'}`}>
+                      <div className="inline-flex items-center gap-2 text-xs font-bold text-[#2563EB] uppercase tracking-wider">
+                        <Sparkles size={14} className="text-[#2563EB]" />
+                        <span>Included Essential #{idx + 1}</span>
+                      </div>
+
+                      <h3 className="text-2xl sm:text-3xl font-extrabold text-[#0F2942] font-serif leading-snug">
+                        {item.name}
+                      </h3>
+
+                      <p className="text-sm font-semibold text-[#2563EB]">
+                        {item.shortDesc}
+                      </p>
+
+                      <p className="text-xs sm:text-sm text-[#475569] leading-relaxed">
+                        {item.fullDesc}
+                      </p>
+
+                      {item.features && item.features.length > 0 && (
+                        <div className="pt-2 space-y-2.5">
+                          <span className="text-xs font-bold uppercase tracking-wider text-[#0F2942] block">
+                            Key Benefits:
+                          </span>
+                          <ul className="space-y-2 text-xs text-[#334155]">
+                            {item.features.map((feat, fIdx) => (
+                              <li key={fIdx} className="flex items-start gap-2.5">
+                                <Check size={15} className="text-[#16A34A] flex-shrink-0 mt-0.5" />
+                                <span>{feat}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* WHY YOU'LL LOVE IT Section */}
+            <div className="mt-14 bg-gradient-to-br from-[#0F2942] to-[#1E3A8A] text-white rounded-3xl p-8 sm:p-12 shadow-xl">
+              <div className="max-w-3xl mx-auto text-center space-y-4">
+                <span className="text-xs font-bold uppercase tracking-widest text-blue-200 bg-white/10 px-3.5 py-1 rounded-full border border-white/20 inline-block">
+                  Bundle Advantages
+                </span>
+                <h3 className="text-3xl sm:text-4xl font-extrabold font-serif">
+                  Why You'll Love It
+                </h3>
+                <p className="text-xs sm:text-sm text-blue-100 font-light max-w-xl mx-auto">
+                  Enjoy three practical pet care essentials in one convenient bundle.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 text-left">
+                  <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/15 flex items-start gap-3">
+                    <CheckCircle2 size={18} className="text-emerald-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-bold text-xs text-white">Reduce Loose Pet Hair</h4>
+                      <p className="text-[11px] text-blue-100 mt-0.5">Help reduce loose pet hair around your home from rugs, furniture, and sofas.</p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/15 flex items-start gap-3">
+                    <CheckCircle2 size={18} className="text-emerald-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-bold text-xs text-white">Easier Everyday Grooming</h4>
+                      <p className="text-[11px] text-blue-100 mt-0.5">Make everyday pet grooming a soothing, pleasurable massage for dogs and cats.</p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/15 flex items-start gap-3">
+                    <CheckCircle2 size={18} className="text-emerald-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-bold text-xs text-white">Clean Muddy Paws Fast</h4>
+                      <p className="text-[11px] text-blue-100 mt-0.5">Help clean muddy paws after outdoor adventures, rainy days, and dog park trips.</p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/15 flex items-start gap-3">
+                    <CheckCircle2 size={18} className="text-emerald-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-bold text-xs text-white">3 Practical Essentials</h4>
+                      <p className="text-[11px] text-blue-100 mt-0.5">Enjoy three practical pet care essentials in one convenient bundle with combined shipping.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-8 border-t border-white/15 flex flex-col sm:flex-row items-center justify-between gap-5">
+                  <div className="text-center sm:text-left">
+                    <span className="text-base font-extrabold tracking-wide block">Less Fur. Cleaner Paws. Happier Home.</span>
+                    <span className="text-xs text-blue-200">Combined US Warehouse dispatch · Arrives in 2–4 business days</span>
+                  </div>
+
+                  <button
+                    onClick={handleAdd}
+                    className="w-full sm:w-auto px-8 py-4 rounded-full bg-white text-[#0F2942] hover:bg-blue-50 font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-lg active:scale-98 flex items-center justify-center gap-2"
+                  >
+                    <ShoppingBag size={16} className="text-[#2563EB]" />
+                    <span>Add Complete Kit to Bag · {formatCurrency(effectivePrice)}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Related Essentials Section */}
         {related.length > 0 && (
