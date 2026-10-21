@@ -100,7 +100,7 @@ export interface AdminOrder {
     quantity: number;
     unitPrice: number;
     supplierCost: number;
-    supplier: 'CJ Dropshipping' | 'Zendrop';
+    supplier: string;
     supplierSku: string;
     supplierUrl: string;
   }[];

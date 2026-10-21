@@ -89,7 +89,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigateToShop }) => {
             </div>
             <h3 className="text-xl font-bold font-serif text-[#0F2942]">Nationwide US Logistics</h3>
             <p className="text-xs text-[#64748B] leading-relaxed font-light">
-              Dispatched quickly from our partner fulfillment hubs across the East Coast, West Coast, Florida, and Central US via USPS Ground Advantage.
+              Dispatched quickly from our Central Warehouse via USPS Ground Advantage.
             </p>
           </div>
         </div>

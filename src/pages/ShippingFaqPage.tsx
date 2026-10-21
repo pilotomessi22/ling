@@ -85,7 +85,7 @@ export const ShippingFaqPage: React.FC<ShippingFaqPageProps> = ({
             </div>
             <h3 className="text-lg font-bold font-serif text-[#0F2942]">2–4 Business Days Delivery</h3>
             <p className="text-xs text-[#64748B] font-light leading-relaxed">
-              Dispatched within 24h via USPS Priority and Ground Advantage from regional centers across the East, Central, Florida, and West US.
+              Dispatched within 24h via USPS Priority and Ground Advantage from our Central Warehouse.
             </p>
           </div>
 

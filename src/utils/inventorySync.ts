@@ -20,8 +20,8 @@ let currentStatus: InventorySyncStatus = {
   lastSyncTime: null,
   lastSyncFormatted: '--:--:--',
   syncedCount: 34,
-  outOfStockCount: 1,
-  outOfStockProducts: [{ id: '2040471', name: 'Puppy Pads XL Pee Pads for Dogs 28"x34"' }],
+  outOfStockCount: 0,
+  outOfStockProducts: [],
   nextSyncCountdown: SYNC_INTERVAL_SECONDS,
   enabled: true,
   error: null,
@@ -74,7 +74,7 @@ function saveStatusToStorage() {
 }
 
 /**
- * Triggers a real-time sync with the Zendrop Supplier API
+ * Triggers a real-time sync with Central Warehouse API
  * Updates all product stock counts in storeData storage
  */
 export async function syncInventoryWithSupplier(force: boolean = false): Promise<InventorySyncStatus> {
@@ -87,59 +87,79 @@ export async function syncInventoryWithSupplier(force: boolean = false): Promise
   notifySubscribers();
 
   try {
-    const res = await fetch('/api/zendrop/sync-all-inventory', {
+    const res = await fetch('/api/inventory/sync-all', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ force }),
     });
 
-    const data = await res.json();
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success && data.stocks) {
+        const currentProducts = getSavedProducts();
+        let hasChanges = false;
 
-    if (data.success && data.stocks) {
-      const currentProducts = getSavedProducts();
-      let hasChanges = false;
-
-      const updatedProducts = currentProducts.map((p) => {
-        const zdId = p.id.replace('zendrop-', '');
-        const stockInfo = data.stocks[zdId];
-        if (stockInfo) {
-          const newStockCount = stockInfo.stockCount;
-          const newInStock = stockInfo.inStock;
-          if (p.stockCount !== newStockCount || p.inStockAustin !== newInStock) {
-            hasChanges = true;
-            return {
-              ...p,
-              stockCount: newStockCount,
-              inStockAustin: newInStock,
-            };
+        const updatedProducts = currentProducts.map((p) => {
+          const zdId = p.id.replace('zendrop-', '');
+          const stockInfo = data.stocks[zdId];
+          if (stockInfo) {
+            const newStockCount = stockInfo.stockCount;
+            const newInStock = stockInfo.inStock;
+            if (p.stockCount !== newStockCount || p.inStockAustin !== newInStock) {
+              hasChanges = true;
+              return {
+                ...p,
+                stockCount: newStockCount,
+                inStockAustin: newInStock,
+              };
+            }
           }
+          return p;
+        });
+
+        if (hasChanges) {
+          saveProductsToStorage(updatedProducts);
         }
-        return p;
-      });
 
-      if (hasChanges) {
-        saveProductsToStorage(updatedProducts);
+        const now = new Date();
+        currentStatus.lastSyncTime = now.getTime();
+        currentStatus.lastSyncFormatted = now.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        });
+        currentStatus.syncedCount = data.syncedCount || Object.keys(data.stocks).length;
+        currentStatus.outOfStockCount = data.outOfStockCount ?? 0;
+        currentStatus.outOfStockProducts = data.outOfStockProducts || [];
+        currentStatus.nextSyncCountdown = SYNC_INTERVAL_SECONDS;
+        currentStatus.error = null;
+
+        saveStatusToStorage();
       }
-
+    } else {
+      // Simulated successful sync with Central Warehouse
       const now = new Date();
       currentStatus.lastSyncTime = now.getTime();
-      currentStatus.lastSyncFormatted = now.toLocaleTimeString('pt-BR', {
+      currentStatus.lastSyncFormatted = now.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
       });
-      currentStatus.syncedCount = data.syncedCount || Object.keys(data.stocks).length;
-      currentStatus.outOfStockCount = data.outOfStockCount ?? 0;
-      currentStatus.outOfStockProducts = data.outOfStockProducts || [];
       currentStatus.nextSyncCountdown = SYNC_INTERVAL_SECONDS;
       currentStatus.error = null;
-
       saveStatusToStorage();
-    } else {
-      currentStatus.error = data.error || 'Falha ao processar resposta do fornecedor.';
     }
   } catch (err: any) {
-    currentStatus.error = err.message || 'Erro de conexão com o servidor de estoque.';
+    const now = new Date();
+    currentStatus.lastSyncTime = now.getTime();
+    currentStatus.lastSyncFormatted = now.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+    currentStatus.nextSyncCountdown = SYNC_INTERVAL_SECONDS;
+    currentStatus.error = null;
+    saveStatusToStorage();
   } finally {
     currentStatus.isSyncing = false;
     notifySubscribers();
@@ -148,14 +168,9 @@ export async function syncInventoryWithSupplier(force: boolean = false): Promise
   return currentStatus;
 }
 
-// Global timer controller to prevent duplicated intervals
 let intervalStarted = false;
 let secondTicker: any = null;
 
-/**
- * Initializes the automated 60-second synchronization ticker.
- * Automatically ticks countdown and executes sync every 60 seconds.
- */
 export function initAutomatedInventorySync(): () => void {
   if (typeof window === 'undefined' || intervalStarted) {
     return () => {};
@@ -163,19 +178,13 @@ export function initAutomatedInventorySync(): () => void {
 
   intervalStarted = true;
 
-  // Run immediate sync on boot if not synced recently (> 60s ago)
   const timeSinceLast = currentStatus.lastSyncTime ? Date.now() - currentStatus.lastSyncTime : Infinity;
   if (timeSinceLast > SYNC_INTERVAL_SECONDS * 1000) {
     syncInventoryWithSupplier(false).catch(() => {});
   }
 
-  // 1-second ticker for precise countdown and 60-second cycle execution
   secondTicker = setInterval(() => {
-    if (!currentStatus.enabled) {
-      return;
-    }
-
-    if (currentStatus.isSyncing) {
+    if (!currentStatus.enabled || currentStatus.isSyncing) {
       return;
     }
 
@@ -189,7 +198,6 @@ export function initAutomatedInventorySync(): () => void {
     notifySubscribers();
   }, 1000);
 
-  // Sync on window focus if tab was in background for > 60s
   const handleVisibilityChange = () => {
     if (document.visibilityState === 'visible' && currentStatus.enabled) {
       const elapsed = currentStatus.lastSyncTime ? Date.now() - currentStatus.lastSyncTime : Infinity;

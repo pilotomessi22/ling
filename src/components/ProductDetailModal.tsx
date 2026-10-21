@@ -150,16 +150,6 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 <span className="text-[11px] font-bold uppercase tracking-widest text-[#8E867C]">
                   {product.brand || 'Ling Petshop'} · {product.department}
                 </span>
-                {product.badge && (
-                  <span className="bg-[#2C2724] text-[#FAF7F2] font-semibold text-[10px] px-2.5 py-0.5 rounded-full">
-                    {product.badge}
-                  </span>
-                )}
-                {product.isLingPick && (
-                  <span className="bg-[#F9EDE8] border border-[#F2D7CD] text-[#C86446] text-[10px] font-bold px-2 py-0.5 rounded-full">
-                    ★ Studio Pick
-                  </span>
-                )}
               </div>
 
               <h2 className="text-2xl sm:text-3xl font-extrabold text-[#2C2724] leading-tight font-serif">
@@ -189,19 +179,16 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     {formatCurrency(product.compareAt)}
                   </span>
                 )}
-                <span className="text-xs font-bold text-[#C86446]">
-                  Save {formatCurrency(product.compareAt - effectivePrice)}
-                </span>
               </div>
               <p className="text-xs text-[#766E65] mt-1.5 leading-relaxed">{product.tagline}</p>
             </div>
 
-            {/* Real-time Zendrop Stock Callout */}
+            {/* Real-time Stock Callout */}
             {product.stockCount === 0 ? (
               <div className="bg-rose-50 border border-rose-200 p-3.5 rounded-2xl flex items-center justify-between gap-2 text-xs text-rose-900">
                 <div className="flex items-center gap-2 font-bold">
                   <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0" />
-                  <span>Esgotado no Armazém Zendrop · Currently Out of Stock (0 un.)</span>
+                  <span>Esgotado na Central Warehouse (0 un.)</span>
                 </div>
                 <span className="text-[10px] uppercase font-black text-rose-700 bg-rose-100 px-2.5 py-1 rounded-full">
                   Sold Out
@@ -211,7 +198,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-2xl flex items-center justify-between gap-2 text-xs text-emerald-900">
                 <div className="flex items-center gap-2 font-bold">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-                  <span>Em estoque em tempo real ({product.stockCount.toLocaleString()} unidades) · Armazém EUA Zendrop</span>
+                  <span>Em estoque em tempo real ({product.stockCount.toLocaleString()} unidades) · Central Warehouse</span>
                 </div>
                 <span className="text-[10px] uppercase font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
                   Envio em 24h

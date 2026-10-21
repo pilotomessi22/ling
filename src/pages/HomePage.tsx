@@ -25,19 +25,19 @@ export const HomePage: React.FC<HomePageProps> = ({
     {
       title: 'Dogs',
       tagline: 'Orthopedic beds, zero-pull harnesses & durable play toys',
-      image: 'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85',
+      image: '/assets/aistudio/Retriever_Dourado_Relaxado_no_Tapete_bb337bb9.png',
       category: 'Dogs',
     },
     {
       title: 'Cats',
       tagline: 'Whisper-quiet water fountains, scratching lounges & kickers',
-      image: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85',
+      image: '/assets/aistudio/Gatos_aconchegados_no_cantinho_ensolarado_62c3595a.png',
       category: 'Cats',
     },
     {
       title: 'Essential Gear',
       tagline: 'Elevated dining feeders, travel protectors & daily care',
-      image: 'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&w=1200&q=85',
+      image: '/assets/aistudio/Momento_Aconchegante_de_Alimenta__o_Canina_9419c806.png',
       category: 'all',
     },
   ];
@@ -276,7 +276,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               </div>
               <h3 className="text-base font-bold font-serif text-[#0F2942]">Coast-to-Coast US Shipping</h3>
               <p className="text-xs text-[#64748B] font-light leading-relaxed">
-                Fulfillment centers located in New Jersey, California, Texas, and Florida for 2 to 4 business days USPS delivery.
+                Dispatched directly from Central Warehouse for 2 to 4 business days USPS delivery.
               </p>
             </div>
 

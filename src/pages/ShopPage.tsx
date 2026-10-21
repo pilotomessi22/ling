@@ -107,7 +107,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
             <div>
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EFF6FF] border border-[#BFDBFE] text-[#2563EB] text-xs font-bold uppercase tracking-wider mb-3">
                 <Leaf size={13} />
-                <span>Nationwide Catalog · US Warehouses</span>
+                <span>Nationwide Catalog · Central Warehouse</span>
               </div>
               <h1 className="text-4xl sm:text-5xl font-extrabold text-[#0F2942] font-serif tracking-tight">
                 All Pet Essentials

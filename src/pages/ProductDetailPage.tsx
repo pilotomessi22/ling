@@ -170,16 +170,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 <span className="text-[11px] font-bold uppercase tracking-widest text-[#64748B]">
                   {product.brand || 'Ling Petshop'} · {product.department}
                 </span>
-                {product.badge && (
-                  <span className="bg-[#0F2942] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">
-                    {product.badge}
-                  </span>
-                )}
-                {product.isLingPick && (
-                  <span className="bg-[#EFF6FF] border border-[#BFDBFE] text-[#2563EB] text-[10px] font-bold px-2 py-0.5 rounded-full">
-                    ★ Premium Standard
-                  </span>
-                )}
               </div>
 
               <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0F2942] font-serif leading-tight">
@@ -202,12 +192,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                     {formatCurrency(product.compareAt)}
                   </span>
                 )}
-                <span className="text-xs font-bold text-[#2563EB] bg-[#EFF6FF] px-2.5 py-0.5 rounded-full">
-                  Save {formatCurrency(product.compareAt - effectivePrice)}
-                </span>
               </div>
 
-              {/* Real-time Supplier Stock Banner */}
+              {/* Real-time Central Warehouse Stock Banner */}
               <div className="mt-3 pt-3 border-t border-[#F1F5F9]">
                 {isOutOfStock ? (
                   <div className="bg-rose-50 border border-rose-200 p-3.5 rounded-2xl flex items-center gap-3 text-xs text-rose-800">
@@ -217,14 +204,14 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                     <div>
                       <span className="font-extrabold text-rose-950 block">Produto Temporariamente Indisponível</span>
                       <span className="text-[11px] text-rose-700">
-                        Esgotado no fornecedor Zendrop (0 unidades em estoque). Compras bloqueadas até reposição no armazém central.
+                        Esgotado na Central Warehouse (0 unidades em estoque).
                       </span>
                     </div>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 text-xs text-emerald-800 font-bold bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full w-fit">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span>Em Estoque · {product.stockCount} unidades no Armazém Central Zendrop</span>
+                    <span>Em Estoque · {product.stockCount} unidades na Central Warehouse</span>
                   </div>
                 )}
               </div>
