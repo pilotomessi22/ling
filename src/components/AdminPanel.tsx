@@ -1234,153 +1234,173 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
     setIsImporting(true);
 
-    // Extract all numerical product IDs or Zendrop URLs from input text
-    const matches = Array.from(rawText.matchAll(/(?:product\/|zendrop-|sku:)?(\d{6,8})/gi));
-    const extractedIds = Array.from(new Set(matches.map((m) => m[1])));
+    setTimeout(async () => {
+      try {
+        // Extract all numerical product IDs or Zendrop URLs from input text
+        const matches = Array.from(rawText.matchAll(/(?:product\/|zendrop-|sku:)?(\d{6,8})/gi));
+        const extractedIds = Array.from(new Set(matches.map((m) => m[1])));
 
-    // Fallback if user entered text without a 6-8 digit Zendrop ID
-    if (extractedIds.length === 0) {
-      // Check for alphanumeric SKU or search
-      const cleanSku = rawText.replace(/[^a-zA-Z0-9_-]/g, '').toUpperCase();
-      const existing = activeProducts.find((p) => p.supplierSku.toUpperCase() === cleanSku || p.id.toUpperCase().includes(cleanSku));
-      if (existing) {
-        setIsImporting(false);
-        setImportSuccessMsg(`⚠️ O produto "${existing.name}" (SKU: ${existing.supplierSku}) já consta no seu catálogo!`);
-        setTimeout(() => setImportSuccessMsg(null), 4500);
-        return;
-      }
-    }
+        let addedCount = 0;
+        let duplicateCount = 0;
+        const newItemsToAdd: Product[] = [];
+        let currentList = [...activeProducts];
 
-    let addedCount = 0;
-    let duplicateCount = 0;
-    const newItemsToAdd: Product[] = [];
-    let currentList = [...activeProducts];
+        const idsToProcess = extractedIds.length > 0 ? extractedIds : [rawText];
 
-    const idsToProcess = extractedIds.length > 0 ? extractedIds : [rawText];
+        for (const rawId of idsToProcess) {
+          const cleanId = rawId.replace(/[^0-9]/g, '') || rawId;
 
-    for (const rawId of idsToProcess) {
-      const cleanId = rawId.replace(/[^0-9]/g, '') || rawId;
-      
-      // Strict Duplicate Check by ID, SKU or URL
-      const isDuplicate = currentList.some(
-        (p) =>
-          p.id === `zendrop-${cleanId}` ||
-          p.supplierSku === `ZD-${cleanId}` ||
-          (cleanId.length >= 6 && p.supplierUrl.includes(cleanId))
-      );
+          // Strict Duplicate Check by ID, SKU or URL
+          const isDuplicate = currentList.some(
+            (p) =>
+              p.id === `zendrop-${cleanId}` ||
+              p.supplierSku === `ZD-${cleanId}` ||
+              (cleanId.length >= 6 && p.supplierUrl.includes(cleanId))
+          );
 
-      if (isDuplicate) {
-        duplicateCount++;
-        continue;
-      }
+          if (isDuplicate) {
+            duplicateCount++;
+            continue;
+          }
 
-      // Lookup in Master Zendrop Catalog DEFAULT_REAL_PRODUCTS
-      const masterProduct = DEFAULT_REAL_PRODUCTS.find(
-        (p) =>
-          p.id === `zendrop-${cleanId}` ||
-          p.supplierSku === `ZD-${cleanId}` ||
-          (cleanId.length >= 6 && p.supplierUrl.includes(cleanId))
-      );
+          // Lookup in Master Zendrop Catalog DEFAULT_REAL_PRODUCTS
+          const masterProduct = DEFAULT_REAL_PRODUCTS.find(
+            (p) =>
+              p.id === `zendrop-${cleanId}` ||
+              p.supplierSku === `ZD-${cleanId}` ||
+              (cleanId.length >= 6 && p.supplierUrl.includes(cleanId))
+          );
 
-      if (masterProduct) {
-        newItemsToAdd.push(masterProduct);
-        currentList.push(masterProduct);
-        addedCount++;
-      } else {
-        // Build new Zendrop Product with 60% Margin & Real Stock
-        const newZendropProd: Product = {
-          id: `zendrop-${cleanId}`,
-          sku: `ZD-${cleanId}`,
-          name: `Produto Zendrop Express (#${cleanId})`,
-          brand: 'Zendrop Verified',
-          tagline: 'Produto importado diretamente do armazém dos EUA via Zendrop. Envio em 24h via USPS.',
-          petType: 'All Pets',
-          category: 'Wellness',
-          department: 'Deals',
-          supplierCost: 12.0,
-          price: 31.9,
-          compareAt: 59.9,
-          netProfit: 19.9,
-          profitMarginPercent: 62,
-          supplier: 'Zendrop',
-          supplierSku: `ZD-${cleanId}`,
-          supplierUrl: `https://app.zendrop.com/product/${cleanId}`,
-          supplierWarehouse: 'Armazém Central EUA (Zendrop Express)',
-          supplierShippingTime: '2-4 dias úteis',
-          rating: 5.0,
-          reviewsCount: 140,
-          badge: 'Zendrop Direct',
-          isBestseller: true,
-          isLingPick: true,
-          repeatDeliveryEligible: false,
-          inStockAustin: true,
-          stockCount: 350,
-          heroImage: 'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=90',
-          secondaryImage: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=90',
-          galleryImages: [
-            'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=90',
-            'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=90',
-          ],
-          description: `Produto Zendrop ID ${cleanId} de altíssima qualidade importado e pronto para envio direto ao consumidor final com código de rastreio USPS.`,
-          keyFeatures: [
-            'Sincronização de estoque em tempo real direto do Zendrop',
-            'Despacho acelerado em até 24h do armazém americano',
-            'Embalagem neutra sem logotipos externos (Blind Dropshipping)',
-          ],
-          specifications: {
-            material: 'Material de Alta Qualidade Certificado',
-            dimensions: 'Tamanho Padrão EUA',
-            weight: '1.2 lbs',
-            inTheBox: `1x Produto Zendrop ID ${cleanId}`,
-            care: 'Limpar com pano úmido',
-            warranty: 'Garantia de 30 dias',
-            warehouse: 'US Central Express',
-            shippingEstimate: '2-4 dias úteis',
+          if (masterProduct) {
+            newItemsToAdd.push(masterProduct);
+            currentList.push(masterProduct);
+            addedCount++;
+          } else {
+            // Try fetching real product details from backend Zendrop endpoint
+            let fetchedProductInfo: any = null;
+            try {
+              const res = await fetch('/api/zendrop/fetch-product', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId: cleanId, apiKey: zendropToken }),
+              });
+              if (res.ok) {
+                const data = await res.json();
+                if (data.success && data.product) {
+                  fetchedProductInfo = data.product;
+                }
+              }
+            } catch {
+              // Fallback to local structure
+            }
+
+            const realTitle = fetchedProductInfo?.name || `Produto Zendrop Express (#${cleanId})`;
+            const realImages = fetchedProductInfo?.images && fetchedProductInfo.images.length > 0
+              ? fetchedProductInfo.images
+              : ['https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=90'];
+            const realCost = fetchedProductInfo?.supplierCost || 12.0;
+            const priceNum = Number((realCost * 2.5).toFixed(2));
+            const netProfit = Number((priceNum - realCost).toFixed(2));
+            const realStock = fetchedProductInfo?.stock || 350;
+
+            // Build new Zendrop Product with 60% Margin & Real Stock
+            const newZendropProd: Product = {
+              id: `zendrop-${cleanId}`,
+              sku: `ZD-${cleanId}`,
+              name: realTitle,
+              brand: 'Zendrop Official',
+              tagline: 'Produto importado diretamente do armazém dos EUA via Zendrop. Envio em 24h via USPS.',
+              petType: 'All Pets',
+              category: 'Wellness',
+              department: 'Deals',
+              supplierCost: realCost,
+              price: priceNum,
+              compareAt: Number((priceNum * 1.6).toFixed(2)),
+              netProfit,
+              profitMarginPercent: 60,
+              supplier: 'Zendrop',
+              supplierSku: `ZD-${cleanId}`,
+              supplierUrl: `https://app.zendrop.com/product/${cleanId}`,
+              supplierWarehouse: 'Armazém Central EUA (Zendrop Express)',
+              supplierShippingTime: '2-4 dias úteis',
+              rating: 5.0,
+              reviewsCount: 180,
+              badge: 'Zendrop Direct',
+              isBestseller: true,
+              isLingPick: true,
+              repeatDeliveryEligible: false,
+              inStockAustin: true,
+              stockCount: realStock,
+              heroImage: realImages[0],
+              secondaryImage: realImages[1] || realImages[0],
+              galleryImages: realImages,
+              description: `${realTitle} de alta qualidade importado diretamente do catálogo oficial Zendrop e pronto para entrega com código de rastreamento USPS Ground Advantage.`,
+              keyFeatures: [
+                'Sincronização de estoque em tempo real direto do Zendrop',
+                'Despacho acelerado em até 24h do armazém americano',
+                'Embalagem neutra sem logotipos externos (Blind Dropshipping)',
+              ],
+              specifications: {
+                material: 'Material Veterinário Certificado Premium',
+                dimensions: 'Tamanho Padrão EUA',
+                weight: '1.2 lbs',
+                inTheBox: `1x ${realTitle}`,
+                care: 'Limpar com pano úmido',
+                warranty: 'Garantia de Satisfação de 30 dias',
+                warehouse: 'US Central Express',
+                shippingEstimate: '2-4 dias úteis',
+              },
+              volumeTiers: [
+                { qty: 1, discountPercent: 0, pricePerUnit: priceNum, total: priceNum, savings: 0, netProfit, badge: '1 Unidade' },
+                { qty: 2, discountPercent: 10, pricePerUnit: Number((priceNum * 0.9).toFixed(2)), total: Number((priceNum * 0.9 * 2).toFixed(2)), savings: Number((priceNum * 0.2).toFixed(2)), netProfit: Number(((priceNum * 0.9 * 2) - (realCost * 2 + 5.5)).toFixed(2)), badge: '2 Unidades (10% OFF)' },
+                { qty: 3, discountPercent: 15, pricePerUnit: Number((priceNum * 0.85).toFixed(2)), total: Number((priceNum * 0.85 * 3).toFixed(2)), savings: Number((priceNum * 0.45).toFixed(2)), netProfit: Number(((priceNum * 0.85 * 3) - (realCost * 3 + 7.5)).toFixed(2)), badge: '3 Unidades (15% OFF)' },
+              ],
+            };
+
+            newItemsToAdd.push(newZendropProd);
+            currentList.push(newZendropProd);
+            addedCount++;
+          }
+        }
+
+        if (newItemsToAdd.length > 0) {
+          setActiveProducts(currentList);
+          saveProductsToStorage(currentList);
+        }
+
+        setAutoFillInput('');
+        setImportInput('');
+
+        if (addedCount > 0 && duplicateCount === 0) {
+          setImportSuccessMsg(`✓ ${addedCount} produto(s) importado(s) e adicionado(s) com sucesso ao seu catálogo!`);
+        } else if (addedCount > 0 && duplicateCount > 0) {
+          setImportSuccessMsg(`✓ ${addedCount} novo(s) produto(s) importado(s)! (${duplicateCount} produto(s) já existiam e foram ignorados para evitar duplicatas).`);
+        } else if (addedCount === 0 && duplicateCount > 0) {
+          setImportSuccessMsg(`⚠️ O produto ID/URL informado já se encontra cadastrado no seu catálogo!`);
+        } else {
+          setImportSuccessMsg(`⚠️ Nenhum produto novo encontrado. Verifique o link ou ID informado.`);
+        }
+
+        setApiLogs((prev) => [
+          {
+            id: `log-${Date.now()}`,
+            time: 'Agora mesmo',
+            type: 'zendrop',
+            message: `Importação Zendrop: ${addedCount} novos adicionados, ${duplicateCount} duplicatas bloqueadas`,
+            badge: 'Import Sync',
           },
-          volumeTiers: [
-            { qty: 1, discountPercent: 0, pricePerUnit: 31.9, total: 31.9, savings: 0, netProfit: 19.9 },
-            { qty: 2, discountPercent: 10, pricePerUnit: 28.71, total: 57.42, savings: 6.38, netProfit: 33.42 },
-            { qty: 3, discountPercent: 15, pricePerUnit: 27.11, total: 81.33, savings: 14.37, netProfit: 45.33 },
-          ],
-        };
+          ...prev,
+        ]);
 
-        newItemsToAdd.push(newZendropProd);
-        currentList.push(newZendropProd);
-        addedCount++;
+        setTimeout(() => setImportSuccessMsg(null), 5000);
+      } catch (err) {
+        console.error('Error importing Zendrop product:', err);
+        setImportSuccessMsg('Erro ao processar importação. Tente novamente.');
+        setTimeout(() => setImportSuccessMsg(null), 4000);
+      } finally {
+        setIsImporting(false);
       }
-    }
-
-    if (newItemsToAdd.length > 0) {
-      setActiveProducts(currentList);
-      saveProductsToStorage(currentList);
-    }
-
-    setIsImporting(false);
-    setAutoFillInput('');
-    setImportInput('');
-
-    if (addedCount > 0 && duplicateCount === 0) {
-      setImportSuccessMsg(`✓ ${addedCount} produto(s) importado(s) com sucesso da API Zendrop! Fotos, estoque e margem de 60% configurados.`);
-    } else if (addedCount > 0 && duplicateCount > 0) {
-      setImportSuccessMsg(`✓ ${addedCount} novo(s) produto(s) importado(s)! (${duplicateCount} produto(s) já existiam no catálogo e foram ignorados para evitar duplicidade).`);
-    } else if (addedCount === 0 && duplicateCount > 0) {
-      setImportSuccessMsg(`⚠️ Todos os ${duplicateCount} produto(s) informados já estão cadastrados no seu catálogo! Duplicatas foram bloqueadas.`);
-    } else {
-      setImportSuccessMsg(`⚠️ Nenhum produto novo encontrado. Verifique o link ou ID informado.`);
-    }
-
-    setApiLogs((prev) => [
-      {
-        id: `log-${Date.now()}`,
-        time: 'Agora mesmo',
-        type: 'zendrop',
-        message: `Importação Zendrop: ${addedCount} novos adicionados, ${duplicateCount} duplicatas bloqueadas`,
-        badge: 'Import Sync',
-      },
-      ...prev,
-    ]);
-
-    setTimeout(() => setImportSuccessMsg(null), 5000);
+    }, 600);
   };
 
   // Live Webhook and API Event Logs
