@@ -10,7 +10,7 @@ import { PolicyModal } from './components/PolicyModal.tsx';
 import { AdminPanel } from './components/AdminPanel.tsx';
 import { MobileBottomNav } from './components/MobileBottomNav.tsx';
 
-// Dedicated Fable Pets Multi-Page Views
+// Dedicated Ling Petshop Multi-Page Views
 import { HomePage } from './pages/HomePage.tsx';
 import { ShopPage } from './pages/ShopPage.tsx';
 import { ProductDetailPage } from './pages/ProductDetailPage.tsx';
@@ -330,14 +330,9 @@ export default function App() {
                         className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
                         loading="lazy"
                       />
-                      {p.badge && (
-                        <span className="absolute top-3 left-3 bg-[#0F2942]/90 backdrop-blur-xs text-white font-semibold text-[10px] px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                          {p.badge}
-                        </span>
-                      )}
                     </div>
                     <span className="text-[10px] font-semibold text-[#64748B] uppercase tracking-wider">
-                      {p.brand} · {p.category}
+                      {p.brand && !p.brand.includes('Fable') ? p.brand : 'Ling Petshop'} · {p.category}
                     </span>
                     <h3 className="text-base font-bold text-[#0F2942] group-hover:text-[#2563EB] mt-1 transition-colors leading-snug line-clamp-2 font-serif">
                       {p.name}

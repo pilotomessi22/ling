@@ -369,28 +369,15 @@ export const BestsellersGrid: React.FC<BestsellersGridProps> = ({
                         </div>
                       )}
 
-                      {/* Brand & Collection Tag + Clean Badges */}
+                      {/* Brand & Collection Tag */}
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <span className="text-[10px] font-semibold tracking-widest text-[#8E867C] uppercase">
-                          {p.brand || 'Ling Petshop'} · {p.petType}
+                          {p.brand && !p.brand.includes('Fable') ? p.brand : 'Ling Petshop'} · {p.petType}
                         </span>
-                        {p.stockCount === 0 ? (
+                        {p.stockCount === 0 && (
                           <span className="bg-rose-50 text-rose-800 border border-rose-200 font-bold text-[9px] px-2 py-0.5 rounded-full">
                             Sold Out
                           </span>
-                        ) : (
-                          <>
-                            {p.badge && (
-                              <span className="bg-[#FAF7F2] text-[#2C2724] border border-[#E7DFD5] font-semibold text-[9px] px-2 py-0.5 rounded-full">
-                                {p.badge}
-                              </span>
-                            )}
-                            {discountPct > 0 && (
-                              <span className="text-emerald-700 bg-emerald-50 border border-emerald-200/70 font-bold text-[9px] px-1.5 py-0.5 rounded">
-                                Save {discountPct}%
-                              </span>
-                            )}
-                          </>
                         )}
                       </div>
 
@@ -428,10 +415,6 @@ export const BestsellersGrid: React.FC<BestsellersGridProps> = ({
                           </span>
                         )}
                       </div>
-
-                      <span className="text-[11px] font-bold text-[#C86446] bg-[#FDF2F0] px-2 py-0.5 rounded-md border border-[#F5D0C9]">
-                        Use LING20
-                      </span>
                     </div>
                   </div>
                 </div>

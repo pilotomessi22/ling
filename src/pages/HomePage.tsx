@@ -161,14 +161,6 @@ export const HomePage: React.FC<HomePageProps> = ({
                       }
                     }}
                   />
-                  <div className="absolute top-4 left-4 flex flex-col gap-1.5">
-                    <span className="bg-[#0F2942] text-white text-[10px] sm:text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-xs">
-                      Special Campaign Bundle
-                    </span>
-                    <span className="bg-[#16A34A] text-white text-[10px] sm:text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-xs">
-                      Save $44.98
-                    </span>
-                  </div>
                 </div>
               </div>
 
@@ -217,9 +209,6 @@ export const HomePage: React.FC<HomePageProps> = ({
                       </span>
                       <span className="text-sm line-through text-[#94A3B8]">
                         $124.97
-                      </span>
-                      <span className="text-xs font-bold text-[#16A34A] bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
-                        36% Off Bundle
                       </span>
                     </div>
                     <span className="text-[11px] text-[#64748B] block mt-0.5">

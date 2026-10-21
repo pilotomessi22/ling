@@ -335,23 +335,14 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                         </div>
                       )}
 
-                      {/* Brand & Collection Tag + Clean Badges */}
+                      {/* Brand & Collection Tag */}
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <span className="text-[10px] font-bold tracking-widest text-[#94A3B8] uppercase">
-                          {p.brand || 'Ling Petshop'} · {p.petType}
+                          {p.brand && !p.brand.includes('Fable') ? p.brand : 'Ling Petshop'} · {p.petType}
                         </span>
-                        {isOut ? (
+                        {isOut && (
                           <span className="bg-rose-50 text-rose-700 border border-rose-300 font-bold text-[9px] px-2 py-0.5 rounded-full">
                             Sem Estoque (0 un.)
-                          </span>
-                        ) : p.badge ? (
-                          <span className="bg-[#F1F5F9] text-[#0F2942] border border-[#CBD5E1] font-semibold text-[9px] px-2 py-0.5 rounded-full">
-                            {p.badge}
-                          </span>
-                        ) : null}
-                        {discountPct > 0 && (
-                          <span className="text-emerald-700 bg-emerald-50 border border-emerald-200/70 font-bold text-[9px] px-1.5 py-0.5 rounded">
-                            Save {discountPct}%
                           </span>
                         )}
                       </div>
