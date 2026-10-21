@@ -152,10 +152,10 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "category": "Grooming",
     "department": "Grooming",
     "supplierCost": 27.97,
-    "price": 67.97,
-    "compareAt": 95.17,
-    "netProfit": 40.00,
-    "profitMarginPercent": 59,
+    "price": 79.99,
+    "compareAt": 124.97,
+    "netProfit": 52.02,
+    "profitMarginPercent": 65,
     "supplier": "Zendrop",
     "supplierSku": "ZD-BUNDLE-CLEANUP-3IN1",
     "supplierUrl": "https://app.zendrop.com",
@@ -243,27 +243,27 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
       {
         "qty": 1,
         "discountPercent": 0,
-        "pricePerUnit": 67.97,
-        "total": 67.97,
-        "savings": 27.20,
-        "netProfit": 40.00
+        "pricePerUnit": 79.99,
+        "total": 79.99,
+        "savings": 44.98,
+        "netProfit": 52.02
       },
       {
         "qty": 2,
         "discountPercent": 15,
-        "pricePerUnit": 57.77,
-        "total": 115.54,
-        "savings": 74.80,
-        "netProfit": 59.60,
+        "pricePerUnit": 67.99,
+        "total": 135.98,
+        "savings": 113.96,
+        "netProfit": 80.04,
         "badge": "POPULAR"
       },
       {
         "qty": 3,
         "discountPercent": 25,
-        "pricePerUnit": 50.98,
-        "total": 152.94,
-        "savings": 132.57,
-        "netProfit": 69.03,
+        "pricePerUnit": 59.99,
+        "total": 179.98,
+        "savings": 194.93,
+        "netProfit": 96.07,
         "badge": "BEST DEAL"
       }
     ]
@@ -448,10 +448,10 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "category": "Grooming",
     "department": "Grooming",
     "supplierCost": 3.99,
-    "price": 14.99,
-    "compareAt": 20.99,
-    "netProfit": 11,
-    "profitMarginPercent": 73,
+    "price": 24.99,
+    "compareAt": 34.99,
+    "netProfit": 21.00,
+    "profitMarginPercent": 84,
     "supplier": "Zendrop",
     "supplierSku": "ZD-1603576",
     "supplierUrl": "https://app.zendrop.com/product/1603576",
@@ -497,26 +497,26 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
       {
         "qty": 1,
         "discountPercent": 0,
-        "pricePerUnit": 14.99,
-        "total": 14.99,
+        "pricePerUnit": 24.99,
+        "total": 24.99,
         "savings": 0,
-        "netProfit": 11
+        "netProfit": 21.00
       },
       {
         "qty": 2,
         "discountPercent": 10,
-        "pricePerUnit": 13.49,
-        "total": 26.98,
-        "savings": 3,
-        "netProfit": 19
+        "pricePerUnit": 22.49,
+        "total": 44.98,
+        "savings": 5.00,
+        "netProfit": 37.00
       },
       {
         "qty": 3,
         "discountPercent": 15,
-        "pricePerUnit": 12.74,
-        "total": 38.22,
-        "savings": 6.75,
-        "netProfit": 26.25
+        "pricePerUnit": 21.24,
+        "total": 63.72,
+        "savings": 11.25,
+        "netProfit": 51.75
       }
     ]
   },
@@ -530,10 +530,10 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "category": "Beds",
     "department": "Dogs",
     "supplierCost": 14.99,
-    "price": 29.99,
-    "compareAt": 41.99,
-    "netProfit": 15,
-    "profitMarginPercent": 50,
+    "price": 39.99,
+    "compareAt": 49.99,
+    "netProfit": 25.00,
+    "profitMarginPercent": 63,
     "supplier": "Zendrop",
     "supplierSku": "ZD-2053714",
     "supplierUrl": "https://app.zendrop.com/product/2053714",
@@ -575,26 +575,26 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
       {
         "qty": 1,
         "discountPercent": 0,
-        "pricePerUnit": 29.99,
-        "total": 29.99,
+        "pricePerUnit": 39.99,
+        "total": 39.99,
         "savings": 0,
-        "netProfit": 15
+        "netProfit": 25.00
       },
       {
         "qty": 2,
         "discountPercent": 10,
-        "pricePerUnit": 26.99,
-        "total": 53.98,
-        "savings": 6,
-        "netProfit": 24
+        "pricePerUnit": 35.99,
+        "total": 71.98,
+        "savings": 8.00,
+        "netProfit": 42.00
       },
       {
         "qty": 3,
         "discountPercent": 15,
-        "pricePerUnit": 25.49,
-        "total": 76.47,
-        "savings": 13.5,
-        "netProfit": 31.5
+        "pricePerUnit": 33.99,
+        "total": 101.97,
+        "savings": 18.00,
+        "netProfit": 57.00
       }
     ]
   },
@@ -608,10 +608,10 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     "category": "Beds",
     "department": "Dogs",
     "supplierCost": 8.99,
-    "price": 22.99,
-    "compareAt": 32.19,
-    "netProfit": 14,
-    "profitMarginPercent": 61,
+    "price": 29.99,
+    "compareAt": 39.99,
+    "netProfit": 21.00,
+    "profitMarginPercent": 70,
     "supplier": "Zendrop",
     "supplierSku": "ZD-2058716",
     "supplierUrl": "https://app.zendrop.com/product/2058716",
@@ -653,26 +653,26 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
       {
         "qty": 1,
         "discountPercent": 0,
-        "pricePerUnit": 22.99,
-        "total": 22.99,
+        "pricePerUnit": 29.99,
+        "total": 29.99,
         "savings": 0,
-        "netProfit": 14
+        "netProfit": 21.00
       },
       {
         "qty": 2,
         "discountPercent": 10,
-        "pricePerUnit": 20.69,
-        "total": 41.38,
-        "savings": 4.6,
-        "netProfit": 23.4
+        "pricePerUnit": 26.99,
+        "total": 53.98,
+        "savings": 6.00,
+        "netProfit": 36.00
       },
       {
         "qty": 3,
         "discountPercent": 15,
-        "pricePerUnit": 19.54,
-        "total": 58.62,
-        "savings": 10.35,
-        "netProfit": 31.65
+        "pricePerUnit": 25.49,
+        "total": 76.47,
+        "savings": 13.50,
+        "netProfit": 49.50
       }
     ]
   },
@@ -3192,16 +3192,37 @@ export function getSavedProducts(): Product[] {
   if (typeof window === 'undefined') return DEFAULT_REAL_PRODUCTS;
   try {
     // Reset to load official catalog including The Ultimate Pet Cleanup Kit campaign bundle
-    if (!localStorage.getItem('ling_catalog_zendrop_aligned_v36_cleanupkit')) {
+    if (!localStorage.getItem('ling_catalog_zendrop_aligned_v37_kit7999')) {
       localStorage.setItem('ling_admin_products', JSON.stringify(DEFAULT_REAL_PRODUCTS));
-      localStorage.setItem('ling_catalog_zendrop_aligned_v36_cleanupkit', 'true');
+      localStorage.setItem('ling_catalog_zendrop_aligned_v37_kit7999', 'true');
       return DEFAULT_REAL_PRODUCTS;
     }
     const saved = localStorage.getItem('ling_admin_products');
     if (saved !== null) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
+        return parsed.map((p) => {
+          const fresh = DEFAULT_REAL_PRODUCTS.find((def) => def.id === p.id);
+          if (
+            fresh &&
+            (p.isCampaignBundle ||
+              p.id === 'ultimate-pet-cleanup-kit' ||
+              p.id === 'zendrop-1603576' ||
+              p.id === 'zendrop-2053714' ||
+              p.id === 'zendrop-2058716')
+          ) {
+            return {
+              ...p,
+              price: fresh.price,
+              compareAt: fresh.compareAt,
+              netProfit: fresh.netProfit,
+              profitMarginPercent: fresh.profitMarginPercent,
+              volumeTiers: fresh.volumeTiers,
+              bundleItems: fresh.bundleItems || p.bundleItems,
+            };
+          }
+          return p;
+        });
       }
     }
   } catch (e) {
