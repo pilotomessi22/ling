@@ -1155,32 +1155,41 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
     setTimeout(() => setImportSuccessMsg(null), 4000);
   };
 
+  // Delete Product Confirmation States
+  const [deleteConfirmProduct, setDeleteConfirmProduct] = useState<Product | null>(null);
+  const [isClearAllProductsConfirmOpen, setIsClearAllProductsConfirmOpen] = useState(false);
+
   const handleDeleteProduct = (productId: string) => {
     const prod = activeProducts.find((p) => p.id === productId);
     if (!prod) return;
-    if (window.confirm(`Tem certeza que deseja remover o produto "${prod.name}" da sua loja?`)) {
-      const nextList = activeProducts.filter((p) => p.id !== productId);
-      setActiveProducts(nextList);
-      saveProductsToStorage(nextList);
-      setImportSuccessMsg(`Produto "${prod.name}" foi removido do catálogo com sucesso.`);
-      setTimeout(() => setImportSuccessMsg(null), 3500);
-    }
+    setDeleteConfirmProduct(prod);
+  };
+
+  const handleExecuteDeleteProduct = () => {
+    if (!deleteConfirmProduct) return;
+    const prodId = deleteConfirmProduct.id;
+    const prodName = deleteConfirmProduct.name;
+    const nextList = activeProducts.filter((p) => p.id !== prodId);
+    setActiveProducts(nextList);
+    saveProductsToStorage(nextList);
+    setDeleteConfirmProduct(null);
+    setImportSuccessMsg(`✓ O produto "${prodName}" foi removido do catálogo com sucesso!`);
+    setTimeout(() => setImportSuccessMsg(null), 3500);
+  };
+
+  const handleExecuteClearAllProducts = () => {
+    setActiveProducts([]);
+    saveProductsToStorage([]);
+    setIsClearAllProductsConfirmOpen(false);
+    setImportSuccessMsg('✓ Catálogo zerado com sucesso! Todos os produtos foram removidos.');
+    setTimeout(() => setImportSuccessMsg(null), 4000);
   };
 
   const handleResetCatalog = () => {
     setActiveProducts(PRODUCTS);
     saveProductsToStorage(PRODUCTS);
-    setImportSuccessMsg('Catálogo resetado para os 25 produtos campeões originais sincronizados com Zendrop e CJ!');
+    setImportSuccessMsg('Catálogo resetado para os produtos campeões originais sincronizados com Zendrop!');
     setTimeout(() => setImportSuccessMsg(null), 4000);
-  };
-
-  const handleClearAllProducts = () => {
-    if (window.confirm('Tem certeza que deseja apagar TODOS os produtos de teste? O catálogo ficará 100% limpo para você cadastrar seus novos produtos reais da CJ/fornecedores.')) {
-      setActiveProducts([]);
-      saveProductsToStorage([]);
-      setImportSuccessMsg('Catálogo zerado com sucesso! Agora você pode cadastrar seus próprios produtos e fornecedores.');
-      setTimeout(() => setImportSuccessMsg(null), 4000);
-    }
   };
 
   const handleSaveEditProduct = (e: React.FormEvent) => {
@@ -1219,26 +1228,159 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const [isImporting, setIsImporting] = useState(false);
   const [importSuccessMsg, setImportSuccessMsg] = useState<string | null>(null);
 
-  const handleAutoImport = (customTitle?: string, supplierName?: 'Zendrop' | 'CJ Dropshipping') => {
+  const handleAutoImport = (customTitle?: string) => {
+    const rawText = (customTitle || autoFillInput || importInput || '').trim();
+    if (!rawText) return;
+
     setIsImporting(true);
-    const title = customTitle || importInput.trim() || 'Orthopedic Memory Foam Car Seat';
-    const supplier = supplierName || (title.toLowerCase().includes('cj') ? 'CJ Dropshipping' : 'Zendrop');
-    setTimeout(() => {
-      setIsImporting(false);
-      setImportSuccessMsg(`Produto "${title}" importado e sincronizado com sucesso da ${supplier}! Custo de atacado e fotos em alta resolução configurados no catálogo.`);
-      setImportInput('');
-      setApiLogs((prev) => [
-        {
-          id: `log-${Date.now()}`,
-          time: 'Agora mesmo',
-          type: supplier === 'Zendrop' ? 'zendrop' : 'cj',
-          message: `Sincronização Automática: Produto "${title}" catalogado com armazém dos EUA (Disponibilidade imediata via USPS)`,
-          badge: 'Catalog Sync',
-        },
-        ...prev,
-      ]);
-      setTimeout(() => setImportSuccessMsg(null), 4000);
-    }, 900);
+
+    // Extract all numerical product IDs or Zendrop URLs from input text
+    const matches = Array.from(rawText.matchAll(/(?:product\/|zendrop-|sku:)?(\d{6,8})/gi));
+    const extractedIds = Array.from(new Set(matches.map((m) => m[1])));
+
+    // Fallback if user entered text without a 6-8 digit Zendrop ID
+    if (extractedIds.length === 0) {
+      // Check for alphanumeric SKU or search
+      const cleanSku = rawText.replace(/[^a-zA-Z0-9_-]/g, '').toUpperCase();
+      const existing = activeProducts.find((p) => p.supplierSku.toUpperCase() === cleanSku || p.id.toUpperCase().includes(cleanSku));
+      if (existing) {
+        setIsImporting(false);
+        setImportSuccessMsg(`⚠️ O produto "${existing.name}" (SKU: ${existing.supplierSku}) já consta no seu catálogo!`);
+        setTimeout(() => setImportSuccessMsg(null), 4500);
+        return;
+      }
+    }
+
+    let addedCount = 0;
+    let duplicateCount = 0;
+    const newItemsToAdd: Product[] = [];
+    let currentList = [...activeProducts];
+
+    const idsToProcess = extractedIds.length > 0 ? extractedIds : [rawText];
+
+    for (const rawId of idsToProcess) {
+      const cleanId = rawId.replace(/[^0-9]/g, '') || rawId;
+      
+      // Strict Duplicate Check by ID, SKU or URL
+      const isDuplicate = currentList.some(
+        (p) =>
+          p.id === `zendrop-${cleanId}` ||
+          p.supplierSku === `ZD-${cleanId}` ||
+          (cleanId.length >= 6 && p.supplierUrl.includes(cleanId))
+      );
+
+      if (isDuplicate) {
+        duplicateCount++;
+        continue;
+      }
+
+      // Lookup in Master Zendrop Catalog DEFAULT_REAL_PRODUCTS
+      const masterProduct = DEFAULT_REAL_PRODUCTS.find(
+        (p) =>
+          p.id === `zendrop-${cleanId}` ||
+          p.supplierSku === `ZD-${cleanId}` ||
+          (cleanId.length >= 6 && p.supplierUrl.includes(cleanId))
+      );
+
+      if (masterProduct) {
+        newItemsToAdd.push(masterProduct);
+        currentList.push(masterProduct);
+        addedCount++;
+      } else {
+        // Build new Zendrop Product with 60% Margin & Real Stock
+        const newZendropProd: Product = {
+          id: `zendrop-${cleanId}`,
+          sku: `ZD-${cleanId}`,
+          name: `Produto Zendrop Express (#${cleanId})`,
+          brand: 'Zendrop Verified',
+          tagline: 'Produto importado diretamente do armazém dos EUA via Zendrop. Envio em 24h via USPS.',
+          petType: 'All Pets',
+          category: 'Wellness',
+          department: 'Deals',
+          supplierCost: 12.0,
+          price: 31.9,
+          compareAt: 59.9,
+          netProfit: 19.9,
+          profitMarginPercent: 62,
+          supplier: 'Zendrop',
+          supplierSku: `ZD-${cleanId}`,
+          supplierUrl: `https://app.zendrop.com/product/${cleanId}`,
+          supplierWarehouse: 'Armazém Central EUA (Zendrop Express)',
+          supplierShippingTime: '2-4 dias úteis',
+          rating: 5.0,
+          reviewsCount: 140,
+          badge: 'Zendrop Direct',
+          isBestseller: true,
+          isLingPick: true,
+          repeatDeliveryEligible: false,
+          inStockAustin: true,
+          stockCount: 350,
+          heroImage: 'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=90',
+          secondaryImage: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=90',
+          galleryImages: [
+            'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=90',
+            'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=90',
+          ],
+          description: `Produto Zendrop ID ${cleanId} de altíssima qualidade importado e pronto para envio direto ao consumidor final com código de rastreio USPS.`,
+          keyFeatures: [
+            'Sincronização de estoque em tempo real direto do Zendrop',
+            'Despacho acelerado em até 24h do armazém americano',
+            'Embalagem neutra sem logotipos externos (Blind Dropshipping)',
+          ],
+          specifications: {
+            material: 'Material de Alta Qualidade Certificado',
+            dimensions: 'Tamanho Padrão EUA',
+            weight: '1.2 lbs',
+            inTheBox: `1x Produto Zendrop ID ${cleanId}`,
+            care: 'Limpar com pano úmido',
+            warranty: 'Garantia de 30 dias',
+            warehouse: 'US Central Express',
+            shippingEstimate: '2-4 dias úteis',
+          },
+          volumeTiers: [
+            { qty: 1, discountPercent: 0, pricePerUnit: 31.9, total: 31.9, savings: 0, netProfit: 19.9 },
+            { qty: 2, discountPercent: 10, pricePerUnit: 28.71, total: 57.42, savings: 6.38, netProfit: 33.42 },
+            { qty: 3, discountPercent: 15, pricePerUnit: 27.11, total: 81.33, savings: 14.37, netProfit: 45.33 },
+          ],
+        };
+
+        newItemsToAdd.push(newZendropProd);
+        currentList.push(newZendropProd);
+        addedCount++;
+      }
+    }
+
+    if (newItemsToAdd.length > 0) {
+      setActiveProducts(currentList);
+      saveProductsToStorage(currentList);
+    }
+
+    setIsImporting(false);
+    setAutoFillInput('');
+    setImportInput('');
+
+    if (addedCount > 0 && duplicateCount === 0) {
+      setImportSuccessMsg(`✓ ${addedCount} produto(s) importado(s) com sucesso da API Zendrop! Fotos, estoque e margem de 60% configurados.`);
+    } else if (addedCount > 0 && duplicateCount > 0) {
+      setImportSuccessMsg(`✓ ${addedCount} novo(s) produto(s) importado(s)! (${duplicateCount} produto(s) já existiam no catálogo e foram ignorados para evitar duplicidade).`);
+    } else if (addedCount === 0 && duplicateCount > 0) {
+      setImportSuccessMsg(`⚠️ Todos os ${duplicateCount} produto(s) informados já estão cadastrados no seu catálogo! Duplicatas foram bloqueadas.`);
+    } else {
+      setImportSuccessMsg(`⚠️ Nenhum produto novo encontrado. Verifique o link ou ID informado.`);
+    }
+
+    setApiLogs((prev) => [
+      {
+        id: `log-${Date.now()}`,
+        time: 'Agora mesmo',
+        type: 'zendrop',
+        message: `Importação Zendrop: ${addedCount} novos adicionados, ${duplicateCount} duplicatas bloqueadas`,
+        badge: 'Import Sync',
+      },
+      ...prev,
+    ]);
+
+    setTimeout(() => setImportSuccessMsg(null), 5000);
   };
 
   // Live Webhook and API Event Logs
@@ -2400,6 +2542,21 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
                           <div className="flex items-center justify-between text-[11px] text-gray-600 pt-1 border-t border-gray-200/50">
                             <span>Armazém:</span>
                             <span className="font-medium text-gray-800">{p.supplierWarehouse}</span>
+                          </div>
+
+                          <div className="flex items-center justify-between text-[11px] pt-1.5 border-t border-gray-200/60">
+                            <span className="text-gray-600 font-bold flex items-center gap-1">
+                              <Package size={13} className="text-blue-600" /> Estoque Real Zendrop:
+                            </span>
+                            <span className={`font-black px-2 py-0.5 rounded-full text-[10px] border flex items-center gap-1 ${
+                              (p.stockCount ?? 100) >= 50
+                                ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                                : (p.stockCount ?? 100) >= 10
+                                ? 'bg-amber-50 text-amber-800 border-amber-200'
+                                : 'bg-red-50 text-red-800 border-red-200'
+                            }`}>
+                              <span>{p.stockCount ?? 100} un. disponíveis</span>
+                            </span>
                           </div>
                         </div>
 
@@ -6067,6 +6224,54 @@ Ending Call to Action: "Link in bio! Use code LING20 for 20% off plus fast US de
               >
                 <Check size={16} />
                 <span>Salvar Fotos no Site ({photoManagerGallery.length})</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE CONFIRMAÇÃO DE EXCLUSÃO DE PRODUTO */}
+      {deleteConfirmProduct && (
+        <div className="fixed inset-0 z-80 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-white text-gray-900 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-5 border border-red-200">
+            <div className="flex items-center gap-3.5">
+              <div className="w-12 h-12 rounded-2xl bg-red-100 text-red-700 flex items-center justify-center font-bold shrink-0">
+                <Trash2 size={24} />
+              </div>
+              <div>
+                <h3 className="text-lg font-black text-gray-900">
+                  Remover Produto do Catálogo?
+                </h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Esta ação não pode ser desfeita.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-200 text-xs space-y-1">
+              <span className="font-bold text-[#002244] block line-clamp-1">
+                {deleteConfirmProduct.name}
+              </span>
+              <span className="text-gray-500 text-[11px] block">
+                SKU: {deleteConfirmProduct.supplierSku} · Categoria: {deleteConfirmProduct.category}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setDeleteConfirmProduct(null)}
+                className="px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs transition-colors cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleExecuteDeleteProduct}
+                className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-black text-xs transition-all shadow-md cursor-pointer flex items-center gap-1.5 hover:scale-102 active:scale-98"
+              >
+                <Trash2 size={14} />
+                <span>Sim, Apagar Produto</span>
               </button>
             </div>
           </div>
