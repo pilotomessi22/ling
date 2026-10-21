@@ -174,11 +174,15 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                           <p className="text-[11px] text-[#8E867C] mt-0.5">
                             {item.size} · {item.color}
                           </p>
-
+                          {item.stockCount === 0 && (
+                            <span className="inline-block mt-1 text-[10px] font-bold text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-md">
+                              ⚠️ Esgotado no fornecedor (0 un.)
+                            </span>
+                          )}
                         </div>
                         <button
                           onClick={() => onRemoveItem(item.id)}
-                          className="text-[#A8A196] hover:text-[#C86446] transition-colors p-1"
+                          className="text-[#A8A196] hover:text-[#C86446] transition-colors p-1 cursor-pointer"
                           title="Remove item"
                         >
                           <Trash2 size={14} />
@@ -290,16 +294,26 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               </div>
 
               {/* Checkout Action Button in Terracotta */}
-              <button
-                onClick={() => {
-                  onClose();
-                  onOpenCheckout();
-                }}
-                className="w-full bg-[#C86446] hover:bg-[#B55539] text-white font-bold text-sm py-4 px-4 rounded-full shadow-md transition-transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider"
-              >
-                <span>Checkout Now</span>
-                <ArrowRight size={17} />
-              </button>
+              {items.some((i) => i.stockCount === 0) ? (
+                <button
+                  disabled
+                  className="w-full bg-stone-200 text-stone-500 font-bold text-xs py-4 px-4 rounded-full shadow-none cursor-not-allowed flex items-center justify-center gap-2 uppercase tracking-wider border border-stone-300"
+                >
+                  <X size={16} />
+                  <span>Remova Itens Esgotados para Finalizar</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    onClose();
+                    onOpenCheckout();
+                  }}
+                  className="w-full bg-[#C86446] hover:bg-[#B55539] text-white font-bold text-sm py-4 px-4 rounded-full shadow-md transition-transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider"
+                >
+                  <span>Checkout Now</span>
+                  <ArrowRight size={17} />
+                </button>
+              )}
 
               <div className="text-center text-[10px] text-[#766E65] flex items-center justify-center gap-1.5">
                 <ShieldCheck size={13} className="text-[#4E664D]" />

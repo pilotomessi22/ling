@@ -71,6 +71,12 @@ import {
 } from '../data/storeData.ts';
 import { formatCurrency } from '../utils/storeLogic.ts';
 import { checkAdminPassword } from '../utils/security.ts';
+import {
+  InventorySyncStatus,
+  getCurrentSyncStatus,
+  syncInventoryWithSupplier,
+  toggleAutoSync,
+} from '../utils/inventorySync.ts';
 
 export interface AdminOrder {
   id: string;
@@ -715,6 +721,27 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   // Active Products persisted state
   const [activeProducts, setActiveProducts] = useState<Product[]>(() => getSavedProducts());
 
+  useEffect(() => {
+    const handleProductsUpdated = () => {
+      setActiveProducts(getSavedProducts());
+    };
+    window.addEventListener('ling_products_updated', handleProductsUpdated);
+    return () => window.removeEventListener('ling_products_updated', handleProductsUpdated);
+  }, []);
+
+  // Automated 60-Second Inventory Sync State
+  const [syncStatus, setSyncStatus] = useState<InventorySyncStatus>(() => getCurrentSyncStatus());
+
+  useEffect(() => {
+    const handleTick = (e: any) => {
+      if (e.detail) {
+        setSyncStatus(e.detail);
+      }
+    };
+    window.addEventListener('ling_inventory_sync_tick', handleTick);
+    return () => window.removeEventListener('ling_inventory_sync_tick', handleTick);
+  }, []);
+
   // Modal state for adding custom real products
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -1238,42 +1265,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
     setIsSyncingInventory(true);
     setSyncInventoryFeedback(null);
     try {
-      const res = await fetch('/api/zendrop/sync-all-inventory', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ force: true }),
-      });
-      const data = await res.json();
-      if (data.success && data.stocks) {
-        setActiveProducts((prev) => {
-          const updated = prev.map((p) => {
-            const zdId = p.id.replace('zendrop-', '');
-            const stockInfo = data.stocks[zdId];
-            if (stockInfo) {
-              return {
-                ...p,
-                stockCount: stockInfo.stockCount,
-                inStockAustin: stockInfo.inStock,
-              };
-            }
-            return p;
-          });
-          saveProductsToStorage(updated);
-          return updated;
-        });
-
-        const oosCount = data.outOfStockCount || 0;
-        const msg = `✅ Sincronização em tempo real concluída! ${data.syncedCount} produtos verificados na API do Zendrop. ${
-          oosCount > 0
-            ? `${oosCount} produto(s) identificado(s) como ESGOTADO(S) (ex: Puppy Pads XL Pee Pads com 0 un.).`
-            : 'Todos os produtos possuem unidades disponíveis em estoque nos EUA.'
-        }`;
-        setSyncInventoryFeedback(msg);
-        setImportSuccessMsg(msg);
-        setTimeout(() => setImportSuccessMsg(null), 8000);
-      } else {
-        setImportSuccessMsg('⚠️ Falha ao obter dados em tempo real da API Zendrop. Verifique a conexão.');
-      }
+      const res = await syncInventoryWithSupplier(true);
+      setActiveProducts(getSavedProducts());
+      const oosCount = res.outOfStockCount || 0;
+      const msg = `✅ Sincronização em tempo real concluída! ${res.syncedCount} produtos verificados na API do Zendrop. ${
+        oosCount > 0
+          ? `${oosCount} produto(s) identificado(s) como ESGOTADO(S) (ex: Puppy Pads XL Pee Pads com 0 un.).`
+          : 'Todos os produtos possuem unidades disponíveis em estoque nos EUA.'
+      }`;
+      setSyncInventoryFeedback(msg);
+      setImportSuccessMsg(msg);
+      setTimeout(() => setImportSuccessMsg(null), 8000);
     } catch (err: any) {
       setImportSuccessMsg(`❌ Erro ao conectar com o serviço de sincronização: ${err.message}`);
     } finally {
@@ -1600,41 +1602,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
     localStorage.setItem('ling_admin_orders', JSON.stringify(orders));
   }, [orders]);
 
-  // Background check for real-time Zendrop inventory on mount
-  useEffect(() => {
-    let isMounted = true;
-    fetch('/api/zendrop/sync-all-inventory')
-      .then((res) => res.json())
-      .then((data) => {
-        if (!isMounted || !data?.success || !data?.stocks) return;
-        setActiveProducts((prev) => {
-          let hasChanges = false;
-          const updated = prev.map((p) => {
-            const zdId = p.id.replace('zendrop-', '');
-            const stockInfo = data.stocks[zdId];
-            if (stockInfo && (p.stockCount !== stockInfo.stockCount || p.inStockAustin !== stockInfo.inStock)) {
-              hasChanges = true;
-              return {
-                ...p,
-                stockCount: stockInfo.stockCount,
-                inStockAustin: stockInfo.inStock,
-              };
-            }
-            return p;
-          });
-          if (hasChanges) {
-            saveProductsToStorage(updated);
-            return updated;
-          }
-          return prev;
-        });
-      })
-      .catch(() => {});
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  // Automated 60s inventory sync is globally handled by initAutomatedInventorySync() and updates activeProducts via ling_products_updated
 
 
 
@@ -2251,6 +2219,98 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
         {/* TAB 2: CATÁLOGO & LUCROS CJ DROPSHIPPING (NOVA CENTRAL ESTRATÉGICA) */}
         {activeTab === 'catalog' && (
           <div className="space-y-6">
+            {/* ⏱️ BARRA DE MONITORAMENTO DE SINCRONIZAÇÃO AUTOMÁTICA EM TEMPO REAL (A CADA 60s) */}
+            <div className="bg-gradient-to-r from-[#00142A] via-[#002244] to-[#011B38] text-white p-4 sm:p-5 rounded-3xl border border-blue-500/30 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <div className="relative flex items-center justify-center w-11 h-11 rounded-2xl bg-blue-900/60 border border-blue-500/40 text-blue-400 shrink-0">
+                  <RefreshCw
+                    size={20}
+                    className={syncStatus.isSyncing || isSyncingInventory ? 'animate-spin text-emerald-400' : 'text-blue-300'}
+                  />
+                  {syncStatus.enabled && (
+                    <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                    </span>
+                  )}
+                </div>
+
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs font-black text-white tracking-wide flex items-center gap-1.5">
+                      Sincronização Automática Zendrop:
+                    </span>
+                    <span
+                      className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border flex items-center gap-1 ${
+                        syncStatus.enabled
+                          ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/40'
+                          : 'bg-stone-800 text-stone-400 border-stone-600'
+                      }`}
+                    >
+                      <span className={`w-1.5 h-1.5 rounded-full ${syncStatus.enabled ? 'bg-emerald-400 animate-pulse' : 'bg-stone-500'}`} />
+                      {syncStatus.enabled ? 'Ativo (A cada 60 segundos)' : 'Pausado'}
+                    </span>
+                    {syncStatus.outOfStockCount > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setCatalogCategory('out-of-stock')}
+                        className="bg-red-500/25 text-red-300 border border-red-500/40 text-[10px] font-black px-2.5 py-0.5 rounded-full flex items-center gap-1 hover:bg-red-500/40 cursor-pointer transition-colors"
+                        title="Clique para ver os produtos esgotados no catálogo"
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-ping"></span>
+                        {syncStatus.outOfStockCount} Esgotado no Fornecedor
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-blue-200/80 mt-1 flex items-center gap-2 flex-wrap">
+                    <span>
+                      Última verificação: <strong className="text-white font-mono">{syncStatus.lastSyncFormatted}</strong>
+                    </span>
+                    <span>•</span>
+                    <span>
+                      Próximo ciclo automático em:{' '}
+                      <strong className="text-emerald-300 font-mono">
+                        {syncStatus.isSyncing ? 'Sincronizando...' : `${syncStatus.nextSyncCountdown}s`}
+                      </strong>
+                    </span>
+                    <span>•</span>
+                    <span className="text-blue-300 font-medium">
+                      {syncStatus.syncedCount} produtos monitorados em tempo real
+                    </span>
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0 self-end md:self-auto">
+                <button
+                  type="button"
+                  onClick={() => toggleAutoSync()}
+                  className="bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-3 py-2 rounded-xl border border-white/15 transition-all cursor-pointer"
+                  title={syncStatus.enabled ? 'Pausar ciclo de 60 segundos' : 'Ativar ciclo de 60 segundos'}
+                >
+                  {syncStatus.enabled ? '⏸️ Pausar Auto-Sync' : '▶️ Ativar Auto-Sync'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleSyncZendropInventory}
+                  disabled={syncStatus.isSyncing || isSyncingInventory}
+                  className="bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-xs px-3.5 py-2 rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 disabled:opacity-50"
+                  title="Forçar consulta imediata de estoque na API do Zendrop"
+                >
+                  <RefreshCw
+                    size={13}
+                    className={syncStatus.isSyncing || isSyncingInventory ? 'animate-spin' : ''}
+                  />
+                  <span>
+                    {syncStatus.isSyncing || isSyncingInventory
+                      ? 'Sincronizando...'
+                      : 'Sincronizar Agora'}
+                  </span>
+                </button>
+              </div>
+            </div>
+
             {/* Clean, Professional Catalog Header */}
             <div className="bg-white p-6 sm:p-7 rounded-3xl border border-gray-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>

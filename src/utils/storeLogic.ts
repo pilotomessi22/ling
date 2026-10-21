@@ -16,6 +16,9 @@ export interface CartItem {
   };
   image: string;
   supplierCost: number; // Custo do fornecedor para acompanhamento de margem
+  stockCount?: number;
+  inStock?: boolean;
+  productId?: string;
 }
 
 export interface ShippingAddress {

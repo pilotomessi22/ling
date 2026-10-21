@@ -266,11 +266,17 @@ app.all(['/api/zendrop/sync-all-inventory', '/api/zendrop/sync-inventory'], asyn
 
     // 60-second cache unless force is requested
     if (!force && inventoryCache && (now - inventoryCache.timestamp < 60000)) {
+      const outOfStockList = Object.entries(inventoryCache.data)
+        .filter(([_, item]) => !item.inStock)
+        .map(([id, item]) => ({ id, name: item.name }));
+
       return res.json({
         success: true,
         cached: true,
         timestamp: new Date(inventoryCache.timestamp).toISOString(),
         syncedCount: Object.keys(inventoryCache.data).length,
+        outOfStockCount: outOfStockList.length,
+        outOfStockProducts: outOfStockList,
         stocks: inventoryCache.data,
       });
     }

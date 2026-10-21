@@ -22,10 +22,16 @@ import { ShippingFaqPage } from './pages/ShippingFaqPage.tsx';
 import { PRODUCTS, Product, getSavedProducts } from './data/storeData.ts';
 import { CartItem, filterProducts, calculateOrderTotals } from './utils/storeLogic.ts';
 import { initSiteSecurity } from './utils/security.ts';
+import { initAutomatedInventorySync } from './utils/inventorySync.ts';
 
 export default function App() {
   // Live dynamic product catalog (including manually added CJ/supplier products)
   const [products, setProducts] = useState<Product[]>(() => getSavedProducts());
+
+  // Automated 60-second background inventory sync with Zendrop Supplier API
+  useEffect(() => {
+    return initAutomatedInventorySync();
+  }, []);
 
   useEffect(() => {
     const handleProductsUpdated = () => {
@@ -36,6 +42,20 @@ export default function App() {
         const matching = updated.find((p) => p.id === prev.id);
         return matching || updated[0] || null;
       });
+      // Synchronize cart items with live supplier stock levels
+      setCartItems((prevCart) =>
+        prevCart.map((item) => {
+          const fresh = updated.find((p) => p.sku === item.sku || p.name === item.name || p.id === item.productId);
+          return fresh
+            ? {
+                ...item,
+                stockCount: fresh.stockCount,
+                inStock: fresh.inStockAustin,
+                productId: fresh.id,
+              }
+            : item;
+        })
+      );
     };
     window.addEventListener('ling_products_updated', handleProductsUpdated);
     return () => window.removeEventListener('ling_products_updated', handleProductsUpdated);
