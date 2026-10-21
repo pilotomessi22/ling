@@ -117,6 +117,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               <img
                 src={activeImage}
                 alt={product.name}
+                referrerPolicy="no-referrer"
                 className="w-full h-full object-cover transition-all duration-300"
               />
             </div>
@@ -134,7 +135,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                         : 'border-[#DFD8CC] opacity-75 hover:opacity-100'
                     }`}
                   >
-                    <img src={img} alt="Thumbnail view" className="w-full h-full object-cover" />
+                    <img src={img} alt="Thumbnail view" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                   </button>
                 ))}
                 <span className="text-xs text-[#8E867C] ml-2">Click photo to switch perspective</span>

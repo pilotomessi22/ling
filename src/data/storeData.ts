@@ -154,11 +154,19 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 480,
-    heroImage: 'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/06/ee/b16863484e24800cd1e5d9553f50.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/06/ee/b16863484e24800cd1e5d9553f50_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/06/ee/b16863484e24800cd1e5d9553f50.jpeg',
+      'https://file.zendrop.com/products/06/ee/b16863484e24800cd1e5d9553f50_import.webp',
+      'https://file.zendrop.com/products/59/d6/666729bf4c3b9f88c5917075d175.jpeg',
+      'https://file.zendrop.com/products/13/7c/15a0dd1f4f0e98d3687d1be8b41f.jpeg',
+      'https://file.zendrop.com/products/91/f7/39d05d7e41fc8454eaecc21563bd.jpeg',
+      'https://file.zendrop.com/products/f3/8f/393d6e0249ae847e9253797ce551.jpeg',
+      'https://file.zendrop.com/products/f6/ab/87c42217454d97abacdb11846532.jpeg',
+      'https://file.zendrop.com/products/b1/f5/2aa17ee544918223225c6b4050c1.jpeg',
+      'https://file.zendrop.com/products/47/46/6d1fb51a49fe96a45152a77dc205.jpeg',
+      'https://cf.cjdropshipping.com/12fc24b8-d0df-4c09-b155-801da3bd376e.png'
     ],
     description:
       'Engineered by veterinary specialists to provide maximum thermal and orthopedic comfort. High-density memory foam reduces up to 85% of joint pressure for restful sleep.',
@@ -211,11 +219,12 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 320,
-    heroImage: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1568640347023-a616a30bc3bd?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/27/ce/5258638a4b9197f9dad3d50bfeca.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/27/ce/5258638a4b9197f9dad3d50bfeca_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1568640347023-a616a30bc3bd?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/27/ce/5258638a4b9197f9dad3d50bfeca.jpeg',
+      'https://file.zendrop.com/products/27/ce/5258638a4b9197f9dad3d50bfeca_import.webp',
+      'https://file.zendrop.com/products/9b/a3/318353fe49acbb1d40fdd2d18e4d.jpeg'
     ],
     description:
       'Engineered system featuring front and back stainless steel leash rings. Padded breathable mesh fabric prevents chafing while eliminating pulling on walks.',
@@ -268,11 +277,16 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 210,
-    heroImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/40/b1/574e46614f7482afe1aaac7320ca.png',
+    secondaryImage: 'https://file.zendrop.com/products/40/b1/574e46614f7482afe1aaac7320ca_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/40/b1/574e46614f7482afe1aaac7320ca.png',
+      'https://file.zendrop.com/products/40/b1/574e46614f7482afe1aaac7320ca_import.webp',
+      'https://file.zendrop.com/products/fb/93/6004fbfc462da19deca29a3fa286.png',
+      'https://file.zendrop.com/products/c1/4a/d8b88f6042e7bbddb94f811bd204.png',
+      'https://file.zendrop.com/products/78/a7/8cba440b4b269016db39aba9ae7f.png',
+      'https://file.zendrop.com/products/d3/25/02e592b84088876dc9495312d0c6.png',
+      'https://file.zendrop.com/products/66/2c/c7c3280c44bc83e592089cf39330.png'
     ],
     description:
       'Prevent urinary tract and kidney issues by keeping your pet hydrated with clean, oxygenated water. Ultra-quiet submersible pump operates below 20dB.',
@@ -325,11 +339,12 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 155,
-    heroImage: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/87/e1/c63523784fc396c4f2c6bd4c1c24.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/87/e1/c63523784fc396c4f2c6bd4c1c24_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/87/e1/c63523784fc396c4f2c6bd4c1c24.jpeg',
+      'https://file.zendrop.com/products/87/e1/c63523784fc396c4f2c6bd4c1c24_import.webp',
+      'https://file.zendrop.com/products/6a/02/2831dac34aa78777055be36f17e2.jpeg'
     ],
     description:
       'The ultimate solution to end pet shedding on couches, floors, and clothes. Interchangeable stainless steel tools remove loose undercoat without scratching delicate skin.',
@@ -382,11 +397,12 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 420,
-    heroImage: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/87/9c/ec669b3a4f67a8ecb5a6be7b267d.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/87/9c/ec669b3a4f67a8ecb5a6be7b267d_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/87/9c/ec669b3a4f67a8ecb5a6be7b267d.jpeg',
+      'https://file.zendrop.com/products/87/9c/ec669b3a4f67a8ecb5a6be7b267d_import.webp',
+      'https://file.zendrop.com/products/4e/80/238229d348018dedf04b7f3ef324.jpeg'
     ],
     description:
       'Heavy-duty dog seat belt with high-density elastic buffer spring that absorbs sudden stops and sharp turns. Universal attachment clip compatible with all vehicles.',
@@ -439,11 +455,12 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 290,
-    heroImage: 'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/e2/67/13ee6178492cbb4714ad09e346c8.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/e2/67/13ee6178492cbb4714ad09e346c8_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/e2/67/13ee6178492cbb4714ad09e346c8.jpeg',
+      'https://file.zendrop.com/products/e2/67/13ee6178492cbb4714ad09e346c8_import.webp',
+      'https://file.zendrop.com/products/93/ce/c1b89b084e5e8ca937ae5090b8c5.jpeg'
     ],
     description:
       'Ergonomic stand with 4 adjustable height settings (from 3in to 12in). Helps prevent bloating, acid reflux, and joint discomfort for growing pups and senior pets.',
@@ -496,11 +513,19 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 180,
-    heroImage: 'https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/78/67/b3a2860443c0a48a043836b613ab.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/78/67/b3a2860443c0a48a043836b613ab_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/78/67/b3a2860443c0a48a043836b613ab.jpeg',
+      'https://file.zendrop.com/products/78/67/b3a2860443c0a48a043836b613ab_import.webp',
+      'https://file.zendrop.com/products/60/58/0b9b71e24216b1f72575a89cfb8a.jpeg',
+      'https://file.zendrop.com/products/9b/43/b5cb5a154c35863fc329b2863d75.jpeg',
+      'https://file.zendrop.com/products/52/8f/07db298245c5904039f12f27e6f4.jpeg',
+      'https://file.zendrop.com/products/14/ad/a62be2b448dba3a325f604e3c484.jpeg',
+      'https://file.zendrop.com/products/66/69/f7f803a743a8931c8c86e88e1a0f.jpeg',
+      'https://file.zendrop.com/products/af/58/48d9f4a54e69b7f530a5f27299b8.png',
+      'https://file.zendrop.com/products/88/65/49bfff08433e82acd658616f6fd2.jpeg',
+      'https://file.zendrop.com/products/7d/00/b79b23474211af0664e58bf9f2d6.jpeg'
     ],
     description:
       'Sturdy reinforced structure wrapped with 100% natural, chemical-free sisal rope. Features elevated perch, cozy nap condo, and dangling spring teaser balls.',
@@ -553,11 +578,19 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 340,
-    heroImage: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/5e/15/ca184d4c4c7faf6be52319848d23.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/5e/15/ca184d4c4c7faf6be52319848d23_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/5e/15/ca184d4c4c7faf6be52319848d23.jpeg',
+      'https://file.zendrop.com/products/5e/15/ca184d4c4c7faf6be52319848d23_import.webp',
+      'https://file.zendrop.com/products/0b/47/c0f973ce4e64aa0ee66d8e6b98b8.jpeg',
+      'https://file.zendrop.com/products/8f/30/9e0244b8426f8c4baa36add7419e.jpeg',
+      'https://file.zendrop.com/products/27/06/a6af3ff84efc9e23ac2936039db5.jpeg',
+      'https://file.zendrop.com/products/2a/14/edc7393144d9a8858180b606cc98.jpeg',
+      'https://file.zendrop.com/products/49/51/a9847844456d9dc4544ea0b720ef.jpeg',
+      'https://file.zendrop.com/products/46/af/51d353d24a14af7b6eb8ee78a672.jpeg',
+      'https://file.zendrop.com/products/f5/06/03933c404bfe8e9f1a6681b36782.jpeg',
+      'https://file.zendrop.com/products/d8/e5/18da1f98452e93e2a70e3f1e91e8.jpeg'
     ],
     description:
       'Endothermic cooling gel technology activated by your pet’s weight, lowering body temperature 5°F to 10°F below room temperature for up to 3 hours.',
@@ -610,11 +643,19 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 520,
-    heroImage: 'https://images.unsplash.com/photo-1535294435445-d7249524ef2e?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/a7/dd/8286c1cb449ba415ed6424df9eb1.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/a7/dd/8286c1cb449ba415ed6424df9eb1_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1535294435445-d7249524ef2e?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/a7/dd/8286c1cb449ba415ed6424df9eb1.jpeg',
+      'https://file.zendrop.com/products/a7/dd/8286c1cb449ba415ed6424df9eb1_import.webp',
+      'https://file.zendrop.com/products/ca/09/eb29bd7141259c98a2a683a2b3cd.png',
+      'https://file.zendrop.com/products/7b/2c/2a1d3d7d4eab895f8d3cd4a0dfab.png',
+      'https://file.zendrop.com/products/41/1e/df61b2db4925baa75d9dffe3f33c.png',
+      'https://file.zendrop.com/products/ee/b0/7b9d81754701be3db31050d938ca.jpeg',
+      'https://file.zendrop.com/products/bc/6e/53a794da430ea1a983b09c53e0c4.jpeg',
+      'https://file.zendrop.com/products/6b/03/be13f79e48e2ac34bf905af45e1f.jpeg',
+      'https://file.zendrop.com/products/f8/2d/a742c3904c1c985abdb9f5c6541d.jpeg',
+      'https://file.zendrop.com/products/5d/c8/b58a398f49549910ff4d528a63b1.jpeg'
     ],
     description:
       'Soft medical-grade silicone bristles arranged in 360 degrees clean deep between pads without hurting claw beds or nails after rainy walks.',
@@ -667,11 +708,19 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 610,
-    heroImage: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/a1/50/2214100e4ecc80ec74f6a3892caa.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/a1/50/2214100e4ecc80ec74f6a3892caa_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/a1/50/2214100e4ecc80ec74f6a3892caa.jpeg',
+      'https://file.zendrop.com/products/a1/50/2214100e4ecc80ec74f6a3892caa_import.webp',
+      'https://file.zendrop.com/products/0f/f4/9f879b59450db4267469107f8d2c.jpeg',
+      'https://file.zendrop.com/products/59/c0/3df44ee44122b06a4d857ae7e6d6.jpeg',
+      'https://static.hzpdex.com/b67e8822-1c89-4b93-a36a-8d6e59bce8fb.png',
+      'https://res.race321.com/pronew/3904964153101005617/18198c7d.jpg',
+      'https://res.race321.com/pronew/3904964153101005617/c2498b09.jpg',
+      'https://res.race321.com/pronew/3904964153101005617/98186618.jpg',
+      'https://res.race321.com/pronew/3904964153101005617/ca91cddd.jpg',
+      'https://res.race321.com/pronew/3904964153101005617/35c359cf.jpg'
     ],
     description:
       'America’s favorite pet hair remover for couches, car seats, and blankets. Rapid back-and-forth motion creates an electrostatic charge trapping hair in the dust chamber.',
@@ -724,11 +773,15 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 140,
-    heroImage: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/ce/8f/f74e02694cf780d8ef585870064e.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/ce/8f/f74e02694cf780d8ef585870064e_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/ce/8f/f74e02694cf780d8ef585870064e.jpeg',
+      'https://file.zendrop.com/products/ce/8f/f74e02694cf780d8ef585870064e_import.webp',
+      'https://cbu01.alicdn.com/img/ibank/O1CN01RugcHK23A4B9wC45W_!!2836087214-0-cib.jpg',
+      'https://img.alicdn.com/imgextra/i4/6000000007416/O1CN01hiw3My24eZoHvRBBE_!!6000000007416-0-tbvideo.jpg',
+      'https://cbu01.alicdn.com/img/ibank/6408480910_1147337207.jpg',
+      'https://cbu01.alicdn.com/img/ibank/6418892802_1147337207.jpg'
     ],
     description:
       'Provide stress-free outdoor adventures with a crystal-clear acrylic window dome and 9 ventilation eyelets. Built-in interior safety tether clips right to collar.',
@@ -781,11 +834,19 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 430,
-    heroImage: 'https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/8b/71/ea1b681b410991551a11f162b789.png',
+    secondaryImage: 'https://file.zendrop.com/products/8b/71/ea1b681b410991551a11f162b789_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/8b/71/ea1b681b410991551a11f162b789.png',
+      'https://file.zendrop.com/products/8b/71/ea1b681b410991551a11f162b789_import.webp',
+      'https://file.zendrop.com/products/2a/f6/0b31bda643e39234cb97666fc59e.png',
+      'https://file.zendrop.com/products/2f/e0/28c001204141bd8cab56c1ba0474.png',
+      'https://file.zendrop.com/products/00/83/8297138c4009a1c1be2414ac9a9d.png',
+      'https://file.zendrop.com/products/f3/4c/323d055a4b9ea3d03df6dfd982b5.png',
+      'https://file.zendrop.com/products/a1/ee/280ad2704900a5403c35f3774630.png',
+      'https://file.zendrop.com/products/67/fe/eeb5bf77480d918242305de58b38.png',
+      'https://file.zendrop.com/products/92/ff/1d16f0044237959f01dff14ce2b3.png',
+      'https://file.zendrop.com/products/0a/79/ce6be31f4f62bdf3de7808a09d17.png'
     ],
     description:
       'Rotates randomly projecting an adjustable red laser dot across floors and walls. Built-in smart timer automatically powers down after 15 minutes of play.',
@@ -838,11 +899,14 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 220,
-    heroImage: 'https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/69/a5/b0e36f26461f950d7ad2766974b9.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/69/a5/b0e36f26461f950d7ad2766974b9_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/69/a5/b0e36f26461f950d7ad2766974b9.jpeg',
+      'https://file.zendrop.com/products/69/a5/b0e36f26461f950d7ad2766974b9_import.webp',
+      'https://static.hzpdex.com/90ac91eb-d7ba-45ec-b77a-5c18764a7391.jpg',
+      'https://static.hzpdex.com/d9339bd7-1929-42bb-83dc-c1dc4de39532.jpg',
+      'https://static.hzpdex.com/18e5ca1e-a200-483c-b2cd-fa17250f313e.jpeg'
     ],
     description:
       'High-density molded wool felt structure with a 360-degree center zipper. Use as a circular donut tunnel or unzip into two separate nesting shell beds.',
@@ -895,11 +959,19 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 580,
-    heroImage: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/5f/96/2e8f112d4063b96501825858e3da.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/5f/96/2e8f112d4063b96501825858e3da_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/5f/96/2e8f112d4063b96501825858e3da.jpeg',
+      'https://file.zendrop.com/products/5f/96/2e8f112d4063b96501825858e3da_import.webp',
+      'https://file.zendrop.com/products/ad/1c/95465d874f5f83c0d19273d8b148.jpeg',
+      'https://file.zendrop.com/products/cc/c3/b340a129491b8552199f154d6f27.jpeg',
+      'https://file.zendrop.com/products/cd/f9/d47d37a24883a81154877dc3a306.jpeg',
+      'https://file.zendrop.com/products/e9/0b/97ee19ac4683a3e36193b6516e7b.jpeg',
+      'https://file.zendrop.com/products/84/43/25fbfe2f437099f0741181db3c83.jpeg',
+      'https://file.zendrop.com/products/74/c8/3366dd9348bca1010fe9d479bb28.jpeg',
+      'https://file.zendrop.com/products/b5/d9/00ff6d8a4440b1957fc6394425d6.jpeg',
+      'https://file.zendrop.com/products/ce/c7/7d5b1a8147d6b594862583eac5da.jpeg'
     ],
     description:
       'Trim your pet’s nails at home with total peace of mind. Ultra-bright LED spot illuminates the blood vessel (quick) so hardened stainless steel blades slice clean.',
@@ -952,11 +1024,12 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 720,
-    heroImage: 'https://images.unsplash.com/photo-1568640347023-a616a30bc3bd?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/2c/a8/7ab107c2430db481c9248382069d.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/2c/a8/7ab107c2430db481c9248382069d_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1568640347023-a616a30bc3bd?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/2c/a8/7ab107c2430db481c9248382069d.jpeg',
+      'https://file.zendrop.com/products/2c/a8/7ab107c2430db481c9248382069d_import.webp',
+      'https://file.zendrop.com/products/91/09/27c3c7ec417a88cb00ee8a88efdd.jpeg'
     ],
     description:
       'Ensure drivers, cyclists, and pedestrians see your dog clearly in low light. Flexible fiber optic core with USB rechargeable lithium battery and weather resistant coating.',
@@ -1009,11 +1082,19 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 95,
-    heroImage: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1522276498395-f4f68f7f8454?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/40/d4/946348e947e7ac7692df7d9cf200.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/40/d4/946348e947e7ac7692df7d9cf200_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1522276498395-f4f68f7f8454?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/40/d4/946348e947e7ac7692df7d9cf200.jpeg',
+      'https://file.zendrop.com/products/40/d4/946348e947e7ac7692df7d9cf200_import.webp',
+      'https://file.zendrop.com/products/b9/d2/bb4efbec49468d56294a24f112bb.jpeg',
+      'https://file.zendrop.com/products/ad/88/7c765e0b4b2a82b4e8b99a0d215b.jpeg',
+      'https://file.zendrop.com/products/56/90/d7537571403288627743cf0e7407.jpeg',
+      'https://file.zendrop.com/products/15/02/a9749b0f44d1959e419cceb2343d.jpeg',
+      'https://file.zendrop.com/products/80/d2/5573ba9e46689e32496c9d8594fd.jpeg',
+      'https://file.zendrop.com/products/4a/22/887c20f9406cb2a45976594c32c5.jpeg',
+      'https://file.zendrop.com/products/bc/eb/d20c06924805a61b8db45dcc1330.jpeg',
+      'https://file.zendrop.com/products/1d/84/4606e9f64fdb90c6cc66329500d3.jpeg'
     ],
     description:
       'Keep energetic dogs exercised and entertained for hours! Simply drop mini tennis balls into the top funnel and the launcher shoots them 10ft, 20ft, or 30ft.',
@@ -1066,11 +1147,17 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 130,
-    heroImage: 'https://images.unsplash.com/photo-1544568100-847a948585b9?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/8e/5f/db72a8d342c0ab6979229ea3e391.png',
+    secondaryImage: 'https://file.zendrop.com/products/8e/5f/db72a8d342c0ab6979229ea3e391_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1544568100-847a948585b9?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/8e/5f/db72a8d342c0ab6979229ea3e391.png',
+      'https://file.zendrop.com/products/8e/5f/db72a8d342c0ab6979229ea3e391_import.webp',
+      'https://static.hzpdex.com/product/20241005/59a194d9-6598-4cfb-b87f-5a6cba317ae3.jpg',
+      'https://static.hzpdex.com/product/20241005/90f99bf6-3fdb-4bdf-a250-211e7913f03f.jpg',
+      'https://static.hzpdex.com/product/20241005/e8bcab62-c983-4d92-bbd7-4b9be0abf539.jpg',
+      'https://static.hzpdex.com/product/20241005/b0e3ee51-545e-4e19-a160-02437e5ddd39.jpg',
+      'https://static.hzpdex.com/product/20241005/75fa2af5-d5ff-45d0-ae21-fd28351ceffe.jpg',
+      'https://static.hzpdex.com/product/20241005/181c0d60-6e9a-4b2e-a0d9-838cebf84038.jpg'
     ],
     description:
       'Hammock style back seat protector with mesh view window letting airflow from AC reach your pet. Heavy-duty 600D Oxford fabric coated with waterproof TPU layer.',
@@ -1123,11 +1210,19 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 890,
-    heroImage: 'https://images.unsplash.com/photo-1568640347023-a616a30bc3bd?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/bd/ec/fe182b5c48dca204ae6f8892d978.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/bd/ec/fe182b5c48dca204ae6f8892d978_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1568640347023-a616a30bc3bd?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/bd/ec/fe182b5c48dca204ae6f8892d978.jpeg',
+      'https://file.zendrop.com/products/bd/ec/fe182b5c48dca204ae6f8892d978_import.webp',
+      'https://file.zendrop.com/products/52/1e/eb980e1347938cbcb3d63cb91796.jpeg',
+      'https://file.zendrop.com/products/37/0f/cc9b681f4f63adbd323b2de5f65d.jpeg',
+      'https://file.zendrop.com/products/d5/27/fb1837e74f6992bf122dc013eb27.jpeg',
+      'https://file.zendrop.com/products/eb/54/e81fe1a04d9cabd769ca6f8787e1.jpeg',
+      'https://file.zendrop.com/products/26/5c/7482b95c4b59a2c50cef1ab2af7c.jpeg',
+      'https://file.zendrop.com/products/16/ac/10b82177431a8dbe89cfc04fad13.jpeg',
+      'https://file.zendrop.com/products/ed/4b/920fa4d7467c9602f6db314484d6.jpeg',
+      'https://file.zendrop.com/products/a7/f1/0adf0c5c42de9bd9de8dc2f79039.jpeg'
     ],
     description:
       'Internal maze ridges extend meal times up to 10x longer, preventing choking, post-meal vomiting, and painful canine bloat.',
@@ -1180,11 +1275,19 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 640,
-    heroImage: 'https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/84/d4/b3216d7e42088dc6cb3d98d5b8f0.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/84/d4/b3216d7e42088dc6cb3d98d5b8f0_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/84/d4/b3216d7e42088dc6cb3d98d5b8f0.jpeg',
+      'https://file.zendrop.com/products/84/d4/b3216d7e42088dc6cb3d98d5b8f0_import.webp',
+      'https://file.zendrop.com/products/97/0e/c4d561d64771ae7d5d96c9153698.jpeg',
+      'https://file.zendrop.com/products/92/77/518b06ae4acd9ad8fd303d322ff6.jpeg',
+      'https://file.zendrop.com/products/a4/c2/3f31694f480a859ed8813ca6c6aa.jpeg',
+      'https://file.zendrop.com/products/43/59/b31d02ae4bf8a87f84eb1e997e43.jpeg',
+      'https://file.zendrop.com/products/27/09/456fc80e420fb615a1dcfebf08cc.jpeg',
+      'https://file.zendrop.com/products/ee/c6/fc412d0e419dbef0667891624005.jpeg',
+      'https://file.zendrop.com/products/80/fc/0501493f4bbabc7c53b7a27ef912.jpeg',
+      'https://file.zendrop.com/products/ed/c9/d5e3794040399a198bc57f975a84.jpeg'
     ],
     description:
       'Equipped with an internal motion sensor: whenever your cat bats at the fish, it flops and wiggles realistically. Includes a pouch of premium organic catnip.',
@@ -1237,11 +1340,12 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 410,
-    heroImage: 'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/71/35/d62fab834d1794542641bd4a79b1.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/71/35/d62fab834d1794542641bd4a79b1_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/71/35/d62fab834d1794542641bd4a79b1.jpeg',
+      'https://file.zendrop.com/products/71/35/d62fab834d1794542641bd4a79b1_import.webp',
+      'https://file.zendrop.com/products/7b/d3/8cbee82c48ed80091b0fbcd6527e.jpeg'
     ],
     description:
       'Medical surgical silicone finger sleeve with 360-degree soft bristles. Clean all sides of teeth effortlessly without bleeding gums or oral discomfort.',
@@ -1294,11 +1398,12 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 510,
-    heroImage: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1544568100-847a948585b9?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/83/c8/2fc7eb1d4a1d8335fa1152252a70.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/83/c8/2fc7eb1d4a1d8335fa1152252a70_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1544568100-847a948585b9?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/83/c8/2fc7eb1d4a1d8335fa1152252a70.jpeg',
+      'https://file.zendrop.com/products/83/c8/2fc7eb1d4a1d8335fa1152252a70_import.webp',
+      'https://file.zendrop.com/products/d4/b4/2003d7944e848ee582537ea43bf3.jpeg'
     ],
     description:
       'Keep your dog secure in transit while meeting state vehicle pet restraint guidelines. Heavy-duty elastic bungee cord absorbs sudden braking energy.',
@@ -1351,11 +1456,12 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 370,
-    heroImage: 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/ee/2f/1a39c64d40549ad9cc8c389e7894.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/ee/2f/1a39c64d40549ad9cc8c389e7894_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/ee/2f/1a39c64d40549ad9cc8c389e7894.jpeg',
+      'https://file.zendrop.com/products/ee/2f/1a39c64d40549ad9cc8c389e7894_import.webp',
+      'https://file.zendrop.com/products/a4/b1/a1d6e5044d75b4fce4b1c6cebf7d.jpeg'
     ],
     description:
       'Seamless fit inside plastic wire crates and soft travel carriers. Soft fleece filling lowers travel anxiety and provides joint cushioning.',
@@ -1408,11 +1514,12 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 810,
-    heroImage: 'https://images.unsplash.com/photo-1601758003122-53c40e686a19?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/3f/e8/d48325cc45be8e7df72b6740b076.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/3f/e8/d48325cc45be8e7df72b6740b076_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1601758003122-53c40e686a19?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/3f/e8/d48325cc45be8e7df72b6740b076.jpeg',
+      'https://file.zendrop.com/products/3f/e8/d48325cc45be8e7df72b6740b076_import.webp',
+      'https://file.zendrop.com/products/6d/16/a00a03c1440db58a231d42c87678.jpeg'
     ],
     description:
       'Designed with toothbrush-like ridges that scrub tartar off teeth while your dog plays. Features an inner cavity you can stuff with peanut butter or treats.',
@@ -1465,11 +1572,19 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 490,
-    heroImage: 'https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/e3/1f/2e8bc4644e90bf052eecfd43704e.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/e3/1f/2e8bc4644e90bf052eecfd43704e_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/e3/1f/2e8bc4644e90bf052eecfd43704e.jpeg',
+      'https://file.zendrop.com/products/e3/1f/2e8bc4644e90bf052eecfd43704e_import.webp',
+      'https://file.zendrop.com/products/5f/e6/5158e78a4bad82e0397e8ddab5a1.jpeg',
+      'https://file.zendrop.com/products/60/17/4320656e4f3abf6b478e80e85476.jpeg',
+      'https://file.zendrop.com/products/93/d6/b450ce674d80b7c6e4eef6626622.jpeg',
+      'https://file.zendrop.com/products/69/98/ebefb17d44928022436c1325055d.jpeg',
+      'https://file.zendrop.com/products/31/9e/ea7bf7114813bce4e70d11c21534.jpeg',
+      'https://file.zendrop.com/products/5f/b8/afbb285847c0afbfd87be8813b20.jpeg',
+      'https://file.zendrop.com/products/43/65/1bb45247450e91f04760b8240354.jpeg',
+      'https://file.zendrop.com/products/15/62/97f2d6e8446a9029b43768c1f57c.jpeg'
     ],
     description:
       'Seamless waterproof TPU lining prevents liquid leaks and holds odors. Folds down flat like a wallet for compact storage in car trunks or backpacks.',
@@ -1522,11 +1637,19 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: true,
     inStockAustin: true,
     stockCount: 950,
-    heroImage: 'https://images.unsplash.com/photo-1541364983171-a8ba01e95cfc?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/a8/49/d2c8c981411586b81645852daf7a.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/a8/49/d2c8c981411586b81645852daf7a_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1541364983171-a8ba01e95cfc?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/a8/49/d2c8c981411586b81645852daf7a.jpeg',
+      'https://file.zendrop.com/products/a8/49/d2c8c981411586b81645852daf7a_import.webp',
+      'https://file.zendrop.com/products/1a/29/f6813f9540e9a8c57a73a942fcb7.jpeg',
+      'https://file.zendrop.com/products/5f/cd/e19ca9f0422d97921195611cd9ac.jpeg',
+      'https://file.zendrop.com/products/a2/57/b658becf4cd28eb7bd77f4c0fdbb.jpeg',
+      'https://file.zendrop.com/products/82/dc/d36951e644fc9f6ce9f76370ffe2.jpeg',
+      'https://file.zendrop.com/products/19/c8/2299ba9a4ef681f96b15adeb9900.jpeg',
+      'https://file.zendrop.com/products/63/57/f287ecc14f77bf9ccafa87056d5f.jpeg',
+      'https://oss-cf.cjdropshipping.com/product/2024/08/12/08/d80e4565-a556-42b8-8936-8743bb0ed44d.jpg',
+      'https://oss-cf.cjdropshipping.com/product/2024/08/12/08/78bd7282-87cc-441b-9012-69780818a527.jpg'
     ],
     description:
       'State-of-the-art freeze-drying process locks in 100% of essential nutrients and Omega-3 fatty acids from wild Alaskan salmon. Free of grains, preservatives, and artificial flavorings.',
@@ -1579,11 +1702,12 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: true,
     inStockAustin: true,
     stockCount: 810,
-    heroImage: 'https://images.unsplash.com/photo-1560807707-8cc77767d783?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/75/f3/fe6ad2864bf1a0e5acd71059796c.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/75/f3/fe6ad2864bf1a0e5acd71059796c_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1560807707-8cc77767d783?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/75/f3/fe6ad2864bf1a0e5acd71059796c.jpeg',
+      'https://file.zendrop.com/products/75/f3/fe6ad2864bf1a0e5acd71059796c_import.webp',
+      'https://file.zendrop.com/products/82/d4/b864addc48f091ff617100db04a6.jpeg'
     ],
     description:
       'Gradual release matrix of natural citronella, lavender, and eucalyptus botanical oils. Repels pests effectively without synthetic pesticides or harsh toxins.',
@@ -1636,11 +1760,12 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 395,
-    heroImage: 'https://images.unsplash.com/photo-1596492784531-6e6eb5ea9993?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/ae/f8/c09a4ad04bd7a500aea2711e0c60.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/ae/f8/c09a4ad04bd7a500aea2711e0c60_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1596492784531-6e6eb5ea9993?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/ae/f8/c09a4ad04bd7a500aea2711e0c60.jpeg',
+      'https://file.zendrop.com/products/ae/f8/c09a4ad04bd7a500aea2711e0c60_import.webp',
+      'https://file.zendrop.com/products/2d/e7/a89c675c4d5bae401aef2cdd4655.jpeg'
     ],
     description:
       'High-speed brass shaft coated with real diamond bit grinder. Low-vibration acoustic dampening operating below 40dB prevents pet fear and nervous reactions.',
@@ -1693,11 +1818,12 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 910,
-    heroImage: 'https://images.unsplash.com/photo-1581888227599-779811939961?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/a8/78/092ad92341c9a9584c9fb7049867.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/a8/78/092ad92341c9a9584c9fb7049867_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1581888227599-779811939961?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/a8/78/092ad92341c9a9584c9fb7049867.jpeg',
+      'https://file.zendrop.com/products/a8/78/092ad92341c9a9584c9fb7049867_import.webp',
+      'https://file.zendrop.com/products/0d/60/67ebeecb4218ac2847081b1a477b.jpeg'
     ],
     description:
       'With 255 soft-touch silicone tips, the GentleGlove transforms mandatory grooming into a relaxing stroke session. Trapped shed fur peels off in one neat sheet.',
@@ -1750,11 +1876,12 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 460,
-    heroImage: 'https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/f8/39/b51faf674ccab56176bf966595e6.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/f8/39/b51faf674ccab56176bf966595e6_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/f8/39/b51faf674ccab56176bf966595e6.jpeg',
+      'https://file.zendrop.com/products/f8/39/b51faf674ccab56176bf966595e6_import.webp',
+      'https://file.zendrop.com/products/c4/e3/93f3eef744eeb6dfe66afa5144ad.jpeg'
     ],
     description:
       'Made of high-density eco-friendly corrugated cardboard linked by strong magnets. Flexes into a donut ring, race track, or scratch lounge pad.',
@@ -1807,11 +1934,12 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 280,
-    heroImage: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/1e/6c/cec604364493a87abc3b64af7bc0.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/1e/6c/cec604364493a87abc3b64af7bc0_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/1e/6c/cec604364493a87abc3b64af7bc0.jpeg',
+      'https://file.zendrop.com/products/1e/6c/cec604364493a87abc3b64af7bc0_import.webp',
+      'https://file.zendrop.com/products/c7/47/ef577bd243c4a7b76344510fa7ba.jpeg'
     ],
     description:
       'Uses intelligent vocal cord sound sensors and 7 levels of progressive vibration and warning tones. Completely free of painful electric shocks for humane behavioral training.',
@@ -1864,11 +1992,12 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 610,
-    heroImage: 'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/d1/1b/457d8d2343b7abbdf49bb73440f3.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/d1/1b/457d8d2343b7abbdf49bb73440f3_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/d1/1b/457d8d2343b7abbdf49bb73440f3.jpeg',
+      'https://file.zendrop.com/products/d1/1b/457d8d2343b7abbdf49bb73440f3_import.webp',
+      'https://file.zendrop.com/products/17/6d/627ef4f349fdbdc509033831a875.jpeg'
     ],
     description:
       'Innovative water recycling button: if your dog doesn’t finish drinking, press the button to drain water back inside. Features a bottom compartment for kibble or snacks.',
@@ -1921,11 +2050,13 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 430,
-    heroImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/9b/5c/7e49020f44faaf316ac083163c62.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/9b/5c/7e49020f44faaf316ac083163c62_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/9b/5c/7e49020f44faaf316ac083163c62.jpeg',
+      'https://file.zendrop.com/products/9b/5c/7e49020f44faaf316ac083163c62_import.webp',
+      'https://file.zendrop.com/products/2e/0b/2c8afa0d4592bf1d4b709eb0d27a.jpeg',
+      'https://file.zendrop.com/products/81/12/4d3f870c4ccaac5aeb42cb7245bf.jpeg'
     ],
     description:
       '3 Connected tunnels with a central peek-a-boo hole. Built-in crinkle crackle paper and dangling teaser ball keep multiple cats exploring and playing.',
@@ -1978,11 +2109,12 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 1200,
-    heroImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/eb/db/64de34084ce7ad95adfeae5fd9c9.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/eb/db/64de34084ce7ad95adfeae5fd9c9_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/eb/db/64de34084ce7ad95adfeae5fd9c9.jpeg',
+      'https://file.zendrop.com/products/eb/db/64de34084ce7ad95adfeae5fd9c9_import.webp',
+      'https://file.zendrop.com/products/27/78/c3458d854dd38f17084a7ac9f93f.jpeg'
     ],
     description:
       'Ultra-compact and lightweight: pop open in seconds to serve fresh water or kibble during hikes, park trips, and car rides.',
@@ -2035,11 +2167,19 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 390,
-    heroImage: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&q=90',
-    secondaryImage: 'https://images.unsplash.com/photo-1568640347023-a616a30bc3bd?auto=format&fit=crop&w=1200&q=90',
+    heroImage: 'https://file.zendrop.com/products/75/97/e69bf8834ed4baf63627ac731e10.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/75/97/e69bf8834ed4baf63627ac731e10_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&q=90',
-      'https://images.unsplash.com/photo-1568640347023-a616a30bc3bd?auto=format&fit=crop&w=1200&q=90',
+      'https://file.zendrop.com/products/75/97/e69bf8834ed4baf63627ac731e10.jpeg',
+      'https://file.zendrop.com/products/75/97/e69bf8834ed4baf63627ac731e10_import.webp',
+      'https://file.zendrop.com/products/fb/21/fc6884084635b28ff3100e9c348d.jpeg',
+      'https://file.zendrop.com/products/78/12/5c9f64b147118a5533bdf6ce5123.jpeg',
+      'https://file.zendrop.com/products/ec/70/245f90a64591a130c7d65e9bc2bc.jpeg',
+      'https://file.zendrop.com/products/08/c8/187b8e3845128e738eefc02d65db.jpeg',
+      'https://file.zendrop.com/products/24/99/c14acaac403092db097eaf7e7af8.jpeg',
+      'https://file.zendrop.com/products/8c/75/43897831462d8e523354f4ec04ac.jpeg',
+      'https://file.zendrop.com/products/fb/a1/6c95aefb4bc6b61eb4efcaa34328.jpeg',
+      'https://file.zendrop.com/products/61/38/6bf6327e40a88c1ff80147eb74cc.jpeg'
     ],
     description:
       'Built with breathable neoprene inner padding that won’t overheat or pull fur. Top anatomical control handle lets you secure your dog instantly at street crosswalks.',
@@ -2158,11 +2298,12 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: true,
     inStockAustin: true,
     stockCount: 412,
-    heroImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/27/ce/5258638a4b9197f9dad3d50bfeca.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/27/ce/5258638a4b9197f9dad3d50bfeca_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85',
-      'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/27/ce/5258638a4b9197f9dad3d50bfeca.jpeg',
+      'https://file.zendrop.com/products/27/ce/5258638a4b9197f9dad3d50bfeca_import.webp',
+      'https://file.zendrop.com/products/9b/a3/318353fe49acbb1d40fdd2d18e4d.jpeg'
     ],
     description: 'Bebedouro inteligente automático com bomba ultrassilenciosa (< 20dB) e filtro de carvão ativado. Estimula a ingestão frequente de água fresca e previne cálculos renais em felinos e cães pequenos.',
     keyFeatures: [
@@ -2216,10 +2357,16 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 680,
-    heroImage: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/40/b1/574e46614f7482afe1aaac7320ca.png',
+    secondaryImage: 'https://file.zendrop.com/products/40/b1/574e46614f7482afe1aaac7320ca_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/40/b1/574e46614f7482afe1aaac7320ca.png',
+      'https://file.zendrop.com/products/40/b1/574e46614f7482afe1aaac7320ca_import.webp',
+      'https://file.zendrop.com/products/fb/93/6004fbfc462da19deca29a3fa286.png',
+      'https://file.zendrop.com/products/c1/4a/d8b88f6042e7bbddb94f811bd204.png',
+      'https://file.zendrop.com/products/78/a7/8cba440b4b269016db39aba9ae7f.png',
+      'https://file.zendrop.com/products/d3/25/02e592b84088876dc9495312d0c6.png',
+      'https://file.zendrop.com/products/66/2c/c7c3280c44bc83e592089cf39330.png'
     ],
     description: 'Projetado com anel peitoral duplo para redirecionar o movimento quando o cão puxa, evitando pressão no pescoço e traqueia. Faixas refletivas 3M garantem visibilidade e segurança em caminhadas noturnas.',
     keyFeatures: [
@@ -2272,10 +2419,12 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 230,
-    heroImage: 'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/87/e1/c63523784fc396c4f2c6bd4c1c24.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/87/e1/c63523784fc396c4f2c6bd4c1c24_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/87/e1/c63523784fc396c4f2c6bd4c1c24.jpeg',
+      'https://file.zendrop.com/products/87/e1/c63523784fc396c4f2c6bd4c1c24_import.webp',
+      'https://file.zendrop.com/products/6a/02/2831dac34aa78777055be36f17e2.jpeg'
     ],
     description: 'Programe até 6 refeições por dia com porções personalizadas de 10g a 100g. Conta com gravação de voz de 10s para chamar seu pet durante as refeições e sistema de energia dupla com bateria de reserva.',
     keyFeatures: [
@@ -2329,10 +2478,12 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 310,
-    heroImage: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/e2/67/13ee6178492cbb4714ad09e346c8.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/e2/67/13ee6178492cbb4714ad09e346c8_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/e2/67/13ee6178492cbb4714ad09e346c8.jpeg',
+      'https://file.zendrop.com/products/e2/67/13ee6178492cbb4714ad09e346c8_import.webp',
+      'https://file.zendrop.com/products/93/ce/c1b89b084e5e8ca937ae5090b8c5.jpeg'
     ],
     description: 'Sistema completo de tosa e escovação profissional com sucção integrada. Remove o subpêlo sem arranhar a pele do animal, mantendo sua casa livre de fiapos e pelos espalhados.',
     keyFeatures: [
@@ -2385,10 +2536,19 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 490,
-    heroImage: 'https://images.unsplash.com/photo-1544568100-847a948585b9?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/78/67/b3a2860443c0a48a043836b613ab.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/78/67/b3a2860443c0a48a043836b613ab_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1544568100-847a948585b9?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/78/67/b3a2860443c0a48a043836b613ab.jpeg',
+      'https://file.zendrop.com/products/78/67/b3a2860443c0a48a043836b613ab_import.webp',
+      'https://file.zendrop.com/products/60/58/0b9b71e24216b1f72575a89cfb8a.jpeg',
+      'https://file.zendrop.com/products/9b/43/b5cb5a154c35863fc329b2863d75.jpeg',
+      'https://file.zendrop.com/products/52/8f/07db298245c5904039f12f27e6f4.jpeg',
+      'https://file.zendrop.com/products/14/ad/a62be2b448dba3a325f604e3c484.jpeg',
+      'https://file.zendrop.com/products/66/69/f7f803a743a8931c8c86e88e1a0f.jpeg',
+      'https://file.zendrop.com/products/af/58/48d9f4a54e69b7f530a5f27299b8.png',
+      'https://file.zendrop.com/products/88/65/49bfff08433e82acd658616f6fd2.jpeg',
+      'https://file.zendrop.com/products/7d/00/b79b23474211af0664e58bf9f2d6.jpeg'
     ],
     description: 'Capa estilo rede para banco traseiro de automóveis com janela de malha respirável para que o cão veja os donos no banco da frente. Tecido Oxford 600D com revestimento em TPU impermeável.',
     keyFeatures: [
@@ -2442,10 +2602,19 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 820,
-    heroImage: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/5e/15/ca184d4c4c7faf6be52319848d23.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/5e/15/ca184d4c4c7faf6be52319848d23_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/5e/15/ca184d4c4c7faf6be52319848d23.jpeg',
+      'https://file.zendrop.com/products/5e/15/ca184d4c4c7faf6be52319848d23_import.webp',
+      'https://file.zendrop.com/products/0b/47/c0f973ce4e64aa0ee66d8e6b98b8.jpeg',
+      'https://file.zendrop.com/products/8f/30/9e0244b8426f8c4baa36add7419e.jpeg',
+      'https://file.zendrop.com/products/27/06/a6af3ff84efc9e23ac2936039db5.jpeg',
+      'https://file.zendrop.com/products/2a/14/edc7393144d9a8858180b606cc98.jpeg',
+      'https://file.zendrop.com/products/49/51/a9847844456d9dc4544ea0b720ef.jpeg',
+      'https://file.zendrop.com/products/46/af/51d353d24a14af7b6eb8ee78a672.jpeg',
+      'https://file.zendrop.com/products/f5/06/03933c404bfe8e9f1a6681b36782.jpeg',
+      'https://file.zendrop.com/products/d8/e5/18da1f98452e93e2a70e3f1e91e8.jpeg'
     ],
     description: 'Movimentos de vai-e-vem geram uma carga eletrostática que recolhe 100% dos pelos encravados em estofados, sofás, camas e bancos de carros. Esvazie a câmara com 1 clique diretamente na lixeira.',
     keyFeatures: [
@@ -2498,10 +2667,19 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 610,
-    heroImage: 'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/a7/dd/8286c1cb449ba415ed6424df9eb1.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/a7/dd/8286c1cb449ba415ed6424df9eb1_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/a7/dd/8286c1cb449ba415ed6424df9eb1.jpeg',
+      'https://file.zendrop.com/products/a7/dd/8286c1cb449ba415ed6424df9eb1_import.webp',
+      'https://file.zendrop.com/products/ca/09/eb29bd7141259c98a2a683a2b3cd.png',
+      'https://file.zendrop.com/products/7b/2c/2a1d3d7d4eab895f8d3cd4a0dfab.png',
+      'https://file.zendrop.com/products/41/1e/df61b2db4925baa75d9dffe3f33c.png',
+      'https://file.zendrop.com/products/ee/b0/7b9d81754701be3db31050d938ca.jpeg',
+      'https://file.zendrop.com/products/bc/6e/53a794da430ea1a983b09c53e0c4.jpeg',
+      'https://file.zendrop.com/products/6b/03/be13f79e48e2ac34bf905af45e1f.jpeg',
+      'https://file.zendrop.com/products/f8/2d/a742c3904c1c985abdb9f5c6541d.jpeg',
+      'https://file.zendrop.com/products/5d/c8/b58a398f49549910ff4d528a63b1.jpeg'
     ],
     description: 'Sistema inovador com botão de retorno de água: se o pet não beber tudo, a água volta para a garrafa sem desperdício. Conta com compartimento inferior para ração ou snacks.',
     keyFeatures: [
@@ -2554,10 +2732,19 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 395,
-    heroImage: 'https://images.unsplash.com/photo-1596492784531-6e6eb5ea9993?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/a1/50/2214100e4ecc80ec74f6a3892caa.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/a1/50/2214100e4ecc80ec74f6a3892caa_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/a1/50/2214100e4ecc80ec74f6a3892caa.jpeg',
+      'https://file.zendrop.com/products/a1/50/2214100e4ecc80ec74f6a3892caa_import.webp',
+      'https://file.zendrop.com/products/0f/f4/9f879b59450db4267469107f8d2c.jpeg',
+      'https://file.zendrop.com/products/59/c0/3df44ee44122b06a4d857ae7e6d6.jpeg',
+      'https://static.hzpdex.com/b67e8822-1c89-4b93-a36a-8d6e59bce8fb.png',
+      'https://res.race321.com/pronew/3904964153101005617/18198c7d.jpg',
+      'https://res.race321.com/pronew/3904964153101005617/c2498b09.jpg',
+      'https://res.race321.com/pronew/3904964153101005617/98186618.jpg',
+      'https://res.race321.com/pronew/3904964153101005617/ca91cddd.jpg',
+      'https://res.race321.com/pronew/3904964153101005617/35c359cf.jpg'
     ],
     description: 'Motor de alta rotação revestido em liga de diamante com baixo ruído (< 40dB) para não assustar o animal. Possui 3 portas de lixamento para diferentes tamanhos de unhas.',
     keyFeatures: [
@@ -2611,10 +2798,15 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 520,
-    heroImage: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/ce/8f/f74e02694cf780d8ef585870064e.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/ce/8f/f74e02694cf780d8ef585870064e_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/ce/8f/f74e02694cf780d8ef585870064e.jpeg',
+      'https://file.zendrop.com/products/ce/8f/f74e02694cf780d8ef585870064e_import.webp',
+      'https://cbu01.alicdn.com/img/ibank/O1CN01RugcHK23A4B9wC45W_!!2836087214-0-cib.jpg',
+      'https://img.alicdn.com/imgextra/i4/6000000007416/O1CN01hiw3My24eZoHvRBBE_!!6000000007416-0-tbvideo.jpg',
+      'https://cbu01.alicdn.com/img/ibank/6408480910_1147337207.jpg',
+      'https://cbu01.alicdn.com/img/ibank/6418892802_1147337207.jpg'
     ],
     description: 'Projeta padrões de laser aleatórios em 360 graus que despertam o instinto caçador do gato. Possui temporizador automático de desligamento a cada 15 minutos para evitar exaustão.',
     keyFeatures: [
@@ -2667,10 +2859,19 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 740,
-    heroImage: 'https://images.unsplash.com/photo-1535930891776-0c2dfb7fda1a?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/8b/71/ea1b681b410991551a11f162b789.png',
+    secondaryImage: 'https://file.zendrop.com/products/8b/71/ea1b681b410991551a11f162b789_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/8b/71/ea1b681b410991551a11f162b789.png',
+      'https://file.zendrop.com/products/8b/71/ea1b681b410991551a11f162b789_import.webp',
+      'https://file.zendrop.com/products/2a/f6/0b31bda643e39234cb97666fc59e.png',
+      'https://file.zendrop.com/products/2f/e0/28c001204141bd8cab56c1ba0474.png',
+      'https://file.zendrop.com/products/00/83/8297138c4009a1c1be2414ac9a9d.png',
+      'https://file.zendrop.com/products/f3/4c/323d055a4b9ea3d03df6dfd982b5.png',
+      'https://file.zendrop.com/products/a1/ee/280ad2704900a5403c35f3774630.png',
+      'https://file.zendrop.com/products/67/fe/eeb5bf77480d918242305de58b38.png',
+      'https://file.zendrop.com/products/92/ff/1d16f0044237959f01dff14ce2b3.png',
+      'https://file.zendrop.com/products/0a/79/ce6be31f4f62bdf3de7808a09d17.png'
     ],
     description: 'Copo limpador com cerdas internas de silicone macio de grau médico. Remova a lama, poeira e produtos químicos da rua antes do cão entrar em casa.',
     keyFeatures: [
@@ -2723,10 +2924,14 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 280,
-    heroImage: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/69/a5/b0e36f26461f950d7ad2766974b9.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/69/a5/b0e36f26461f950d7ad2766974b9_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/69/a5/b0e36f26461f950d7ad2766974b9.jpeg',
+      'https://file.zendrop.com/products/69/a5/b0e36f26461f950d7ad2766974b9_import.webp',
+      'https://static.hzpdex.com/90ac91eb-d7ba-45ec-b77a-5c18764a7391.jpg',
+      'https://static.hzpdex.com/d9339bd7-1929-42bb-83dc-c1dc4de39532.jpg',
+      'https://static.hzpdex.com/18e5ca1e-a200-483c-b2cd-fa17250f313e.jpeg'
     ],
     description: 'Utiliza vibração inteligente e apito de alta frequência ajustável em 7 níveis. Isento de choques elétricos dolorosos, focado no reforço comportamental positivo.',
     keyFeatures: [
@@ -2780,10 +2985,19 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 910,
-    heroImage: 'https://images.unsplash.com/photo-1581888227599-779811939961?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/5f/96/2e8f112d4063b96501825858e3da.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/5f/96/2e8f112d4063b96501825858e3da_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/5f/96/2e8f112d4063b96501825858e3da.jpeg',
+      'https://file.zendrop.com/products/5f/96/2e8f112d4063b96501825858e3da_import.webp',
+      'https://file.zendrop.com/products/ad/1c/95465d874f5f83c0d19273d8b148.jpeg',
+      'https://file.zendrop.com/products/cc/c3/b340a129491b8552199f154d6f27.jpeg',
+      'https://file.zendrop.com/products/cd/f9/d47d37a24883a81154877dc3a306.jpeg',
+      'https://file.zendrop.com/products/e9/0b/97ee19ac4683a3e36193b6516e7b.jpeg',
+      'https://file.zendrop.com/products/84/43/25fbfe2f437099f0741181db3c83.jpeg',
+      'https://file.zendrop.com/products/74/c8/3366dd9348bca1010fe9d479bb28.jpeg',
+      'https://file.zendrop.com/products/b5/d9/00ff6d8a4440b1957fc6394425d6.jpeg',
+      'https://file.zendrop.com/products/ce/c7/7d5b1a8147d6b594862583eac5da.jpeg'
     ],
     description: 'Com 255 pontas de silicone de textura macia, a luva GentleGlove transforma o momento de escovação em um carinho relaxante. Os pelos acumulados saem em uma única camada uniforme.',
     keyFeatures: [
@@ -2836,10 +3050,12 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 460,
-    heroImage: 'https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/2c/a8/7ab107c2430db481c9248382069d.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/2c/a8/7ab107c2430db481c9248382069d_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/2c/a8/7ab107c2430db481c9248382069d.jpeg',
+      'https://file.zendrop.com/products/2c/a8/7ab107c2430db481c9248382069d_import.webp',
+      'https://file.zendrop.com/products/91/09/27c3c7ec417a88cb00ee8a88efdd.jpeg'
     ],
     description: 'Feito de papel ondulado ecológico de alta densidade acoplado com imãs potentes. Pode ser dobrado em formato de donut, pista de corrida ou cama relaxante.',
     keyFeatures: [
@@ -2893,10 +3109,19 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 320,
-    heroImage: 'https://images.unsplash.com/photo-1522276498395-f4f68f7f8454?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/40/d4/946348e947e7ac7692df7d9cf200.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/40/d4/946348e947e7ac7692df7d9cf200_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1544568100-847a948585b9?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/40/d4/946348e947e7ac7692df7d9cf200.jpeg',
+      'https://file.zendrop.com/products/40/d4/946348e947e7ac7692df7d9cf200_import.webp',
+      'https://file.zendrop.com/products/b9/d2/bb4efbec49468d56294a24f112bb.jpeg',
+      'https://file.zendrop.com/products/ad/88/7c765e0b4b2a82b4e8b99a0d215b.jpeg',
+      'https://file.zendrop.com/products/56/90/d7537571403288627743cf0e7407.jpeg',
+      'https://file.zendrop.com/products/15/02/a9749b0f44d1959e419cceb2343d.jpeg',
+      'https://file.zendrop.com/products/80/d2/5573ba9e46689e32496c9d8594fd.jpeg',
+      'https://file.zendrop.com/products/4a/22/887c20f9406cb2a45976594c32c5.jpeg',
+      'https://file.zendrop.com/products/bc/eb/d20c06924805a61b8db45dcc1330.jpeg',
+      'https://file.zendrop.com/products/1d/84/4606e9f64fdb90c6cc66329500d3.jpeg'
     ],
     description: 'Cápsula acrílica transparente com 9 orifícios de ventilação de ar e malhas laterais. Permite que o pet curta a paisagem durante passeios, ida ao veterinário ou viagens de avião.',
     keyFeatures: [
@@ -2949,10 +3174,17 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 580,
-    heroImage: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/8e/5f/db72a8d342c0ab6979229ea3e391.png',
+    secondaryImage: 'https://file.zendrop.com/products/8e/5f/db72a8d342c0ab6979229ea3e391_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/8e/5f/db72a8d342c0ab6979229ea3e391.png',
+      'https://file.zendrop.com/products/8e/5f/db72a8d342c0ab6979229ea3e391_import.webp',
+      'https://static.hzpdex.com/product/20241005/59a194d9-6598-4cfb-b87f-5a6cba317ae3.jpg',
+      'https://static.hzpdex.com/product/20241005/90f99bf6-3fdb-4bdf-a250-211e7913f03f.jpg',
+      'https://static.hzpdex.com/product/20241005/e8bcab62-c983-4d92-bbd7-4b9be0abf539.jpg',
+      'https://static.hzpdex.com/product/20241005/b0e3ee51-545e-4e19-a160-02437e5ddd39.jpg',
+      'https://static.hzpdex.com/product/20241005/75fa2af5-d5ff-45d0-ae21-fd28351ceffe.jpg',
+      'https://static.hzpdex.com/product/20241005/181c0d60-6e9a-4b2e-a0d9-838cebf84038.jpg'
     ],
     description: 'O gel interno reativo é ativado pelo próprio peso do animal, reduzindo a temperatura em até 7°C em relação ao ambiente. Essencial para prevenção de intermação em dias quentes.',
     keyFeatures: [
@@ -3005,10 +3237,19 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 800,
-    heroImage: 'https://images.unsplash.com/photo-1568640347023-a616a30bc3bd?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/bd/ec/fe182b5c48dca204ae6f8892d978.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/bd/ec/fe182b5c48dca204ae6f8892d978_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/bd/ec/fe182b5c48dca204ae6f8892d978.jpeg',
+      'https://file.zendrop.com/products/bd/ec/fe182b5c48dca204ae6f8892d978_import.webp',
+      'https://file.zendrop.com/products/52/1e/eb980e1347938cbcb3d63cb91796.jpeg',
+      'https://file.zendrop.com/products/37/0f/cc9b681f4f63adbd323b2de5f65d.jpeg',
+      'https://file.zendrop.com/products/d5/27/fb1837e74f6992bf122dc013eb27.jpeg',
+      'https://file.zendrop.com/products/eb/54/e81fe1a04d9cabd769ca6f8787e1.jpeg',
+      'https://file.zendrop.com/products/26/5c/7482b95c4b59a2c50cef1ab2af7c.jpeg',
+      'https://file.zendrop.com/products/16/ac/10b82177431a8dbe89cfc04fad13.jpeg',
+      'https://file.zendrop.com/products/ed/4b/920fa4d7467c9602f6db314484d6.jpeg',
+      'https://file.zendrop.com/products/a7/f1/0adf0c5c42de9bd9de8dc2f79039.jpeg'
     ],
     description: 'Labirintos internos em relevo multiplicam o tempo de refeição em até 10x, prevenindo engasgos, vômitos pós-prandiais e gases abdominais.',
     keyFeatures: [
@@ -3062,10 +3303,19 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 650,
-    heroImage: 'https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/84/d4/b3216d7e42088dc6cb3d98d5b8f0.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/84/d4/b3216d7e42088dc6cb3d98d5b8f0_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/84/d4/b3216d7e42088dc6cb3d98d5b8f0.jpeg',
+      'https://file.zendrop.com/products/84/d4/b3216d7e42088dc6cb3d98d5b8f0_import.webp',
+      'https://file.zendrop.com/products/97/0e/c4d561d64771ae7d5d96c9153698.jpeg',
+      'https://file.zendrop.com/products/92/77/518b06ae4acd9ad8fd303d322ff6.jpeg',
+      'https://file.zendrop.com/products/a4/c2/3f31694f480a859ed8813ca6c6aa.jpeg',
+      'https://file.zendrop.com/products/43/59/b31d02ae4bf8a87f84eb1e997e43.jpeg',
+      'https://file.zendrop.com/products/27/09/456fc80e420fb615a1dcfebf08cc.jpeg',
+      'https://file.zendrop.com/products/ee/c6/fc412d0e419dbef0667891624005.jpeg',
+      'https://file.zendrop.com/products/80/fc/0501493f4bbabc7c53b7a27ef912.jpeg',
+      'https://file.zendrop.com/products/ed/c9/d5e3794040399a198bc57f975a84.jpeg'
     ],
     description: 'Equipado com sensor de toque interno: ao ser tocado pelo patinha do gato, o peixe começa a se debater de forma ultrarrealista. Acompanha saquinho de erva do gato (catnip).',
     keyFeatures: [
@@ -3118,10 +3368,12 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: true,
     inStockAustin: true,
     stockCount: 1100,
-    heroImage: 'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/71/35/d62fab834d1794542641bd4a79b1.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/71/35/d62fab834d1794542641bd4a79b1_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/71/35/d62fab834d1794542641bd4a79b1.jpeg',
+      'https://file.zendrop.com/products/71/35/d62fab834d1794542641bd4a79b1_import.webp',
+      'https://file.zendrop.com/products/7b/d3/8cbee82c48ed80091b0fbcd6527e.jpeg'
     ],
     description: 'Dedal em silicone macio de grau cirúrgico com cerdas de 360 graus. Permite escovar todos os lados dos dentes com facilidade e sem ferir a gengiva sensível do animal.',
     keyFeatures: [
@@ -3174,10 +3426,12 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 890,
-    heroImage: 'https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1544568100-847a948585b9?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/83/c8/2fc7eb1d4a1d8335fa1152252a70.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/83/c8/2fc7eb1d4a1d8335fa1152252a70_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/83/c8/2fc7eb1d4a1d8335fa1152252a70.jpeg',
+      'https://file.zendrop.com/products/83/c8/2fc7eb1d4a1d8335fa1152252a70_import.webp',
+      'https://file.zendrop.com/products/d4/b4/2003d7944e848ee582537ea43bf3.jpeg'
     ],
     description: 'Cinto com fivela universal compatível com todos os automóveis. Possui elástico interno amortecedor de impacto elástico que absorve solavancos e partidas rápidas.',
     keyFeatures: [
@@ -3230,10 +3484,12 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 340,
-    heroImage: 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/ee/2f/1a39c64d40549ad9cc8c389e7894.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/ee/2f/1a39c64d40549ad9cc8c389e7894_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/ee/2f/1a39c64d40549ad9cc8c389e7894.jpeg',
+      'https://file.zendrop.com/products/ee/2f/1a39c64d40549ad9cc8c389e7894_import.webp',
+      'https://file.zendrop.com/products/a4/b1/a1d6e5044d75b4fce4b1c6cebf7d.jpeg'
     ],
     description: 'Encaixe perfeito para caixas de transporte rígidas ou bolsas flexíveis. Enchimento de veludo ultra macio que diminui o estresse durante deslocamentos.',
     keyFeatures: [
@@ -3286,10 +3542,12 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 720,
-    heroImage: 'https://images.unsplash.com/photo-1601758003122-53c40e686a19?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/3f/e8/d48325cc45be8e7df72b6740b076.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/3f/e8/d48325cc45be8e7df72b6740b076_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/3f/e8/d48325cc45be8e7df72b6740b076.jpeg',
+      'https://file.zendrop.com/products/3f/e8/d48325cc45be8e7df72b6740b076_import.webp',
+      'https://file.zendrop.com/products/6d/16/a00a03c1440db58a231d42c87678.jpeg'
     ],
     description: 'Projetado com ranhuras em formato de escova que massageiam as gengivas e limpam os dentes durante a brincadeira. Possui compartimento interno para rechear com pasta de amendoim ou petiscos.',
     keyFeatures: [
@@ -3342,10 +3600,19 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 260,
-    heroImage: 'https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/e3/1f/2e8bc4644e90bf052eecfd43704e.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/e3/1f/2e8bc4644e90bf052eecfd43704e_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/e3/1f/2e8bc4644e90bf052eecfd43704e.jpeg',
+      'https://file.zendrop.com/products/e3/1f/2e8bc4644e90bf052eecfd43704e_import.webp',
+      'https://file.zendrop.com/products/5f/e6/5158e78a4bad82e0397e8ddab5a1.jpeg',
+      'https://file.zendrop.com/products/60/17/4320656e4f3abf6b478e80e85476.jpeg',
+      'https://file.zendrop.com/products/93/d6/b450ce674d80b7c6e4eef6626622.jpeg',
+      'https://file.zendrop.com/products/69/98/ebefb17d44928022436c1325055d.jpeg',
+      'https://file.zendrop.com/products/31/9e/ea7bf7114813bce4e70d11c21534.jpeg',
+      'https://file.zendrop.com/products/5f/b8/afbb285847c0afbfd87be8813b20.jpeg',
+      'https://file.zendrop.com/products/43/65/1bb45247450e91f04760b8240354.jpeg',
+      'https://file.zendrop.com/products/15/62/97f2d6e8446a9029b43768c1f57c.jpeg'
     ],
     description: 'Caixa higiênica sanfonada dobrável com revestimento impermeável sem costuras que evita vazamento de líquidos e odores. Dobra do tamanho de uma carteira para transporte fácil.',
     keyFeatures: [
@@ -3399,10 +3666,19 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: true,
     inStockAustin: true,
     stockCount: 950,
-    heroImage: 'https://images.unsplash.com/photo-1541364983171-a8ba01e95cfc?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/a8/49/d2c8c981411586b81645852daf7a.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/a8/49/d2c8c981411586b81645852daf7a_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/a8/49/d2c8c981411586b81645852daf7a.jpeg',
+      'https://file.zendrop.com/products/a8/49/d2c8c981411586b81645852daf7a_import.webp',
+      'https://file.zendrop.com/products/1a/29/f6813f9540e9a8c57a73a942fcb7.jpeg',
+      'https://file.zendrop.com/products/5f/cd/e19ca9f0422d97921195611cd9ac.jpeg',
+      'https://file.zendrop.com/products/a2/57/b658becf4cd28eb7bd77f4c0fdbb.jpeg',
+      'https://file.zendrop.com/products/82/dc/d36951e644fc9f6ce9f76370ffe2.jpeg',
+      'https://file.zendrop.com/products/19/c8/2299ba9a4ef681f96b15adeb9900.jpeg',
+      'https://file.zendrop.com/products/63/57/f287ecc14f77bf9ccafa87056d5f.jpeg',
+      'https://oss-cf.cjdropshipping.com/product/2024/08/12/08/d80e4565-a556-42b8-8936-8743bb0ed44d.jpg',
+      'https://oss-cf.cjdropshipping.com/product/2024/08/12/08/78bd7282-87cc-441b-9012-69780818a527.jpg'
     ],
     description: 'Processo de liofilização de última geração preserva 100% dos nutrientes, minerais e Ômega-3 essenciais do salmão selvagem. Livre de transgênicos, grãos e corantes artificiais.',
     keyFeatures: [
@@ -3455,10 +3731,12 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: true,
     inStockAustin: true,
     stockCount: 810,
-    heroImage: 'https://images.unsplash.com/photo-1560807707-8cc77767d783?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/75/f3/fe6ad2864bf1a0e5acd71059796c.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/75/f3/fe6ad2864bf1a0e5acd71059796c_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/75/f3/fe6ad2864bf1a0e5acd71059796c.jpeg',
+      'https://file.zendrop.com/products/75/f3/fe6ad2864bf1a0e5acd71059796c_import.webp',
+      'https://file.zendrop.com/products/82/d4/b864addc48f091ff617100db04a6.jpeg'
     ],
     description: 'Fórmula com óleos essenciais de citronela, lavanda e eucalipto liberados gradualmente. Repele parassitas sem o uso de pesticidas sintéticos agressivos à saúde do animal.',
     keyFeatures: [
@@ -3511,10 +3789,12 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 430,
-    heroImage: 'https://images.unsplash.com/photo-1535294435445-d7249524ef2e?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/ae/f8/c09a4ad04bd7a500aea2711e0c60.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/ae/f8/c09a4ad04bd7a500aea2711e0c60_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/ae/f8/c09a4ad04bd7a500aea2711e0c60.jpeg',
+      'https://file.zendrop.com/products/ae/f8/c09a4ad04bd7a500aea2711e0c60_import.webp',
+      'https://file.zendrop.com/products/2d/e7/a89c675c4d5bae401aef2cdd4655.jpeg'
     ],
     description: 'Gira, pula e muda de direção automaticamente ao esbarrar em móveis ou paredes. Revestimento em silicone lavável macio que reduz o barulho no piso de madeira.',
     keyFeatures: [
@@ -3568,10 +3848,12 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 310,
-    heroImage: 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/a8/78/092ad92341c9a9584c9fb7049867.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/a8/78/092ad92341c9a9584c9fb7049867_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/a8/78/092ad92341c9a9584c9fb7049867.jpeg',
+      'https://file.zendrop.com/products/a8/78/092ad92341c9a9584c9fb7049867_import.webp',
+      'https://file.zendrop.com/products/0d/60/67ebeecb4218ac2847081b1a477b.jpeg'
     ],
     description: 'Fixada na janela com 4 ventosas de sucção industrial capazes de suportar até 20kg. Permite que o gato observe pássaros e relaxe ao sol com segurança.',
     keyFeatures: [
@@ -3624,10 +3906,12 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 570,
-    heroImage: 'https://images.unsplash.com/photo-1527153857715-3908f2bae5e8?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/f8/39/b51faf674ccab56176bf966595e6.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/f8/39/b51faf674ccab56176bf966595e6_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/f8/39/b51faf674ccab56176bf966595e6.jpeg',
+      'https://file.zendrop.com/products/f8/39/b51faf674ccab56176bf966595e6_import.webp',
+      'https://file.zendrop.com/products/c4/e3/93f3eef744eeb6dfe66afa5144ad.jpeg'
     ],
     description: 'Com 4 camadas de alta absorção, o tapete EcoPee retém o xixi instantaneamente e neutraliza odores sem vazar no chão. Lavável até 300 vezes na máquina de lavar.',
     keyFeatures: [
@@ -3680,10 +3964,12 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 640,
-    heroImage: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/1e/6c/cec604364493a87abc3b64af7bc0.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/1e/6c/cec604364493a87abc3b64af7bc0_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/1e/6c/cec604364493a87abc3b64af7bc0.jpeg',
+      'https://file.zendrop.com/products/1e/6c/cec604364493a87abc3b64af7bc0_import.webp',
+      'https://file.zendrop.com/products/c7/47/ef577bd243c4a7b76344510fa7ba.jpeg'
     ],
     description: 'Evite sangramentos dolorosos: a luz LED ultrabrilhante destaca a linha sensitiva da unha em cães e gatos de pelagem clara ou escura. Acompanha reservatório coletor de aparas.',
     keyFeatures: [
@@ -3736,10 +4022,12 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 410,
-    heroImage: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/d1/1b/457d8d2343b7abbdf49bb73440f3.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/d1/1b/457d8d2343b7abbdf49bb73440f3_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/d1/1b/457d8d2343b7abbdf49bb73440f3.jpeg',
+      'https://file.zendrop.com/products/d1/1b/457d8d2343b7abbdf49bb73440f3_import.webp',
+      'https://file.zendrop.com/products/17/6d/627ef4f349fdbdc509033831a875.jpeg'
     ],
     description: 'Cobre cirurgias de castração, dermatites e ferimentos abdominais. Impede que o animal lamba os pontos cirúrgicos sem limitar a visão, alimentação ou caminhada.',
     keyFeatures: [
@@ -3792,10 +4080,13 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 530,
-    heroImage: 'https://images.unsplash.com/photo-1561948955-570b270e7c36?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/9b/5c/7e49020f44faaf316ac083163c62.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/9b/5c/7e49020f44faaf316ac083163c62_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/9b/5c/7e49020f44faaf316ac083163c62.jpeg',
+      'https://file.zendrop.com/products/9b/5c/7e49020f44faaf316ac083163c62_import.webp',
+      'https://file.zendrop.com/products/2e/0b/2c8afa0d4592bf1d4b709eb0d27a.jpeg',
+      'https://file.zendrop.com/products/81/12/4d3f870c4ccaac5aeb42cb7245bf.jpeg'
     ],
     description: '3 túneis interconectados com olhal central para espreitar. Papel de estalo interno que faz ruído ao caminhar, instigando a curiosidade natural dos gatos.',
     keyFeatures: [
@@ -3848,10 +4139,12 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 1200,
-    heroImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/eb/db/64de34084ce7ad95adfeae5fd9c9.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/eb/db/64de34084ce7ad95adfeae5fd9c9_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/eb/db/64de34084ce7ad95adfeae5fd9c9.jpeg',
+      'https://file.zendrop.com/products/eb/db/64de34084ce7ad95adfeae5fd9c9_import.webp',
+      'https://file.zendrop.com/products/27/78/c3458d854dd38f17084a7ac9f93f.jpeg'
     ],
     description: 'Super compactas e leves: abrem em segundos para servir água fresca ou ração durante trilhas, parques e passeios de carro.',
     keyFeatures: [
@@ -3904,10 +4197,19 @@ const OLD_ITEMS = [
     repeatDeliveryEligible: false,
     inStockAustin: true,
     stockCount: 780,
-    heroImage: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=1200&q=85',
-    secondaryImage: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=85',
+    heroImage: 'https://file.zendrop.com/products/75/97/e69bf8834ed4baf63627ac731e10.jpeg',
+    secondaryImage: 'https://file.zendrop.com/products/75/97/e69bf8834ed4baf63627ac731e10_import.webp',
     galleryImages: [
-      'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85',
+      'https://file.zendrop.com/products/75/97/e69bf8834ed4baf63627ac731e10.jpeg',
+      'https://file.zendrop.com/products/75/97/e69bf8834ed4baf63627ac731e10_import.webp',
+      'https://file.zendrop.com/products/fb/21/fc6884084635b28ff3100e9c348d.jpeg',
+      'https://file.zendrop.com/products/78/12/5c9f64b147118a5533bdf6ce5123.jpeg',
+      'https://file.zendrop.com/products/ec/70/245f90a64591a130c7d65e9bc2bc.jpeg',
+      'https://file.zendrop.com/products/08/c8/187b8e3845128e738eefc02d65db.jpeg',
+      'https://file.zendrop.com/products/24/99/c14acaac403092db097eaf7e7af8.jpeg',
+      'https://file.zendrop.com/products/8c/75/43897831462d8e523354f4ec04ac.jpeg',
+      'https://file.zendrop.com/products/fb/a1/6c95aefb4bc6b61eb4efcaa34328.jpeg',
+      'https://file.zendrop.com/products/61/38/6bf6327e40a88c1ff80147eb74cc.jpeg'
     ],
     description: 'Fita dupla costurada com fios de nylon refletivos 3M que refletem faróis de carros a até 200 metros de distância. Fivela com trava de segurança antidesengate.',
     keyFeatures: [

@@ -267,6 +267,7 @@ export const BestsellersGrid: React.FC<BestsellersGridProps> = ({
                     <img
                       src={p.heroImage}
                       alt={p.name}
+                      referrerPolicy="no-referrer"
                       className="w-full h-full object-cover transition-opacity duration-700 group-hover:opacity-0"
                       loading="lazy"
                     />
@@ -275,6 +276,7 @@ export const BestsellersGrid: React.FC<BestsellersGridProps> = ({
                     <img
                       src={p.secondaryImage || p.heroImage}
                       alt={`${p.name} in home lifestyle`}
+                      referrerPolicy="no-referrer"
                       className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 scale-100 group-hover:scale-105 transition-all duration-700"
                       loading="lazy"
                     />

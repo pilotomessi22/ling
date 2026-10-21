@@ -105,50 +105,78 @@ app.post('/api/zendrop/status', async (req: Request, res: Response) => {
 // Zendrop Fetch Product Details & HD Images Endpoint
 app.post('/api/zendrop/fetch-product', async (req: Request, res: Response) => {
   try {
-    const { productId, apiKey: providedApiKey } = req.body;
-    const apiKey =
-      providedApiKey ||
-      process.env.ZENDROP_API_KEY ||
-      'UUUvotHLOYoGQopIgxXnfpIFjD4BoQfUW7EisDnPqI9KHQHl2aD8G72eKRiVRbqN';
-
+    const { productId } = req.body;
     if (!productId) {
-      return res.status(400).json({ error: 'ID do produto é obrigatório.' });
-    }
-
-    if (!apiKey) {
-      return res.status(400).json({
-        error: 'Chave API do Zendrop não configurada. Insira sua Zendrop API Key no painel admin para importar produtos e fotos originais.',
-      });
+      return res.status(400).json({ error: 'ID ou link do produto é obrigatório.' });
     }
 
     const cleanId = String(productId).replace(/[^0-9]/g, '');
-    const zendropRes = await fetch(`https://api.zendrop.com/v1/products/${cleanId}`, {
+    if (!cleanId) {
+      return res.status(400).json({ error: 'ID do produto Zendrop inválido.' });
+    }
+
+    // Direct extraction from Zendrop public catalog API (no API key required)
+    const zendropRes = await fetch('https://app.zendrop.com/api/get-product', {
+      method: 'POST',
       headers: {
-        Authorization: `Bearer ${apiKey.trim()}`,
         'Content-Type': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
       },
+      body: JSON.stringify({ product_id: cleanId, id: parseInt(cleanId) })
     });
 
-    const data = await zendropRes.json().catch(() => null);
+    const json = await zendropRes.json().catch(() => null);
 
-    if (!zendropRes.ok || !data) {
-      return res.status(zendropRes.status || 404).json({
-        error: data?.message || `Produto ID ${cleanId} não encontrado no Zendrop ou chave sem permissão.`,
+    if (json?.status === 'success' && json?.data?.product) {
+      const p = json.data.product;
+      const images: string[] = [];
+
+      const addImg = (url: string | undefined | null) => {
+        if (!url) return;
+        let fullUrl = url;
+        if (!fullUrl.startsWith('http')) {
+          fullUrl = 'https://file.zendrop.com/' + fullUrl.replace(/^\//, '');
+        }
+        if (!images.includes(fullUrl)) {
+          images.push(fullUrl);
+        }
+      };
+
+      if (p.featuredProductImage) {
+        if (p.featuredProductImage.urls?.original) addImg(p.featuredProductImage.urls.original);
+        if (p.featuredProductImage.full_image) addImg(p.featuredProductImage.full_image);
+      }
+
+      if (Array.isArray(p.product_image)) {
+        for (const imgObj of p.product_image) {
+          if (imgObj.urls?.original) addImg(imgObj.urls.original);
+          else if (imgObj.full_image) addImg(imgObj.full_image);
+        }
+      }
+
+      if (Array.isArray(p.product_variant)) {
+        for (const v of p.product_variant) {
+          if (v.variant_image_info?.urls?.original) addImg(v.variant_image_info.urls.original);
+          else if (v.variant_image_info?.variant_image_url) addImg(v.variant_image_info.variant_image_url);
+        }
+      }
+
+      return res.json({
+        success: true,
+        product: {
+          id: cleanId,
+          name: p.name,
+          description: p.description,
+          images: images.length > 0 ? images : ['https://file.zendrop.com/products/default.jpg'],
+          heroImage: images[0] || null,
+          secondaryImage: images[1] || images[0] || null,
+          supplierCost: p.base_cost_price || p.display_price || 0,
+          stock: p.product_variant?.[0]?.variant_inventory || 100,
+        },
       });
     }
 
-    return res.json({
-      success: true,
-      product: {
-        id: data.id || cleanId,
-        name: data.title || data.name,
-        description: data.description,
-        images: data.images || (data.image ? [data.image] : []),
-        variants: data.variants || [],
-        stock: data.stock || data.total_quantity || 100,
-        supplierCost: data.price || data.cost || 0,
-      },
-    });
+    return res.status(404).json({ error: `Produto ID ${cleanId} não encontrado no Zendrop.` });
   } catch (err: any) {
     return res.status(500).json({ error: err.message || 'Erro interno ao consultar produto no Zendrop.' });
   }
