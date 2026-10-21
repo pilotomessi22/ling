@@ -30,7 +30,7 @@ export interface ProductSpecifications {
   inTheBox: string;
   care: string;
   warranty: string;
-  cjWarehouse: string;
+  warehouse?: string;
   shippingEstimate: string;
 }
 
@@ -46,12 +46,12 @@ export interface Product {
   price: number;
   compareAt: number;
   supplierCost: number; // Cost from Zendrop
-  cjCost: number; // Unit cost
-  cjShippingEstimate: number; // Estimated shipping fee
-  totalCjCost: number; // Unit cost + shipping
+  cjCost?: number; // Optional legacy field
+  cjShippingEstimate?: number; // Optional legacy field
+  totalCjCost?: number; // Optional legacy field
   netProfit: number; // Store profit (price - supplierCost)
-  profitMarginPercent: number; // Margem exata de 60%
-  supplier: 'CJ Dropshipping' | 'Zendrop';
+  profitMarginPercent: number; // Margem de lucro
+  supplier: 'Zendrop';
   supplierSku: string;
   supplierUrl: string;
   supplierWarehouse: string;
@@ -124,11 +124,12 @@ export const SUPPLIER_AGENTS: SupplierAgent[] = [
   },
 ];
 
-// Complete 33 Zendrop Product Catalog with 60% Margin & Real-Time Stock Tracking
-export const DEFAULT_REAL_PRODUCTS: Product[] = [
+// Clean product catalog - ready for Zendrop integration
+export const DEFAULT_REAL_PRODUCTS: Product[] = [];
+
+// Legacy catalog disabled
+const LEGACY_ITEMS: any[] = [
   {
-    id: 'zendrop-2000857',
-    sku: 'ZD-2000857',
     name: 'Caminha Ortopédica Calming Plush Bed Ultra-Soft',
     brand: 'Cloud9 Pet Care',
     tagline: 'Alívio de ansiedade e suporte articular ortopédico de alta densidade.',
@@ -1996,39 +1997,25 @@ export const PRODUCT_SUPPLIER_CATALOG: Record<string, any> = {};
 export const PRODUCTS: Product[] = DEFAULT_REAL_PRODUCTS;
 
 export function getSavedProducts(): Product[] {
-  if (typeof window === 'undefined') return DEFAULT_REAL_PRODUCTS;
+  if (typeof window === 'undefined') return [];
   try {
-    if (!localStorage.getItem('ling_catalog_zendrop_33_v5')) {
-      localStorage.removeItem('ling_admin_products');
-      localStorage.setItem('ling_catalog_zendrop_33_v5', 'true');
+    // Force clean slate reset for user's request
+    if (!localStorage.getItem('ling_clean_zendrop_reset_v10')) {
+      localStorage.setItem('ling_admin_products', JSON.stringify([]));
+      localStorage.setItem('ling_clean_zendrop_reset_v10', 'true');
+      return [];
     }
     const saved = localStorage.getItem('ling_admin_products');
     if (saved !== null) {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        // Ensure every product has a valid non-empty heroImage
-        const valid = parsed.map((p: any) => {
-          const defaultProd = DEFAULT_REAL_PRODUCTS.find(d => d.id === p.id);
-          const hero = p.heroImage && p.heroImage.trim() !== '' 
-            ? p.heroImage 
-            : (defaultProd?.heroImage || 'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85');
-          const gallery = p.galleryImages && p.galleryImages.length > 0
-            ? p.galleryImages
-            : (defaultProd?.galleryImages || [hero]);
-          return {
-            ...p,
-            heroImage: hero,
-            galleryImages: gallery
-          };
-        });
-        return valid;
+      if (Array.isArray(parsed)) {
+        return parsed;
       }
     }
   } catch (e) {
     console.error('Error loading saved products:', e);
   }
-  localStorage.setItem('ling_admin_products', JSON.stringify(DEFAULT_REAL_PRODUCTS));
-  return DEFAULT_REAL_PRODUCTS;
+  return [];
 }
 
 export function saveProductsToStorage(products: Product[]): void {

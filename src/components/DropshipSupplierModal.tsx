@@ -66,7 +66,7 @@ export const DropshipSupplierModal: React.FC<DropshipSupplierModalProps> = ({
               </span>
               <p className="font-bold text-stone-900">Forward to Supplier</p>
               <p className="text-[11px] text-stone-500 mt-1">
-                You forward the customer's US address to CJ Dropshipping / Zendrop paying wholesale ($15.50).
+                You forward the customer's US address to Zendrop paying wholesale ($15.50).
               </p>
             </div>
 
@@ -130,25 +130,13 @@ export const DropshipSupplierModal: React.FC<DropshipSupplierModalProps> = ({
         {/* Recommended Top Suppliers */}
         <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 space-y-2.5">
           <h4 className="text-xs font-black text-[#2D5A43] uppercase tracking-wide">
-            Recommended US Pet Sourcing Platforms:
+            Official US Sourcing Partner:
           </h4>
           <div className="space-y-2 text-xs text-stone-700">
             <div className="flex items-start gap-2">
-              <span className="font-bold text-[#2D5A43]">1. CJ Dropshipping (USA Warehouse):</span>
+              <span className="font-bold text-[#2D5A43]">Zendrop Official US Express:</span>
               <span className="text-stone-600">
-                Filter by "US Warehouse" for 3–5 day USPS delivery and unbranded boxes. Free to connect.
-              </span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="font-bold text-[#2D5A43]">2. Zendrop (US Fast Shipping):</span>
-              <span className="text-stone-600">
-                Curated pet catalog with express domestic shipping, automated tracking uploads, and custom thank-you cards.
-              </span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="font-bold text-[#2D5A43]">3. Spocket (US / North America Suppliers):</span>
-              <span className="text-stone-600">
-                Direct partnerships with verified American pet manufacturers with 2–5 business days delivery.
+                Curated pet catalog with express domestic shipping (USPS), automated real-time stock sync, and custom branding.
               </span>
             </div>
           </div>

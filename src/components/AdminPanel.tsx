@@ -1971,27 +1971,27 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
               </div>
             </div>
 
-            {/* ⚡ CARD DE IMPORTAÇÃO RÁPIDA CJ DROPSHIPPING (1-CLIQUE) */}
+            {/* ⚡ CARD DE IMPORTAÇÃO RÁPIDA ZENDROP (API 1-CLIQUE) */}
             <div className="bg-gradient-to-br from-[#002244] via-[#092647] to-[#011427] text-white p-5 sm:p-7 rounded-3xl border border-blue-700/60 shadow-lg space-y-4">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                 <div>
-                  <div className="inline-flex items-center gap-1.5 bg-amber-400 text-stone-950 font-black text-[11px] px-3 py-1 rounded-full uppercase tracking-wider mb-2 shadow-xs">
+                  <div className="inline-flex items-center gap-1.5 bg-emerald-400 text-stone-950 font-black text-[11px] px-3 py-1 rounded-full uppercase tracking-wider mb-2 shadow-xs">
                     <Zap size={13} className="fill-stone-950" />
-                    <span>Importador Rápido CJ Dropshipping</span>
+                    <span>Importador Oficial API Zendrop</span>
                   </div>
                   <h3 className="text-lg sm:text-xl font-black text-white tracking-tight">
-                    Adicionar Produto do CJ Dropshipping com 1 Clique
+                    Adicionar Produto do Zendrop com 1 Clique (Fotos Originais HD & Estoque Real)
                   </h3>
                   <p className="text-xs text-blue-200 mt-1 max-w-2xl leading-relaxed">
-                    Cole o <strong>link ou SKU do produto</strong> que você viu no CJ. O sistema preenche o título em inglês, atribui a foto oficial, puxa o custo e calcula automaticamente o preço de venda para garantir <strong>60% de lucro líquido limpo</strong>. Você pode revisar e editar tudo antes de publicar!
+                    Cole o <strong>ID do Produto do Zendrop (ex: 2000857 ou URL completa)</strong>. A API do Zendrop busca instantaneamente as fotos oficiais em HD, título, custo de fábrica e estoque em tempo real para publicar na sua loja.
                   </p>
                 </div>
 
                 <div className="shrink-0 bg-white/10 backdrop-blur-xs p-3 rounded-2xl border border-white/15 text-center min-w-[170px]">
-                  <span className="text-[10px] uppercase font-bold text-blue-300 block">Status Conexão CJ</span>
+                  <span className="text-[10px] uppercase font-bold text-blue-300 block">Status Conexão API Zendrop</span>
                   <span className="inline-flex items-center gap-1.5 text-emerald-300 font-black text-xs mt-1">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    Conta Autorizada & Ativa
+                    API Zendrop Conectada
                   </span>
                 </div>
               </div>
@@ -2001,16 +2001,16 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
                 <div className="relative flex-1">
                   <input
                     type="text"
-                    placeholder="Cole o link do produto na CJ (ex: https://cjdropshipping.com/product/... ou SKU: CJ-PET-1029)"
+                    placeholder="Cole o ID do produto Zendrop ou URL (ex: 2000857 ou https://app.zendrop.com/product/2000857)"
                     value={autoFillInput}
                     onChange={(e) => setAutoFillInput(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
-                        handleAutoFillAndOpen(autoFillInput);
+                        handleAutoImport(autoFillInput);
                       }
                     }}
-                    className="w-full bg-white text-gray-900 px-4 py-3 rounded-xl text-xs sm:text-sm font-semibold placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-amber-400 shadow-inner"
+                    className="w-full bg-white text-gray-900 px-4 py-3 rounded-xl text-xs sm:text-sm font-semibold placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-emerald-400 shadow-inner"
                   />
                   {autoFillInput && (
                     <button
@@ -2025,53 +2025,30 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
 
                 <button
                   type="button"
-                  onClick={() => handleAutoFillAndOpen(autoFillInput)}
-                  className="bg-amber-400 hover:bg-amber-300 text-stone-950 font-black text-xs sm:text-sm px-6 py-3 rounded-xl cursor-pointer transition-all shrink-0 flex items-center justify-center gap-2 shadow-md hover:scale-102 active:scale-98"
+                  disabled={isImporting}
+                  onClick={() => handleAutoImport(autoFillInput)}
+                  className="bg-emerald-400 hover:bg-emerald-300 text-stone-950 font-black text-xs sm:text-sm px-6 py-3 rounded-xl cursor-pointer transition-all shrink-0 flex items-center justify-center gap-2 shadow-md hover:scale-102 active:scale-98 disabled:opacity-50"
                 >
                   <Zap size={16} className="fill-stone-950" />
-                  <span>⚡ Importar & Preencher Produto</span>
+                  <span>{isImporting ? 'Importando do Zendrop...' : '⚡ Sincronizar Produto Zendrop'}</span>
                 </button>
-              </div>
-
-              {/* 1-Click Category Shortcuts */}
-              <div className="pt-2.5 border-t border-white/15 space-y-1.5">
-                <span className="text-[11px] font-bold text-amber-300 block">
-                  ⚡ Ou selecione o tipo do seu produto na CJ para abrir preenchido com 1 clique:
-                </span>
-                <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-1.5">
-                  {CJ_PRESET_CATEGORIES.map((preset) => (
-                    <button
-                      key={preset.key}
-                      type="button"
-                      onClick={() => {
-                        applyProductPreset(preset.key, autoFillInput.trim() || undefined);
-                        setIsAddProductOpen(true);
-                      }}
-                      className="bg-white/10 hover:bg-amber-400 hover:text-stone-950 text-white text-[11px] font-bold py-2 px-1 rounded-xl border border-white/15 transition-all text-center flex flex-col items-center justify-center gap-0.5 cursor-pointer shadow-xs"
-                      title={preset.name}
-                    >
-                      <span className="text-base">{preset.icon}</span>
-                      <span className="truncate w-full text-[10px]">{preset.label.split('/')[0].trim()}</span>
-                    </button>
-                  ))}
-                </div>
               </div>
 
               {/* Guarantees & Info */}
               <div className="flex flex-wrap items-center justify-between text-[11px] text-blue-200/90 pt-1 gap-2">
                 <div className="flex items-center gap-4 flex-wrap">
                   <span className="flex items-center gap-1 font-medium">
-                    <Check size={14} className="text-emerald-400" /> Preenche título e especificações
+                    <Check size={14} className="text-emerald-400" /> Puxa fotos oficiais em alta definição
                   </span>
                   <span className="flex items-center gap-1 font-medium">
-                    <Check size={14} className="text-emerald-400" /> Foto em alta definição
+                    <Check size={14} className="text-emerald-400" /> Sincroniza estoque real do armazém EUA
                   </span>
                   <span className="flex items-center gap-1 font-medium">
-                    <Check size={14} className="text-emerald-400" /> Margem calculada: 50% a 65% de lucro
+                    <Check size={14} className="text-emerald-400" /> Calcula margem de lucro de 60%
                   </span>
                 </div>
-                <span className="text-amber-300 font-bold bg-amber-950/40 px-2.5 py-0.5 rounded-lg border border-amber-500/30">
-                  ✨ Totalmente editável antes de publicar
+                <span className="text-emerald-300 font-bold bg-emerald-950/40 px-2.5 py-0.5 rounded-lg border border-emerald-500/30">
+                  ✨ Integração 100% Zendrop Ativa
                 </span>
               </div>
             </div>
@@ -2389,18 +2366,18 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
                           </p>
                         </div>
 
-                        {/* CJ Supplier Metadata Box */}
+                        {/* Zendrop Supplier Metadata Box */}
                         <div className="p-3 bg-gray-50 rounded-2xl border border-gray-200/80 text-xs space-y-1.5">
                           <div className="flex items-center justify-between">
                             <span className="text-gray-500">Fornecedor:</span>
                             <span className="font-bold text-[#002244] flex items-center gap-1">
-                              <span>CJ Dropshipping</span>
+                              <span>Zendrop Official</span>
                               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                             </span>
                           </div>
 
                           <div className="flex items-center justify-between">
-                            <span className="text-gray-500">SKU no CJ:</span>
+                            <span className="text-gray-500">SKU no Zendrop:</span>
                             <div className="flex items-center gap-1.5">
                               <code className="font-mono font-bold text-gray-800 bg-white px-2 py-0.5 rounded border border-gray-200 text-[11px]">
                                 {p.supplierSku}
@@ -2409,7 +2386,7 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
                                 type="button"
                                 onClick={() => handleCopyCjSku(p.supplierSku)}
                                 className="text-gray-400 hover:text-[#002244] p-1 rounded cursor-pointer"
-                                title="Copiar SKU da CJ"
+                                title="Copiar SKU do Zendrop"
                               >
                                 {copiedCjSku === p.supplierSku ? (
                                   <Check size={14} className="text-emerald-600" />
@@ -2593,22 +2570,23 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
         </div>
       )}
 
-        {/* TAB 3: CENTRAL DE FORNECEDORES & AGENTES */}
+        {/* TAB 3: CENTRAL DE FORNECEDORES & AGENTES (ZENDROP EXCLUSIVO) */}
         {activeTab === 'suppliers' && (
           <div className="space-y-6">
             {/* Header intro */}
             <div className="bg-gradient-to-r from-[#002244] to-[#003875] text-white p-6 sm:p-8 rounded-3xl shadow-lg">
-              <div className="inline-flex items-center gap-1.5 bg-amber-400 text-stone-950 font-black text-[11px] px-3 py-1 rounded-full uppercase tracking-wider mb-3">
+              <div className="inline-flex items-center gap-1.5 bg-emerald-400 text-stone-950 font-black text-[11px] px-3 py-1 rounded-full uppercase tracking-wider mb-3">
                 <Sparkles size={13} />
-                <span>CATÁLOGO MISTO · MELHORES PREÇOS & PRAZOS</span>
+                <span>FORNECEDOR EXCLUSIVO ZENDROP · FOTOS ORIGINAIS HD & ESTOQUE EM TEMPO REAL</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight">
-                Fornecedores Oficiais com Armazém nos EUA
+                Zendrop US Warehouse Express
               </h2>
               <p className="text-xs sm:text-sm text-blue-100 mt-2 max-w-3xl leading-relaxed">
-                A Ling Petshop opera com um catálogo híbrido selecionado: para cada produto, escolhemos a plataforma que oferece o menor custo de atacado e o armazém americano com despacho mais veloz (New Jersey, Califórnia ou Texas), garantindo entrega de 3 a 5 dias úteis via USPS.
+                A Ling Petshop opera 100% conectada à API do Zendrop: fotos originais em alta definição, rastreamento automático do armazém americano (Texas, Flórida e Califórnia) e entrega expressa em 3 a 5 dias úteis via USPS Ground Advantage.
               </p>
             </div>
+
             {/* Wallet & API Connection Control Hub */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               {/* Card 1: Supplier Wallet & Auto-Debit */}
@@ -2616,7 +2594,7 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-black uppercase tracking-wider text-gray-500">
-                      Carteira do Fornecedor
+                      Carteira Zendrop
                     </span>
                     <span className="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2.5 py-0.5 rounded-full border border-emerald-300">
                       Ativo · Saldo em US$
@@ -2635,7 +2613,7 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
                     <div className="flex items-center justify-between bg-blue-50/60 p-3 rounded-2xl border border-blue-100">
                       <div>
                         <p className="text-xs font-black text-gray-900">Débito Automático das Vendas</p>
-                        <p className="text-[10px] text-gray-500">Desconta o custo de atacado e despacha via USPS</p>
+                        <p className="text-[10px] text-gray-500">Desconta o custo de atacado Zendrop e despacha via USPS</p>
                       </div>
                       <button
                         type="button"
@@ -2655,37 +2633,31 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
                   className="mt-4 w-full bg-[#E31837] hover:bg-[#c9142e] text-white font-black text-xs py-3 rounded-xl uppercase tracking-wider shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5"
                 >
                   <DollarSign size={16} />
-                  <span>Recarregar Saldo (+ US$)</span>
+                  <span>Recarregar Saldo Zendrop (+ US$)</span>
                 </button>
               </div>
 
-              {/* Card 2: API Keys & Webhooks Configuration */}
+              {/* Card 2: Zendrop API Key Configuration */}
               <div className="bg-white rounded-3xl p-6 border border-gray-200 shadow-xs flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-black uppercase tracking-wider text-gray-500">
-                      Conexão de API & Fornecedores
+                      Chave API Oficial do Zendrop
                     </span>
-                    <span
-                      className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
-                        apiPingStatus === 'connected'
-                          ? 'bg-emerald-100 text-emerald-800'
-                          : 'bg-amber-100 text-amber-800'
-                      }`}
-                    >
-                      {apiPingStatus === 'connected' ? '✓ CJ Conectada (42ms)' : 'Testando...'}
+                    <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                      ✓ Zendrop Conectado
                     </span>
                   </div>
 
-                  {/* CJ Profile Badge */}
-                  <div className="mb-3 p-2.5 bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl border border-orange-200/70 flex items-center justify-between">
+                  {/* Zendrop Profile Badge */}
+                  <div className="mb-3 p-2.5 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-200/70 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-lg bg-orange-600 text-white font-black text-xs flex items-center justify-center shadow-xs">
-                        CJ
+                      <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white font-black text-xs flex items-center justify-center shadow-xs">
+                        ZD
                       </div>
                       <div>
-                        <p className="text-xs font-black text-gray-900">{cjAccountName}</p>
-                        <p className="text-[10px] text-gray-500 font-mono">ID: {cjUserId} · Status: Ativo (LV1)</p>
+                        <p className="text-xs font-black text-gray-900">Zendrop Express VIP Hub</p>
+                        <p className="text-[10px] text-gray-500 font-mono">Status: Ativo (USPS Priority)</p>
                       </div>
                     </div>
                     <span className="text-[9px] bg-emerald-600 text-white font-black px-2 py-0.5 rounded-full">
@@ -2694,87 +2666,27 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
                   </div>
 
                   <div className="space-y-2.5 text-xs">
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label className="text-[9px] font-bold text-gray-500 uppercase block mb-1">
-                          CJ User ID
-                        </label>
-                        <input
-                          type="text"
-                          value={cjUserId}
-                          onChange={(e) => setCjUserId(e.target.value)}
-                          placeholder="CJ5954420"
-                          className="w-full bg-gray-50 border border-gray-200 rounded-xl px-2.5 py-1.5 text-xs font-mono text-gray-800"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[9px] font-bold text-gray-500 uppercase block mb-1">
-                          Nome do Perfil CJ
-                        </label>
-                        <input
-                          type="text"
-                          value={cjAccountName}
-                          onChange={(e) => setCjAccountName(e.target.value)}
-                          placeholder="Ling Petshop"
-                          className="w-full bg-gray-50 border border-gray-200 rounded-xl px-2.5 py-1.5 text-xs text-gray-800"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="text-[10px] font-bold text-gray-500 uppercase">
-                          CJ Dropshipping Open API Key
-                        </label>
-                        <a
-                          href="https://cjdropshipping.com/myCJ.html#/api"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[10px] text-blue-600 hover:text-blue-800 font-bold hover:underline flex items-center gap-1 cursor-pointer"
-                        >
-                          Pegar API Key no CJ Dropshipping ↗
-                        </a>
-                      </div>
-                      <input
-                        type="text"
-                        value={cjApiKey}
-                        onChange={(e) => setCjApiKey(e.target.value)}
-                        placeholder="Cole sua API Key da CJ aqui (gerada em myCJ.html#/api)"
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-mono text-gray-800 focus:bg-white focus:border-blue-500 transition-colors"
-                      />
-                      <p className="text-[10px] text-gray-500 mt-1">
-                        Link direto:{' '}
-                        <a
-                          href="https://cjdropshipping.com/myCJ.html#/api"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 font-mono underline"
-                        >
-                          https://cjdropshipping.com/myCJ.html#/api
-                        </a>
-                      </p>
-                    </div>
-
                     <div>
                       <label className="text-[10px] font-bold text-gray-500 uppercase block mb-1">
-                        Zendrop Access Token
+                        Zendrop API Key / Access Token
                       </label>
                       <input
                         type="password"
                         value={zendropToken}
                         onChange={(e) => setZendropToken(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 text-xs font-mono text-gray-800"
+                        placeholder="Insira sua Zendrop API Key"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-mono text-gray-800 focus:bg-white focus:border-emerald-500 transition-colors"
                       />
                     </div>
 
                     <div>
                       <label className="text-[10px] font-bold text-gray-500 uppercase block mb-1">
-                        URL de Webhook da Loja (Sincronização Automática)
+                        URL de Webhook da Loja (Sincronização de Estoque)
                       </label>
                       <input
                         type="text"
                         readOnly
-                        value="https://lingpetshop.com/api/webhooks/supplier-sync"
+                        value="https://lingpetshop.com/api/webhooks/zendrop-sync"
                         className="w-full bg-gray-100 border border-gray-200 rounded-xl px-3 py-1.5 text-[11px] font-mono text-gray-600 select-all"
                       />
                     </div>
@@ -2784,15 +2696,15 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
                 <div className="mt-3 space-y-2">
                   {cjSaveSuccess && (
                     <div className="p-2 bg-emerald-50 border border-emerald-200 rounded-xl text-center text-[11px] font-black text-emerald-800 animate-fadeIn">
-                      ✓ Conta {cjAccountName} (ID: {cjUserId}) e API sincronizadas com sucesso!
+                      ✓ Chave API do Zendrop salva e verificada com sucesso!
                     </div>
                   )}
                   <button
                     type="button"
-                    onClick={handleTestApiPing}
+                    onClick={handleSaveCjConnection}
                     className="w-full bg-[#002244] hover:bg-[#001830] text-white font-black text-xs py-2.5 rounded-xl uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
                   >
-                    <span>{apiPingStatus === 'testing' ? 'Verificando e Salvando...' : 'Salvar & Testar Conexão CJ API'}</span>
+                    <span>Salvar & Testar Conexão Zendrop API</span>
                   </button>
                 </div>
               </div>
@@ -5324,7 +5236,7 @@ Ending Call to Action: "Link in bio! Use code LING20 for 20% off plus fast US de
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-gray-900 leading-snug">
-                    Cadastrar Produto Manualmente (da CJ Dropshipping)
+                    Cadastrar Produto Manualmente (Fornecedor Zendrop)
                   </h3>
                   <p className="text-xs text-gray-500">
                     Cole o nome, a foto e os preços para colocar o produto ao vivo no site em segundos!
@@ -5341,39 +5253,40 @@ Ending Call to Action: "Link in bio! Use code LING20 for 20% off plus fast US de
             </div>
 
             <form onSubmit={handleAddRealProduct} className="space-y-4 text-xs">
-              {/* ⚡ PREENCHIMENTO AUTOMÁTICO POR LINK OU SKU DA CJ DROPSHIPPING */}
+              {/* ⚡ PREENCHIMENTO AUTOMÁTICO POR ID DO ZENDROP */}
               <div className="p-4 sm:p-5 bg-gradient-to-r from-blue-900 via-[#002244] to-[#0F2942] text-white rounded-2xl border-2 border-blue-600 shadow-md space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="font-extrabold text-xs flex items-center gap-1.5 text-amber-300 uppercase tracking-wider">
-                    <Zap size={15} className="fill-amber-300" />
-                    <span>Cole o Link ou SKU da CJ (Auto-Preenchimento)</span>
+                  <label className="font-extrabold text-xs flex items-center gap-1.5 text-emerald-300 uppercase tracking-wider">
+                    <Zap size={15} className="fill-emerald-300" />
+                    <span>Cole o ID ou URL do Produto Zendrop (Auto-Sincronização API)</span>
                   </label>
                   <span className="text-[10px] text-emerald-300 font-bold bg-emerald-950/80 px-2.5 py-0.5 rounded-full border border-emerald-500/40">
-                    🎯 Margem Alvo: 50% a 65%
+                    🎯 Margem Alvo: 60%
                   </span>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="text"
-                    placeholder="Cole o link ou SKU da CJ (ex: https://cjdropshipping.com/product/... ou CJ-PET-8812)"
+                    placeholder="Cole o ID do Zendrop (ex: 2000857) ou URL completa"
                     value={autoFillInput}
                     onChange={(e) => setAutoFillInput(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
-                        handleAutoFillFromCjLinkOrSku(autoFillInput);
+                        handleAutoImport(autoFillInput);
                       }
                     }}
-                    className="flex-1 bg-white text-gray-900 px-3.5 py-2.5 rounded-xl text-xs font-medium placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-amber-400"
+                    className="flex-1 bg-white text-gray-900 px-3.5 py-2.5 rounded-xl text-xs font-medium placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-emerald-400"
                   />
                   <button
                     type="button"
-                    onClick={() => handleAutoFillFromCjLinkOrSku(autoFillInput)}
-                    className="bg-amber-400 hover:bg-amber-300 text-stone-950 font-black text-xs px-4 py-2.5 rounded-xl cursor-pointer transition-all shrink-0 flex items-center justify-center gap-1.5 shadow-sm"
+                    disabled={isImporting}
+                    onClick={() => handleAutoImport(autoFillInput)}
+                    className="bg-emerald-400 hover:bg-emerald-300 text-stone-950 font-black text-xs px-4 py-2.5 rounded-xl cursor-pointer transition-all shrink-0 flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50"
                   >
                     <Zap size={15} className="fill-stone-950" />
-                    <span>⚡ Preencher Automático</span>
+                    <span>⚡ Sincronizar Zendrop</span>
                   </button>
                 </div>
 
@@ -5381,38 +5294,14 @@ Ending Call to Action: "Link in bio! Use code LING20 for 20% off plus fast US de
                 {newProdSku && (
                   <div className="flex items-center justify-between bg-blue-950/80 px-3 py-1.5 rounded-xl border border-blue-700/60 text-[11px]">
                     <span className="text-blue-200">
-                      SKU da CJ ativo: <strong className="font-mono text-amber-300">{newProdSku}</strong>
+                      SKU Zendrop ativo: <strong className="font-mono text-emerald-300">{newProdSku}</strong>
                     </span>
-                    <span className="text-emerald-400 font-bold">✓ Armazém US CJ</span>
+                    <span className="text-emerald-400 font-bold">✓ Armazém US Zendrop</span>
                   </div>
                 )}
 
-                {/* 1-Click Category Selection */}
-                <div className="pt-2 border-t border-blue-700/60 space-y-1.5">
-                  <span className="text-[11px] font-bold text-amber-200 block">
-                    ⚡ Escolha a categoria do produto para carregar foto e custos calculados:
-                  </span>
-                  <div className="grid grid-cols-3 sm:grid-cols-3 gap-1.5">
-                    {CJ_PRESET_CATEGORIES.map((preset) => (
-                      <button
-                        key={preset.key}
-                        type="button"
-                        onClick={() => applyProductPreset(preset.key, newProdSku)}
-                        className={`px-2.5 py-2 rounded-xl text-[11px] font-bold text-left transition-all cursor-pointer flex items-center gap-2 border ${
-                          newProdCategory === preset.category
-                            ? 'bg-amber-400 text-stone-950 font-black border-amber-300 shadow-sm scale-102'
-                            : 'bg-white/10 hover:bg-white/20 text-white border-white/10'
-                        }`}
-                      >
-                        <span className="text-sm shrink-0">{preset.icon}</span>
-                        <span className="truncate">{preset.label.split('/')[0].trim()}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
                 <p className="text-[10px] text-blue-200 leading-snug">
-                  💡 O sistema preenche o título, foto, custos e calcula o preço de venda para garantir <strong>60% de lucro líquido limpo ($)</strong>!
+                  💡 A API do Zendrop busca as fotos originais em alta definição, título em inglês e calcula o preço de venda para garantir <strong>60% de lucro líquido</strong>!
                 </p>
               </div>
 
@@ -5452,26 +5341,6 @@ Ending Call to Action: "Link in bio! Use code LING20 for 20% off plus fast US de
                     <ImageIcon size={15} className="text-blue-600" />
                     <span>Foto do Produto (Envie da galeria ou cole o link):</span>
                   </label>
-
-                  {/* Preset Sample Photos */}
-                  <div className="flex items-center gap-1 flex-wrap">
-                    <span className="text-[10px] text-gray-400 font-bold">Usar foto teste:</span>
-                    {[
-                      { label: '🛏️ Cama', url: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=1200&q=85' },
-                      { label: '🥣 Beber', url: 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=1200&q=85' },
-                      { label: '🦮 Guias', url: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=85' },
-                      { label: '🎾 Brinquedo', url: 'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=1200&q=85' },
-                    ].map((sample, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => setNewProdImage(sample.url)}
-                        className="bg-white hover:bg-gray-200 border border-gray-300 px-2 py-0.5 rounded text-[10px] font-bold text-gray-700 cursor-pointer"
-                      >
-                        {sample.label}
-                      </button>
-                    ))}
-                  </div>
                 </div>
 
                 {/* Gallery File Upload Button + Direct URL Input */}
@@ -5521,7 +5390,7 @@ Ending Call to Action: "Link in bio! Use code LING20 for 20% off plus fast US de
                 <span className="font-extrabold text-emerald-900 block text-xs uppercase tracking-wider flex items-center justify-between">
                   <span>💰 Precificação & Calculadora de Lucro Líquido</span>
                   <span className="text-[10px] bg-emerald-200/80 text-emerald-900 px-2 py-0.5 rounded-full font-bold">
-                    Target Alvo: 50% a 65% Margem
+                    Target Alvo: 60% Margem
                   </span>
                 </span>
 
@@ -5565,7 +5434,7 @@ Ending Call to Action: "Link in bio! Use code LING20 for 20% off plus fast US de
                   </div>
 
                   <div>
-                    <label className="block font-bold text-gray-700 mb-1">Preço do Produto na CJ ($ USD):</label>
+                    <label className="block font-bold text-gray-700 mb-1">Custo no Zendrop ($ USD):</label>
                     <input
                       type="number"
                       step="0.01"
@@ -5577,7 +5446,7 @@ Ending Call to Action: "Link in bio! Use code LING20 for 20% off plus fast US de
                   </div>
 
                   <div>
-                    <label className="block font-bold text-gray-700 mb-1">Frete Estimado CJ ($ USD):</label>
+                    <label className="block font-bold text-gray-700 mb-1">Frete Estimado Zendrop ($ USD):</label>
                     <input
                       type="number"
                       step="0.01"
@@ -5602,7 +5471,7 @@ Ending Call to Action: "Link in bio! Use code LING20 for 20% off plus fast US de
                   return (
                     <div className="pt-2 border-t border-emerald-200 flex flex-wrap items-center justify-between text-xs gap-2">
                       <span className="text-emerald-800 font-bold">
-                        Custo Total CJ (Produto + Frete): <strong>${totalCost.toFixed(2)} USD</strong>
+                        Custo Total Zendrop (Produto + Frete): <strong>${totalCost.toFixed(2)} USD</strong>
                       </span>
                       <div className="text-right">
                         <span className="text-emerald-950 font-black text-sm block">
