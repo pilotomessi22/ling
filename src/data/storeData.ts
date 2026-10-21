@@ -355,6 +355,63 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
     ],
   },
   {
+    id: 'zendrop-2038976',
+    sku: 'ZD-2038976',
+    name: 'Cinto de Segurança Canino Pro-Safety™ com Amortecedor Anti-Impacto',
+    brand: 'SafeJourney Pet',
+    tagline: 'Proteção essencial em freadas e trajetos de carro com trava universal ISOFIX.',
+    petType: 'Dog',
+    category: 'Walk & Travel',
+    department: 'Dogs',
+    supplierCost: 7.5,
+    price: 19.9,
+    compareAt: 39.9,
+    netProfit: 12.4,
+    profitMarginPercent: 62,
+    supplier: 'Zendrop',
+    supplierSku: 'ZD-2038976',
+    supplierUrl: 'https://app.zendrop.com/product/2038976',
+    supplierWarehouse: 'Armazém Central EUA (Zendrop Express)',
+    supplierShippingTime: '2-4 dias úteis',
+    rating: 4.9,
+    reviewsCount: 310,
+    badge: 'Segurança Testada',
+    isBestseller: true,
+    isLingPick: true,
+    repeatDeliveryEligible: false,
+    inStockAustin: true,
+    stockCount: 420,
+    heroImage: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=90',
+    secondaryImage: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=90',
+    galleryImages: [
+      'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1200&q=90',
+      'https://images.unsplash.com/photo-1534361960057-19889db9621e?auto=format&fit=crop&w=1200&q=90',
+    ],
+    description:
+      'Cinto de segurança reforçado para cães com amortecimento de elástico de alta densidade que absorve solavancos e freadas bruscas. Engate universal compatível com todos os veículos.',
+    keyFeatures: [
+      'Amortecedor elástico integrado que protege a coluna do cão em curvas ou paradas súbitas',
+      'Engate duplo: Trava tradicional de fivela de cinto de carro + Engate de trava ISOFIX',
+      'Mosquetão giratório 360° em liga de zinco aeronáutico sem emaranhar',
+      'Costuras refletivas 3M para visibilidade extra em trajetos noturnos',
+    ],
+    specifications: {
+      material: 'Nylon Trançado Alta Densidade + Mosquetão Liga de Zinco',
+      dimensions: 'Comprimento Ajustável (55cm a 80cm)',
+      weight: '140g',
+      inTheBox: '1x Cinto de Segurança Canino Pro-Safety com Amortecedor',
+      care: 'Limpar com pano úmido.',
+      warranty: '12 meses de garantia.',
+      warehouse: 'US Central Express',
+      shippingEstimate: '2-4 dias úteis',
+    },
+    volumeTiers: [
+      { qty: 1, discountPercent: 0, pricePerUnit: 19.9, total: 19.9, savings: 0, netProfit: 12.4, badge: '1 Unidade' },
+      { qty: 2, discountPercent: 10, pricePerUnit: 17.91, total: 35.82, savings: 3.98, netProfit: 20.82, badge: '2 Unidades (10% OFF)' },
+      { qty: 3, discountPercent: 15, pricePerUnit: 16.91, total: 50.73, savings: 8.97, netProfit: 28.23, badge: '3 Unidades (15% OFF)' },
+    ],
+  },
+  {
     id: 'zendrop-2058716',
     sku: 'ZD-2058716',
     name: 'Comedouro Elevado Ergonômico Ajustável com Potes Inox',
@@ -3885,9 +3942,9 @@ export function getSavedProducts(): Product[] {
   if (typeof window === 'undefined') return DEFAULT_REAL_PRODUCTS;
   try {
     // Reset to load official 33 Zendrop products catalog
-    if (!localStorage.getItem('ling_catalog_zendrop_33_v22')) {
+    if (!localStorage.getItem('ling_catalog_zendrop_33_v23')) {
       localStorage.setItem('ling_admin_products', JSON.stringify(DEFAULT_REAL_PRODUCTS));
-      localStorage.setItem('ling_catalog_zendrop_33_v22', 'true');
+      localStorage.setItem('ling_catalog_zendrop_33_v23', 'true');
       return DEFAULT_REAL_PRODUCTS;
     }
     const saved = localStorage.getItem('ling_admin_products');
