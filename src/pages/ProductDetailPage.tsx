@@ -451,9 +451,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                         <span className="text-[#64748B]">{product.specifications.care}</span>
                       </div>
                       <div className="p-2 bg-[#EFF6FF] rounded-lg border border-[#BFDBFE] text-[11px]">
-                        <span className="font-bold text-[#1E3A8A] block">CJ Fulfillment & Dispatch:</span>
+                        <span className="font-bold text-[#1E3A8A] block">Supplier Fulfillment & Dispatch:</span>
                         <span className="text-[#1E40AF]">
-                          Warehouse: {product.specifications.cjWarehouse} · {product.specifications.shippingEstimate}
+                          Warehouse: {product.specifications.cjWarehouse || product.specifications.warehouse || 'US Express Hub'} · {product.specifications.shippingEstimate}
                         </span>
                       </div>
                     </div>

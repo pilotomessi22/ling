@@ -59,6 +59,7 @@ import {
 } from 'lucide-react';
 import {
   PRODUCTS,
+  DEFAULT_REAL_PRODUCTS,
   SUPPLIER_AGENTS,
   Product,
   SupplierAgent,
@@ -1103,6 +1104,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
       isLingPick: true,
       repeatDeliveryEligible: true,
       inStockAustin: true,
+      stockCount: 450,
       heroImage: newProdImage.trim() || 'https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?auto=format&fit=crop&w=1200&q=85',
       secondaryImage: newProdImage.trim() || 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80',
       galleryImages: [
@@ -3172,7 +3174,7 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
                       </div>
 
                       <button
-                        onClick={() => handleAutoImport(tpl.name, tpl.supplier as any)}
+                        onClick={() => handleAutoImport(tpl.name)}
                         disabled={isImporting}
                         className="mt-3 w-full py-1.5 px-3 rounded-lg bg-white/20 hover:bg-white text-white hover:text-[#0F2942] font-bold text-[11px] transition-all cursor-pointer text-center"
                       >
@@ -5363,12 +5365,12 @@ Ending Call to Action: "Link in bio! Use code LING20 for 20% off plus fast US de
               {/* Financial Box Summary */}
               <div className="p-4 rounded-2xl bg-[#F8FAFC] border border-blue-100 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-gray-400 block">Custo CJ (Fábrica)</span>
-                  <span className="font-black text-gray-800 text-sm">${previewProductModal.cjCost.toFixed(2)}</span>
+                  <span className="text-[10px] uppercase font-bold text-gray-400 block">Custo de Fábrica</span>
+                  <span className="font-black text-gray-800 text-sm">${(previewProductModal.supplierCost || previewProductModal.cjCost || 0).toFixed(2)}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-gray-400 block">Frete CJ Packet</span>
-                  <span className="font-black text-gray-800 text-sm">${previewProductModal.cjShippingEstimate.toFixed(2)}</span>
+                  <span className="text-[10px] uppercase font-bold text-gray-400 block">Estimativa Frete</span>
+                  <span className="font-black text-gray-800 text-sm">${(previewProductModal.cjShippingEstimate || 0).toFixed(2)}</span>
                 </div>
                 <div>
                   <span className="text-[10px] uppercase font-bold text-gray-400 block">Preço de Venda</span>
@@ -5418,9 +5420,9 @@ Ending Call to Action: "Link in bio! Use code LING20 for 20% off plus fast US de
                   </div>
 
                   <div className="p-3 bg-blue-50/70 rounded-xl border border-blue-200 text-xs text-[#002244]">
-                    <span className="text-[10px] font-black text-blue-800 uppercase block">Fulfillment CJ nos EUA:</span>
+                    <span className="text-[10px] font-black text-blue-800 uppercase block">Fulfillment do Fornecedor nos EUA:</span>
                     <p className="font-semibold text-blue-900 mt-0.5">
-                      Armazém: {previewProductModal.specifications.cjWarehouse} · {previewProductModal.specifications.shippingEstimate}
+                      Armazém: {previewProductModal.specifications.cjWarehouse || previewProductModal.specifications.warehouse || 'EUA Hub'} · {previewProductModal.specifications.shippingEstimate}
                     </p>
                   </div>
                 </div>
