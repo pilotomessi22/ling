@@ -64,14 +64,16 @@ export default function App() {
   // Navigation Route State: 'home' | 'shop' | 'product' | 'cart' | 'checkout' | 'about' | 'shipping-faq'
   const [currentPage, setCurrentPage] = useState<string>(() => {
     if (typeof window !== 'undefined') {
+      const path = window.location.pathname.replace(/^\/+/, '');
       const hash = window.location.hash.replace('#', '');
-      if (['campaign', 'cleanup-kit', 'bundle'].includes(hash)) {
+      const target = hash || path;
+      if (['campaign', 'cleanup-kit', 'bundle'].includes(target)) {
         return 'product';
       }
-      if (['shop', 'cart', 'checkout', 'about', 'shipping-faq', 'faq', 'story'].includes(hash)) {
-        if (hash === 'faq') return 'shipping-faq';
-        if (hash === 'story') return 'about';
-        return hash;
+      if (['shop', 'cart', 'checkout', 'about', 'shipping-faq', 'faq', 'story'].includes(target)) {
+        if (target === 'faq') return 'shipping-faq';
+        if (target === 'story') return 'about';
+        return target;
       }
     }
     return 'home';
@@ -81,8 +83,10 @@ export default function App() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(() => {
     const list = getSavedProducts();
     if (typeof window !== 'undefined') {
+      const path = window.location.pathname.replace(/^\/+/, '');
       const hash = window.location.hash.replace('#', '');
-      if (['campaign', 'cleanup-kit', 'bundle'].includes(hash)) {
+      const target = hash || path;
+      if (['campaign', 'cleanup-kit', 'bundle'].includes(target)) {
         const bundle = list.find((p) => p.isCampaignBundle || p.id === 'ultimate-pet-cleanup-kit');
         if (bundle) return bundle;
       }
@@ -126,34 +130,34 @@ export default function App() {
     return initSiteSecurity();
   }, []);
 
-  // Synchronize hash routing
+  // Synchronize route & history state
   useEffect(() => {
-    const handleHash = () => {
+    const handleRouteSync = () => {
+      const path = window.location.pathname.replace(/^\/+/, '');
       const hash = window.location.hash.replace('#', '');
-      if (hash === 'admin') {
+      const target = hash || path;
+      if (target === 'admin' || window.location.pathname === '/admin') {
         setIsAdminOpen(true);
-      } else if (hash === 'campaign' || hash === 'cleanup-kit' || hash === 'bundle') {
+      } else if (['campaign', 'cleanup-kit', 'bundle'].includes(target)) {
         const bundle = products.find((p) => p.isCampaignBundle || p.id === 'ultimate-pet-cleanup-kit');
         if (bundle) {
           setSelectedProduct(bundle);
           setCurrentPage('product');
         }
-      } else if (hash === 'shop') {
-        setCurrentPage('shop');
-      } else if (hash === 'cart') {
-        setCurrentPage('cart');
-      } else if (hash === 'checkout') {
-        setCurrentPage('checkout');
-      } else if (hash === 'about' || hash === 'story') {
-        setCurrentPage('about');
-      } else if (hash === 'shipping-faq' || hash === 'faq') {
-        setCurrentPage('shipping-faq');
-      } else if (hash === 'home' || hash === '') {
+      } else if (['shop', 'cart', 'checkout', 'about', 'shipping-faq', 'faq', 'story'].includes(target)) {
+        if (target === 'faq') setCurrentPage('shipping-faq');
+        else if (target === 'story') setCurrentPage('about');
+        else setCurrentPage(target);
+      } else if (!target || target === '' || path === '') {
         setCurrentPage('home');
       }
     };
-    window.addEventListener('hashchange', handleHash);
-    return () => window.removeEventListener('hashchange', handleHash);
+    window.addEventListener('popstate', handleRouteSync);
+    window.addEventListener('hashchange', handleRouteSync);
+    return () => {
+      window.removeEventListener('popstate', handleRouteSync);
+      window.removeEventListener('hashchange', handleRouteSync);
+    };
   }, [products]);
 
   // Multi-Page Navigation Handler
@@ -162,7 +166,7 @@ export default function App() {
       const bundle = products.find((p) => p.isCampaignBundle || p.id === 'ultimate-pet-cleanup-kit');
       if (bundle) {
         handleSelectProduct(bundle);
-        window.location.hash = 'campaign';
+        window.history.pushState(null, '', '/product');
         return;
       }
     }
@@ -172,11 +176,8 @@ export default function App() {
     }
     setSearchQuery('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (page === 'home') {
-      window.history.pushState(null, '', ' ');
-    } else {
-      window.location.hash = page;
-    }
+    const newPath = page === 'home' ? '/' : `/${page}`;
+    window.history.pushState(null, '', newPath);
   };
 
   const handleSelectProduct = (p: Product) => {
