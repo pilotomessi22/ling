@@ -799,23 +799,38 @@ app.get('/api/orders', (_req: Request, res: Response) => {
 app.post('/api/orders', async (req: Request, res: Response) => {
   try {
     const newOrder = req.body;
-    if (!newOrder || !newOrder.id) {
-      return res.status(400).json({ success: false, error: 'Invalid order data.' });
+    if (!newOrder || !newOrder.id || !newOrder.orderNumber) {
+      return res.status(400).json({ success: false, error: 'Invalid order data: id and orderNumber are required.' });
     }
     const orders = getStoredOrders();
     const existingIdx = orders.findIndex((o: any) => o.id === newOrder.id || o.orderNumber === newOrder.orderNumber);
     let targetOrder: any = null;
 
     if (existingIdx >= 0) {
-      orders[existingIdx] = { ...orders[existingIdx], ...newOrder };
+      const existing = orders[existingIdx];
+      const isCurrentlyPaid = (existing.paymentStatus || '').toLowerCase().includes('paid') || (existing.paymentStatus || '').toLowerCase().includes('verified');
+
+      orders[existingIdx] = {
+        ...existing,
+        ...newOrder,
+        // Enforce secure server-side payment status (never trust client to mark as paid)
+        paymentStatus: isCurrentlyPaid ? existing.paymentStatus : 'Pending Payment',
+        fulfillmentStatus: isCurrentlyPaid ? existing.fulfillmentStatus : 'Aguardando Pagamento',
+      };
       targetOrder = orders[existingIdx];
     } else {
-      orders.unshift(newOrder);
-      targetOrder = newOrder;
+      const sanitizedOrder = {
+        ...newOrder,
+        paymentStatus: 'Pending Payment',
+        fulfillmentStatus: 'Aguardando Pagamento',
+        confirmationEmailSent: false,
+      };
+      orders.unshift(sanitizedOrder);
+      targetOrder = sanitizedOrder;
     }
     saveStoredOrders(orders);
 
-    // If order was confirmed as Paid and confirmation email was not sent yet, attempt sending (Idempotent)
+    // If order was confirmed as Paid (only via webhook) and confirmation email was not sent yet, attempt sending
     const paymentStatus = (targetOrder.paymentStatus || '').toLowerCase();
     if (paymentStatus.includes('paid') && !targetOrder.confirmationEmailSent && targetOrder.customerEmail) {
       try {
@@ -869,6 +884,17 @@ app.post('/api/orders/update-status', async (req: Request, res: Response) => {
     }
 
     const order = orders[idx];
+    const payStatus = (order.paymentStatus || '').toLowerCase();
+    const isPaid = payStatus.includes('paid') || payStatus.includes('verified');
+
+    // Prevent dispatching unpaid or abandoned orders
+    if (!isPaid && fulfillmentStatus === 'Despachado') {
+      return res.status(400).json({
+        success: false,
+        error: 'Cannot dispatch an unpaid or abandoned order. Payment must be confirmed by Stripe.'
+      });
+    }
+
     order.fulfillmentStatus = fulfillmentStatus || order.fulfillmentStatus;
 
     let emailResult: any = null;

@@ -1750,13 +1750,21 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
     alert('Endereço e dados copiados para a área de transferência!');
   };
 
-  // Financial aggregates
-  const totalRevenueUsd = orders.reduce((acc, curr) => acc + curr.totalUsd, 0);
+  // Financial aggregates (Only counting confirmed paid orders)
+  const paidOrders = orders.filter((o) => {
+    const st = (o.paymentStatus || '').toLowerCase();
+    return st.includes('paid') || st.includes('verified');
+  });
+  const totalRevenueUsd = paidOrders.reduce((acc, curr) => acc + (curr.totalUsd || 0), 0);
   const totalRevenueBrl = totalRevenueUsd * EXCHANGE_RATE_BRL;
-  const totalCostUsd = orders.reduce((acc, curr) => acc + curr.supplierCostUsd, 0);
+  const totalCostUsd = paidOrders.reduce((acc, curr) => acc + (curr.supplierCostUsd || 0), 0);
   const totalProfitUsd = totalRevenueUsd - totalCostUsd;
   const totalProfitBrl = totalProfitUsd * EXCHANGE_RATE_BRL;
-  const pendingDispatchCount = orders.filter((o) => o.fulfillmentStatus === 'Aguardando Despacho').length;
+  const pendingDispatchCount = orders.filter((o) => {
+    const st = (o.paymentStatus || '').toLowerCase();
+    const isPaid = st.includes('paid') || st.includes('verified');
+    return isPaid && o.fulfillmentStatus === 'Aguardando Despacho';
+  }).length;
   const avgMarginPercent = totalRevenueUsd > 0 ? Math.round((totalProfitUsd / totalRevenueUsd) * 100) : 68;
 
   // Filtered orders
@@ -2220,7 +2228,9 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
                     </tr>
                   ) : (
                     filteredOrders.map((ord) => {
-                      const isPending = ord.fulfillmentStatus === 'Aguardando Despacho';
+                      const st = (ord.paymentStatus || '').toLowerCase();
+                      const isPaid = st.includes('paid') || st.includes('verified');
+                      const isPending = isPaid && ord.fulfillmentStatus === 'Aguardando Despacho';
                       return (
                         <tr key={ord.id} className="hover:bg-blue-50/40 transition-colors">
                           <td className="py-4 px-4 align-top">
@@ -2231,17 +2241,25 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
                               {ord.date}
                             </span>
                             <div className="flex flex-col gap-1 mt-1">
-                              <span className="inline-flex items-center gap-1 text-[10px] text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded font-bold">
-                                <CheckCircle2 size={10} /> Pago via Stripe
-                              </span>
-                              {ord.dispatchPriority === 'urgent_2h' || (ord.shippingMethod && ord.shippingMethod.includes('Express')) ? (
-                                <span className="inline-flex items-center gap-1 text-[10px] text-red-700 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded font-extrabold" title="Frete Express: Confirmar compra com o fornecedor em até 2h">
-                                  🚨 URGENTE: Despachar em até 2h
+                              {isPaid ? (
+                                <span className="inline-flex items-center gap-1 text-[10px] text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded font-bold">
+                                  <CheckCircle2 size={10} /> Pago via Stripe
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1 text-[10px] text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded font-bold" title="Frete Padrão: Aguardar 24h para garantir que não haverá pedido de reembolso">
-                                  ⏳ PADRÃO: Aguardar 24h (Despacho)
+                                <span className="inline-flex items-center gap-1 text-[10px] text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded font-bold" title="Checkout abandonado ou pagamento pendente">
+                                  ⏳ Pending Payment (Unpaid)
                                 </span>
+                              )}
+                              {isPaid && (
+                                ord.dispatchPriority === 'urgent_2h' || (ord.shippingMethod && ord.shippingMethod.includes('Express')) ? (
+                                  <span className="inline-flex items-center gap-1 text-[10px] text-red-700 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded font-extrabold" title="Frete Express: Confirmar compra com o fornecedor em até 2h">
+                                    🚨 URGENTE: Despachar em até 2h
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 text-[10px] text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded font-bold" title="Frete Padrão: Aguardar 24h para garantir que não haverá pedido de reembolso">
+                                    ⏳ PADRÃO: Aguardar 24h (Despacho)
+                                  </span>
+                                )
                               )}
                             </div>
                           </td>
@@ -2284,7 +2302,11 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
                           </td>
 
                           <td className="py-4 px-4 align-top text-center">
-                            {isPending ? (
+                            {!isPaid ? (
+                              <span className="bg-gray-100 text-gray-600 font-black text-[10px] px-2.5 py-1 rounded-full uppercase tracking-tight">
+                                Aguardando Pagamento
+                              </span>
+                            ) : isPending ? (
                               <span className="bg-amber-100 text-amber-800 font-black text-[10px] px-2.5 py-1 rounded-full uppercase tracking-tight">
                                 Aguardando Despacho
                               </span>
@@ -2304,14 +2326,22 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
 
                           <td className="py-4 px-4 align-top text-center">
                             <button
-                              onClick={() => handleOpenDispatchModal(ord)}
+                              onClick={() => {
+                                if (!isPaid) {
+                                  alert('Este pedido não pode ser despachado pois o pagamento ainda não foi confirmado pela Stripe (Checkout Abandonado / Pendente).');
+                                  return;
+                                }
+                                handleOpenDispatchModal(ord);
+                              }}
                               className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all cursor-pointer shadow-xs ${
-                                isPending
+                                !isPaid
+                                  ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                                  : isPending
                                   ? 'bg-[#E31837] hover:bg-[#c9142e] text-white'
                                   : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                               }`}
                             >
-                              {isPending ? 'Despachar (1-Clique)' : 'Ver Rastreio'}
+                              {!isPaid ? 'Aguardando Pagamento' : (isPending ? 'Despachar (1-Clique)' : 'Ver Rastreio')}
                             </button>
                           </td>
                         </tr>
