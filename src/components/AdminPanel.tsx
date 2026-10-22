@@ -6930,6 +6930,72 @@ Ending Call to Action: "Link in bio! Use code LING20 for 20% off plus fast US de
           </div>
         </div>
       )}
+
+      {/* MODAL: EMAIL TEMPLATE HTML PREVIEW */}
+      {previewModalTemplate && (
+        <div className="fixed inset-0 z-90 bg-black/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 overflow-y-auto animate-fadeIn">
+          <div className="bg-white text-gray-900 rounded-3xl max-w-3xl w-full p-5 sm:p-7 shadow-2xl space-y-4 border border-gray-200 my-auto max-h-[92vh] flex flex-col">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-3 shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#2563EB] flex items-center justify-center font-bold">
+                  👁️
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-gray-900">
+                    Preview: {previewModalTemplate === 'confirmation' ? '“Your Ling Petshop Order Confirmation”' : '“Your Ling Petshop Order Has Shipped!”'}
+                  </h3>
+                  <p className="text-xs text-gray-500">Responsive HTML email template rendered with sandbox demo data</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPreviewModalTemplate(null)}
+                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center font-bold cursor-pointer transition-colors"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Iframe preview container */}
+            <div className="flex-1 w-full bg-gray-100 rounded-2xl border border-gray-300 overflow-hidden min-h-[450px] relative">
+              <iframe
+                src={`/api/email/preview/${previewModalTemplate}`}
+                title="Email Preview"
+                className="w-full h-full min-h-[480px] bg-white border-0"
+              />
+            </div>
+
+            {/* Footer actions */}
+            <div className="pt-2 flex items-center justify-between gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    const res = await fetch(`/api/email/preview/${previewModalTemplate}`);
+                    const htmlText = await res.text();
+                    await navigator.clipboard.writeText(htmlText);
+                    alert('Código HTML do e-mail copiado para a área de transferência com sucesso!');
+                  } catch (e) {
+                    alert('Erro ao copiar HTML.');
+                  }
+                }}
+                className="px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs transition-colors cursor-pointer flex items-center gap-1.5"
+              >
+                <Copy size={14} />
+                <span>Copiar Código HTML</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setPreviewModalTemplate(null)}
+                className="px-6 py-2.5 rounded-xl bg-[#002244] hover:bg-[#001830] text-white font-bold text-xs transition-colors cursor-pointer shadow-md"
+              >
+                Fechar Preview
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

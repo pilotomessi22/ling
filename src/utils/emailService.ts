@@ -771,7 +771,15 @@ export async function sendTestEmailDirect(
     return {
       success: false,
       status: 'not_configured',
-      error: 'Resend API Key is required.',
+      error: 'Resend API Key is required. Please enter a valid key starting with "re_".',
+    };
+  }
+
+  if (!cleanKey.startsWith('re_') || cleanKey.length < 10) {
+    return {
+      success: false,
+      status: 'failed',
+      error: 'Invalid Resend API Key format. A valid Resend API key must start with "re_" (e.g., re_12345678...).',
     };
   }
 
@@ -783,7 +791,16 @@ export async function sendTestEmailDirect(
     };
   }
 
-  const resend = new Resend(cleanKey);
+  let resend: Resend;
+  try {
+    resend = new Resend(cleanKey);
+  } catch (err: any) {
+    return {
+      success: false,
+      status: 'failed',
+      error: `Invalid Resend API Key format: ${err.message?.includes('pattern') ? 'API key must start with "re_".' : err.message}`,
+    };
+  }
 
   if (templateType === 'confirmation') {
     const data = getDemoOrderConfirmationData();
