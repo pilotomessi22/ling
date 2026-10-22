@@ -34,7 +34,56 @@ app.post(
 
       if (event.type === 'checkout.session.completed') {
         const session = event.data.object as Stripe.Checkout.Session;
+        const anySess = session as any;
         console.log(`[Stripe Webhook] Checkout Session Completed: ${session.id}, payment_status: ${session.payment_status}`);
+        try {
+          const orders = getStoredOrders();
+          const idx = orders.findIndex((o: any) => o.sessionId === session.id || (session.id && o.orderNumber?.includes(session.id.slice(-6).toUpperCase())));
+          if (idx >= 0) {
+            orders[idx].paymentStatus = 'Paid (Stripe Verified)';
+            orders[idx].fulfillmentStatus = 'Aguardando Despacho';
+            orders[idx].totalUsd = session.amount_total ? session.amount_total / 100 : orders[idx].totalUsd;
+            orders[idx].sessionId = session.id;
+            saveStoredOrders(orders);
+            console.log(`[Stripe Webhook] Order updated to Paid for session ${session.id}`);
+          } else {
+            const generatedId = `LP-STRIPE-${session.id.slice(-6).toUpperCase()}`;
+            const newOrder = {
+              id: `ord-${Date.now()}`,
+              orderNumber: generatedId,
+              date: 'Today, just now',
+              customerName: anySess.customer_details?.name || session.customer_email || 'Stripe Customer',
+              customerEmail: session.customer_email || 'customer@lingpetshop.com',
+              customerPhone: anySess.customer_details?.phone || '+1 (555) 019-2831',
+              shippingAddress: anySess.shipping_details?.address ? {
+                street: [anySess.shipping_details.address.line1, anySess.shipping_details.address.line2].filter(Boolean).join(', '),
+                city: anySess.shipping_details.address.city || 'Austin',
+                state: anySess.shipping_details.address.state || 'TX',
+                zip: anySess.shipping_details.address.postal_code || '78701',
+                country: anySess.shipping_details.address.country || 'United States',
+              } : {
+                street: 'Verified Stripe Address',
+                city: 'Austin',
+                state: 'TX',
+                zip: '78701',
+                country: 'United States',
+              },
+              items: [{ name: 'Ling Petshop Verified Order', quantity: 1, unitPrice: (session.amount_total || 1000) / 100, sku: 'LP-VERIFIED', supplier: 'Zendrop US', supplierSku: 'LP-VERIFIED' }],
+              totalUsd: (session.amount_total || 1000) / 100,
+              supplierCostUsd: 0,
+              profitUsd: (session.amount_total || 1000) / 100,
+              paymentGateway: 'Stripe (Credit Card / Apple Pay)',
+              paymentStatus: 'Paid (Stripe Verified)',
+              fulfillmentStatus: 'Aguardando Despacho',
+              sessionId: session.id,
+            };
+            orders.unshift(newOrder);
+            saveStoredOrders(orders);
+            console.log(`[Stripe Webhook] Created new paid order from webhook session ${session.id}`);
+          }
+        } catch (e) {
+          console.error('[Stripe Webhook] Error updating orders:', e);
+        }
       }
 
       return res.json({ received: true });

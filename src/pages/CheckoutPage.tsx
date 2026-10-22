@@ -25,7 +25,17 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
   onReturnToCart,
   onReturnToHome,
 }) => {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [country, setCountry] = useState('United States');
+  const [address1, setAddress1] = useState('');
+  const [address2, setAddress2] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('TX');
+  const [zip, setZip] = useState('78701');
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState('');
@@ -38,8 +48,8 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
     items,
     appliedPromo,
     'shipping',
-    'FL',
-    '33101',
+    state || 'FL',
+    zip || '33101',
     'usps_ground'
   );
   const { subtotal, shipping: shippingCost, total: finalTotal } = calc;
@@ -97,13 +107,25 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                 customerEmail: custEmail,
                 customerPhone: custPhone,
                 shippingAddress,
-                items: items.length > 0 ? items : [{ name: 'Ling Petshop Verified Order', quantity: 1, unit_price: data.amount_total }],
+                items: items.length > 0 ? items.map(i => ({
+                  sku: i.sku || i.id,
+                  name: i.name,
+                  size: i.size,
+                  color: i.color,
+                  quantity: i.quantity,
+                  unitPrice: i.price,
+                  supplierCost: i.supplierCost || 0,
+                  supplier: 'Zendrop US Warehouse',
+                  supplierSku: i.sku || i.id,
+                  supplierUrl: `https://app.zendrop.com/product/${i.sku || '2000857'}`,
+                })) : [{ name: 'Ling Petshop Verified Order', quantity: 1, unitPrice: data.amount_total, sku: 'LP-VERIFIED', supplier: 'Zendrop', supplierSku: 'LP-VERIFIED' }],
                 totalUsd: data.amount_total || finalTotal,
                 supplierCostUsd: 0,
                 profitUsd: data.amount_total || finalTotal,
-                paymentGateway: 'Stripe Official Hosted Checkout (USD)',
+                paymentGateway: 'Stripe (Credit Card / Apple Pay)',
                 paymentStatus: 'Paid (Stripe Verified)',
-                fulfillmentStatus: 'Awaiting Dispatch',
+                fulfillmentStatus: 'Aguardando Despacho',
+                sessionId: sessionId,
               };
               const updatedOrders = [newAdminOrder, ...existingOrders];
               localStorage.setItem('ling_admin_orders', JSON.stringify(updatedOrders));
@@ -167,12 +189,64 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
     const timeoutId = setTimeout(() => controller.abort(), 15000);
 
     try {
+      const customerName = `${firstName.trim()} ${lastName.trim()}`.trim() || 'Valued Customer';
+      const shippingAddress = {
+        street: [address1, address2].filter(Boolean).join(', '),
+        city: city || 'Austin',
+        state: state || 'TX',
+        zip: zip || '78701',
+        country: country || 'United States',
+      };
+
+      const temporaryOrderId = `LP-PENDING-${Date.now().toString().slice(-6)}`;
+
+      // Persist pending order to database before initiating payment
+      const pendingOrderRecord = {
+        id: `ord-${Date.now()}`,
+        orderNumber: temporaryOrderId,
+        date: 'Today, just now',
+        customerName,
+        customerEmail,
+        customerPhone: phone || '+1 (555) 019-2831',
+        shippingAddress,
+        items: items.map(i => ({
+          sku: i.sku || i.id,
+          name: i.name,
+          size: i.size,
+          color: i.color,
+          quantity: i.quantity,
+          unitPrice: i.price,
+          supplierCost: i.supplierCost || 0,
+          supplier: 'Zendrop US Warehouse',
+          supplierSku: i.sku || i.id,
+          supplierUrl: `https://app.zendrop.com/product/${i.sku || '2000857'}`,
+        })),
+        totalUsd: finalTotal,
+        supplierCostUsd: items.reduce((acc, i) => acc + (i.supplierCost || 5) * i.quantity, 0),
+        profitUsd: finalTotal - items.reduce((acc, i) => acc + (i.supplierCost || 5) * i.quantity, 0),
+        paymentGateway: 'Stripe (Credit Card / Apple Pay)',
+        paymentStatus: 'Pending Payment',
+        fulfillmentStatus: 'Aguardando Pagamento',
+      };
+
+      try {
+        await fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(pendingOrderRecord),
+        });
+      } catch (err) {
+        console.warn('Could not pre-persist pending order to server:', err);
+      }
+
       const response = await fetch('/api/checkout/create-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           items,
           customerEmail: customerEmail || undefined,
+          customerName,
+          shippingAddress,
           currency: 'usd',
           domainUrl: window.location.origin,
         }),
@@ -312,7 +386,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                   Complete Your Purchase with Stripe
                 </h1>
                 <p className="text-xs text-[#64748B] mt-1">
-                  You will be securely redirected to Stripe's official checkout page to enter your shipping address and payment details.
+                  Fill in your customer and shipping details below, then proceed to Stripe's official secure checkout.
                 </p>
               </div>
               <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#EFF6FF] border border-[#BFDBFE] text-[#2563EB] text-xs font-bold">
@@ -321,22 +395,138 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
               </div>
             </div>
 
-            {/* Email for Receipt */}
-            <div className="space-y-2">
-              <label className="block text-xs font-bold text-[#0F2942]">
-                Email Address (For Order Receipt & Tracking) *
-              </label>
-              <input
-                type="email"
-                required
-                placeholder="your.email@example.com"
-                value={customerEmail}
-                onChange={(e) => setCustomerEmail(e.target.value)}
-                className="w-full px-4 py-3.5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
-              />
-              <p className="text-[11px] text-[#64748B]">
-                We'll email your receipt and USPS tracking confirmation here once paid.
-              </p>
+            {/* Customer & Shipping Address Form (Requirement 1) */}
+            <div className="space-y-5 pt-2 border-b border-[#E2E8F0] pb-8">
+              <h2 className="text-sm font-bold font-serif text-[#0F2942] flex items-center gap-2">
+                <Truck size={16} className="text-[#2563EB]" />
+                <span>Customer & Delivery Address Details</span>
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-[#0F2942]">First Name *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="John"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-[#0F2942]">Last Name *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Doe"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-[#0F2942]">Email Address *</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="john.doe@example.com"
+                    value={customerEmail}
+                    onChange={(e) => setCustomerEmail(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-[#0F2942]">Phone Number *</label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="+1 (555) 019-2831"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-[#0F2942]">Country *</label>
+                <select
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
+                >
+                  <option value="United States">United States (US)</option>
+                  <option value="Canada">Canada (CA)</option>
+                  <option value="United Kingdom">United Kingdom (UK)</option>
+                  <option value="Australia">Australia (AU)</option>
+                  <option value="Brazil">Brazil (BR)</option>
+                  <option value="Germany">Germany (DE)</option>
+                  <option value="France">France (FR)</option>
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-[#0F2942]">Street Address *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="123 Main Street"
+                  value={address1}
+                  onChange={(e) => setAddress1(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-[#0F2942]">Apartment, Suite, Unit, etc. (Optional)</label>
+                <input
+                  type="text"
+                  placeholder="Apt 4B, Building 2"
+                  value={address2}
+                  onChange={(e) => setAddress2(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-[#0F2942]">City *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Austin"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-[#0F2942]">State / Province *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="TX"
+                    value={state}
+                    onChange={(e) => setState(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-[#0F2942]">ZIP / Postal Code *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="78701"
+                    value={zip}
+                    onChange={(e) => setZip(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Items Summary */}
@@ -351,7 +541,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                       <img src={i.image} alt={i.name} className="w-12 h-12 rounded-xl object-cover border border-[#E2E8F0]" />
                       <div>
                         <p className="text-xs font-bold text-[#0F2942] font-serif">{i.name}</p>
-                        <p className="text-[11px] text-[#64748B]">Qty: {i.quantity} {i.size ? `· ${i.size}` : ''}</p>
+                        <p className="text-[11px] text-[#64748B]">Qty: {i.quantity} {i.size ? `· ${i.size}` : ''} {i.sku ? `· SKU: ${i.sku}` : ''}</p>
                       </div>
                     </div>
                     <span className="text-xs font-bold text-[#0F2942]">{formatCurrency(i.price * i.quantity)}</span>
