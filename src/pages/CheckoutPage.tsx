@@ -68,22 +68,35 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
             onClearCart();
 
             try {
+              const addr = data.shipping_details?.address;
+              const shippingAddress = addr ? {
+                street: [addr.line1, addr.line2].filter(Boolean).join(', '),
+                city: addr.city || 'Austin',
+                state: addr.state || 'TX',
+                zip: addr.postal_code || '78701',
+                country: addr.country || 'United States',
+              } : {
+                street: 'Verified Stripe Checkout Address',
+                city: 'Austin',
+                state: 'TX',
+                zip: '78701',
+                country: 'United States',
+              };
+
+              const custName = data.shipping_details?.name || data.customer_details?.name || data.customer_email || 'Stripe Verified Customer';
+              const custPhone = data.shipping_details?.phone || data.customer_details?.phone || '+1 (555) 019-2831';
+              const custEmail = data.customer_email || 'customer@lingpetshop.com';
+
               const existingOrdersRaw = localStorage.getItem('ling_admin_orders');
               const existingOrders = existingOrdersRaw ? JSON.parse(existingOrdersRaw) : [];
               const newAdminOrder = {
                 id: `ord-${Date.now()}`,
                 orderNumber: generatedId,
                 date: 'Today, just now',
-                customerName: data.customer_email || 'Stripe Verified Customer',
-                customerEmail: data.customer_email || 'customer@lingpetshop.com',
-                customerPhone: '+1 (555) 019-2831',
-                shippingAddress: {
-                  street: 'Verified Stripe Checkout Address',
-                  city: 'Austin',
-                  state: 'TX',
-                  zip: '78701',
-                  country: 'United States',
-                },
+                customerName: custName,
+                customerEmail: custEmail,
+                customerPhone: custPhone,
+                shippingAddress,
                 items: items.length > 0 ? items : [{ name: 'Ling Petshop Verified Order', quantity: 1, unit_price: data.amount_total }],
                 totalUsd: data.amount_total || finalTotal,
                 supplierCostUsd: 0,
@@ -92,8 +105,15 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                 paymentStatus: 'Paid (Stripe Verified)',
                 fulfillmentStatus: 'Awaiting Dispatch',
               };
-              localStorage.setItem('ling_admin_orders', JSON.stringify([newAdminOrder, ...existingOrders]));
+              const updatedOrders = [newAdminOrder, ...existingOrders];
+              localStorage.setItem('ling_admin_orders', JSON.stringify(updatedOrders));
               window.dispatchEvent(new Event('storage'));
+
+              fetch('/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newAdminOrder),
+              }).catch((e) => console.error('Failed to sync order to server:', e));
             } catch (e) {
               console.error(e);
             }

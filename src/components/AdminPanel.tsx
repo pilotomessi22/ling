@@ -512,19 +512,76 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
     return [];
   });
 
+  useEffect(() => {
+    fetch('/api/orders')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.orders)) {
+          setOrders(data.orders);
+          localStorage.setItem('ling_admin_orders', JSON.stringify(data.orders));
+        }
+      })
+      .catch((e) => console.error('Failed to fetch server orders:', e));
+  }, []);
+
   const handleClearOrders = () => {
     setOrders([]);
     localStorage.setItem('ling_admin_orders', JSON.stringify([]));
     localStorage.setItem('ling_orders_zerados_v5', 'true');
-    setImportSuccessMsg('Todos os pedidos de teste foram zerados com sucesso!');
+    setImportSuccessMsg('Todos os pedidos foram zerados com sucesso!');
     setTimeout(() => setImportSuccessMsg(null), 3000);
   };
 
-  // Selected order for 1-Click semi-automatic dispatch
-  const [dispatchOrder, setDispatchOrder] = useState<AdminOrder | null>(null);
-  const [trackingInput, setTrackingInput] = useState('');
-  const [copiedShipping, setCopiedShipping] = useState(false);
-  const [copiedOrderNumber, setCopiedOrderNumber] = useState(false);
+  // Dispatch modal state
+  const [dispatchModalOrder, setDispatchModalOrder] = useState<AdminOrder | null>(null);
+  const [dispatchTrackingInput, setDispatchTrackingInput] = useState('');
+  const [dispatchCarrierInput, setDispatchCarrierInput] = useState('USPS Ground Advantage');
+
+  const handleOpenDispatchModal = (ord: AdminOrder) => {
+    setDispatchModalOrder(ord);
+    setDispatchTrackingInput(ord.trackingNumber || `9400 ${Math.floor(1000 + Math.random() * 9000)} ${Math.floor(1000 + Math.random() * 9000)} 3849 10`);
+    setDispatchCarrierInput(ord.carrier || 'USPS Ground Advantage (3-5 Days US Hub)');
+  };
+
+  const handleConfirmDispatch = async () => {
+    if (!dispatchModalOrder) return;
+    const orderId = dispatchModalOrder.id || dispatchModalOrder.orderNumber;
+    try {
+      const res = await fetch('/api/orders/update-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId,
+          fulfillmentStatus: 'Despachado',
+          trackingNumber: dispatchTrackingInput,
+          carrier: dispatchCarrierInput,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        const updated = orders.map((o) => (o.id === orderId || o.orderNumber === orderId ? data.order : o));
+        setOrders(updated);
+        localStorage.setItem('ling_admin_orders', JSON.stringify(updated));
+        setImportSuccessMsg(`✓ Pedido ${dispatchModalOrder.orderNumber} despachado com sucesso! Rastreio USPS gerado.`);
+        setDispatchModalOrder(null);
+        setTimeout(() => setImportSuccessMsg(null), 4000);
+      }
+    } catch (e) {
+      console.error(e);
+      const updated = orders.map((o) => (o.id === orderId || o.orderNumber === orderId ? {
+        ...o,
+        fulfillmentStatus: 'Despachado' as const,
+        trackingNumber: dispatchTrackingInput,
+        carrier: dispatchCarrierInput,
+        dispatchedAt: new Date().toISOString(),
+      } : o));
+      setOrders(updated);
+      localStorage.setItem('ling_admin_orders', JSON.stringify(updated));
+      setImportSuccessMsg(`✓ Pedido ${dispatchModalOrder.orderNumber} despachado localmente!`);
+      setDispatchModalOrder(null);
+      setTimeout(() => setImportSuccessMsg(null), 4000);
+    }
+  };
 
   // Filter in orders
   const [orderStatusFilter, setOrderStatusFilter] = useState<'all' | 'pending' | 'dispatched'>('all');
@@ -1646,33 +1703,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
     localStorage.removeItem('ling_admin_authenticated');
   };
 
-  // 1-Click semi-automatic dispatch action
-  const handleOpenDispatchModal = (ord: AdminOrder) => {
-    setDispatchOrder(ord);
-    setTrackingInput(
-      ord.trackingNumber ||
-        `9400${Math.floor(10000000000000000 + Math.random() * 90000000000000000)}`
-    );
-  };
 
-  const handleConfirmDispatch = () => {
-    if (!dispatchOrder) return;
-    setOrders((prev) =>
-      prev.map((ord) => {
-        if (ord.id === dispatchOrder.id) {
-          return {
-            ...ord,
-            fulfillmentStatus: 'Despachado',
-            trackingNumber: trackingInput.trim() || '9400111899562537829104',
-            carrier: 'USPS Ground Advantage (3-5 Dias)',
-            dispatchedAt: 'Despachado agora',
-          };
-        }
-        return ord;
-      })
-    );
-    setDispatchOrder(null);
-  };
 
   const copyFormattedAddress = (ord: AdminOrder) => {
     const text = `RECIPIENT: ${ord.customerName}
@@ -1685,8 +1716,7 @@ PHONE: ${ord.customerPhone}
 ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`).join(', ')}`;
 
     navigator.clipboard.writeText(text);
-    setCopiedShipping(true);
-    setTimeout(() => setCopiedShipping(false), 2500);
+    alert('Endereço e dados copiados para a área de transferência!');
   };
 
   // Financial aggregates
@@ -5561,129 +5591,7 @@ Ending Call to Action: "Link in bio! Use code LING20 for 20% off plus fast US de
         )}
       </main>
 
-      {/* 1-CLICK DISPATCH MODAL */}
-      {dispatchOrder && (
-        <div className="fixed inset-0 z-60 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl sm:rounded-3xl max-w-lg w-full p-4 sm:p-8 shadow-2xl border border-gray-200 my-auto max-h-[92vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-5">
-              <div>
-                <span className="text-[10px] font-black uppercase tracking-wider text-[#E31837] bg-red-50 px-2.5 py-0.5 rounded-full border border-red-200">
-                  Despacho Semi-Automático
-                </span>
-                <h3 className="text-lg font-black text-[#002244] mt-1">
-                  Despachar Pedido: {dispatchOrder.orderNumber}
-                </h3>
-              </div>
-              <button
-                onClick={() => setDispatchOrder(null)}
-                className="text-gray-400 hover:text-gray-700 p-1.5 rounded-full hover:bg-gray-100 cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
 
-            {/* Recipient summary in USPS Format */}
-            <div className="space-y-4 text-xs">
-              <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-black uppercase tracking-wider text-gray-500 text-[10px]">
-                    Destinatário nos Estados Unidos
-                  </span>
-                  <button
-                    onClick={() => copyFormattedAddress(dispatchOrder)}
-                    className="text-[#E31837] font-bold hover:underline flex items-center gap-1 cursor-pointer"
-                  >
-                    {copiedShipping ? (
-                      <>
-                        <Check size={12} className="text-emerald-600" /> Copiado!
-                      </>
-                    ) : (
-                      <>
-                        <Copy size={12} /> Copiar Padrão USPS
-                      </>
-                    )}
-                  </button>
-                </div>
-
-                <div className="font-mono text-gray-800 text-[11px] leading-relaxed select-all">
-                  <p className="font-bold">{dispatchOrder.customerName}</p>
-                  <p>{dispatchOrder.shippingAddress.street}</p>
-                  <p>
-                    {dispatchOrder.shippingAddress.city}, {dispatchOrder.shippingAddress.state}{' '}
-                    {dispatchOrder.shippingAddress.zip}
-                  </p>
-                  <p>United States · Tel: {dispatchOrder.customerPhone}</p>
-                </div>
-              </div>
-
-              {/* Items to buy at supplier */}
-              <div>
-                <span className="font-black uppercase tracking-wider text-gray-500 text-[10px] block mb-2">
-                  Itens para Pedir no Fornecedor
-                </span>
-                <div className="space-y-2">
-                  {dispatchOrder.items.map((it, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center justify-between p-3 bg-blue-50/50 rounded-xl border border-blue-200/60"
-                    >
-                      <div>
-                        <p className="font-black text-gray-900">{it.quantity}x {it.name}</p>
-                        <p className="text-[10px] text-gray-500">
-                          SKU Fornecedor: <strong className="text-gray-800">{it.supplierSku}</strong> · {it.supplier}
-                        </p>
-                      </div>
-
-                      <a
-                        href={it.supplierUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-[#002244] hover:bg-[#001830] text-white text-[11px] font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 cursor-pointer shadow-xs"
-                      >
-                        <span>Abrir Produto</span>
-                        <ExternalLink size={12} />
-                      </a>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* USPS Tracking input */}
-              <div className="pt-2">
-                <label className="font-bold text-gray-700 block mb-1">
-                  Código de Rastreamento USPS (fornecido após o pedido):
-                </label>
-                <input
-                  type="text"
-                  value={trackingInput}
-                  onChange={(e) => setTrackingInput(e.target.value)}
-                  placeholder="Ex: 9400 1118 9956 2537 8291 04"
-                  className="w-full bg-white border border-gray-300 rounded-xl px-3.5 py-2.5 text-xs font-mono text-gray-900 focus:outline-none focus:border-[#002244] focus:ring-1 focus:ring-[#002244]"
-                />
-              </div>
-
-              {/* Action buttons */}
-              <div className="pt-4 flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => setDispatchOrder(null)}
-                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 rounded-xl text-xs cursor-pointer"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  onClick={handleConfirmDispatch}
-                  className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-md"
-                >
-                  <Check size={16} />
-                  <span>Marcar como Despachado</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Modal: Ficha Técnica & Galeria de Fotos Reais em Alta Resolução */}
       {previewProductModal && (
@@ -6782,6 +6690,115 @@ Ending Call to Action: "Link in bio! Use code LING20 for 20% off plus fast US de
               >
                 <Trash2 size={14} />
                 <span>Sim, Apagar Produto</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* MODAL DE DESPACHO 1-CLIQUE E APROVAÇÃO ZENDROP */}
+      {dispatchModalOrder && (
+        <div className="fixed inset-0 z-85 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-fadeIn">
+          <div className="bg-white text-gray-900 rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl space-y-6 border border-gray-200 my-auto max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-[#E31837] text-white flex items-center justify-center font-bold shadow-sm">
+                  <Truck size={22} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-[#002244]">
+                    Despacho 1-Clique & Aprovação Zendrop
+                  </h3>
+                  <p className="text-xs text-gray-500">
+                    Pedido <strong className="text-gray-900">{dispatchModalOrder.orderNumber}</strong> · Aprovado via Stripe
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDispatchModalOrder(null)}
+                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center font-bold cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Customer & Shipping Address Card */}
+            <div className="p-4 rounded-2xl bg-blue-50/60 border border-blue-200 space-y-2 text-xs">
+              <span className="font-bold uppercase tracking-wider text-blue-900 block">
+                📦 Endereço de Entrega do Cliente (EUA)
+              </span>
+              <div className="bg-white p-3.5 rounded-xl border border-blue-100 space-y-1 text-gray-800 font-medium">
+                <p className="font-black text-[#002244] text-sm">{dispatchModalOrder.customerName}</p>
+                <p>📍 {dispatchModalOrder.shippingAddress.street}</p>
+                <p>{dispatchModalOrder.shippingAddress.city}, {dispatchModalOrder.shippingAddress.state} {dispatchModalOrder.shippingAddress.zip} · {dispatchModalOrder.shippingAddress.country || 'United States'}</p>
+                <p className="text-gray-500 pt-1 border-t border-gray-100">
+                  ✉️ Email: {dispatchModalOrder.customerEmail} · 📱 Tel: {dispatchModalOrder.customerPhone}
+                </p>
+              </div>
+            </div>
+
+            {/* Items Summary */}
+            <div className="space-y-2">
+              <span className="font-bold uppercase tracking-wider text-gray-500 text-xs">
+                Itens do Pedido ({dispatchModalOrder.items.length})
+              </span>
+              <div className="divide-y divide-gray-100 border border-gray-200 rounded-2xl overflow-hidden bg-gray-50 text-xs">
+                {dispatchModalOrder.items.map((it, i) => (
+                  <div key={i} className="p-3 flex items-center justify-between gap-3 bg-white">
+                    <div>
+                      <p className="font-black text-gray-900">{it.quantity}x {it.name}</p>
+                      <p className="text-gray-400 font-mono text-[11px]">SKU: {it.sku || it.supplierSku}</p>
+                    </div>
+                    <span className="font-bold text-[#002244]">${((it.unitPrice || (it as any).totalUsd || 0) * (it.quantity || 1)).toFixed(2)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Tracking & Carrier inputs */}
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="block font-bold text-gray-700 mb-1">Código de Rastreamento USPS:</label>
+                <input
+                  type="text"
+                  value={dispatchTrackingInput}
+                  onChange={(e) => setDispatchTrackingInput(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 font-mono font-bold text-gray-900 bg-white"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-gray-700 mb-1">Transportadora / Armazém:</label>
+                <input
+                  type="text"
+                  value={dispatchCarrierInput}
+                  onChange={(e) => setDispatchCarrierInput(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 font-bold text-gray-900 bg-white"
+                />
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-gray-100 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  const payload = JSON.stringify(dispatchModalOrder, null, 2);
+                  navigator.clipboard.writeText(payload);
+                  alert('Dados do pedido e endereço de entrega copiados para a área de transferência! Cole no Zendrop ou CJ Dropshipping.');
+                }}
+                className="px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs transition-colors cursor-pointer flex items-center gap-1.5"
+              >
+                <Copy size={14} />
+                <span>Copiar Payload para Zendrop</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleConfirmDispatch}
+                className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs transition-all shadow-md cursor-pointer flex items-center gap-1.5"
+              >
+                <CheckCircle2 size={16} />
+                <span>Aprovar & Marcar como Despachado</span>
               </button>
             </div>
           </div>

@@ -492,6 +492,9 @@ const handleCreateCheckoutSession = async (req: Request, res: Response) => {
       line_items: lineItems,
       success_url,
       cancel_url,
+      shipping_address_collection: {
+        allowed_countries: ['US', 'BR', 'CA', 'GB', 'AU', 'FR', 'DE', 'IT', 'ES'],
+      },
       metadata: {
         itemsSummary: JSON.stringify(items.map((i: any) => ({ sku: i.sku || i.id, qty: i.quantity }))),
       },
@@ -532,16 +535,93 @@ app.get('/api/checkout/session/:sessionId', async (req: Request, res: Response) 
   try {
     const { sessionId } = req.params;
     const stripe = getStripeInstance();
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    const session = await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ['shipping_details', 'customer_details', 'line_items'],
+    });
+    const anySess = session as any;
     return res.json({
       status: session.status,
       payment_status: session.payment_status,
-      customer_email: session.customer_email || session.customer_details?.email,
+      customer_email: session.customer_email || anySess.customer_details?.email,
+      customer_name: anySess.customer_details?.name || anySess.shipping_details?.name,
+      customer_phone: anySess.customer_details?.phone || anySess.shipping_details?.phone,
+      shipping_details: anySess.shipping_details,
+      customer_details: anySess.customer_details,
       amount_total: session.amount_total ? session.amount_total / 100 : 0,
       metadata: session.metadata,
     });
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
+  }
+});
+
+// Server-side persistent orders storage
+import fs from 'fs';
+const ORDERS_FILE = path.join(__dirname, 'orders.json');
+
+const getStoredOrders = () => {
+  try {
+    if (fs.existsSync(ORDERS_FILE)) {
+      const data = fs.readFileSync(ORDERS_FILE, 'utf8');
+      return JSON.parse(data);
+    }
+  } catch (e) {
+    console.error('Error reading orders.json:', e);
+  }
+  return [];
+};
+
+const saveStoredOrders = (orders: any[]) => {
+  try {
+    fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2), 'utf8');
+  } catch (e) {
+    console.error('Error writing orders.json:', e);
+  }
+};
+
+app.get('/api/orders', (_req: Request, res: Response) => {
+  const orders = getStoredOrders();
+  res.json({ success: true, orders });
+});
+
+app.post('/api/orders', (req: Request, res: Response) => {
+  try {
+    const newOrder = req.body;
+    if (!newOrder || !newOrder.id) {
+      return res.status(400).json({ success: false, error: 'Invalid order data.' });
+    }
+    const orders = getStoredOrders();
+    const existingIdx = orders.findIndex((o: any) => o.id === newOrder.id || o.orderNumber === newOrder.orderNumber);
+    if (existingIdx >= 0) {
+      orders[existingIdx] = { ...orders[existingIdx], ...newOrder };
+    } else {
+      orders.unshift(newOrder);
+    }
+    saveStoredOrders(orders);
+    return res.json({ success: true, order: newOrder });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/orders/update-status', (req: Request, res: Response) => {
+  try {
+    const { orderId, fulfillmentStatus, trackingNumber, carrier } = req.body;
+    const orders = getStoredOrders();
+    const idx = orders.findIndex((o: any) => o.id === orderId || o.orderNumber === orderId);
+    if (idx === -1) {
+      return res.status(404).json({ success: false, error: 'Order not found.' });
+    }
+    orders[idx].fulfillmentStatus = fulfillmentStatus || orders[idx].fulfillmentStatus;
+    if (trackingNumber) orders[idx].trackingNumber = trackingNumber;
+    if (carrier) orders[idx].carrier = carrier;
+    if (fulfillmentStatus === 'Despachado') {
+      orders[idx].dispatchedAt = new Date().toISOString();
+    }
+    saveStoredOrders(orders);
+    return res.json({ success: true, order: orders[idx] });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err.message });
   }
 });
 
