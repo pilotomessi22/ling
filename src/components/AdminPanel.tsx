@@ -636,10 +636,36 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   });
 
   // Resend Email Test State
-  const [resendApiKeyInput, setResendApiKeyInput] = useState(() => localStorage.getItem('ling_resend_api_key') || 're_aNjipU2c_DDU5j6EJ823rfmwpAdBNEuCN');
+  const [resendApiKeyInput, setResendApiKeyInput] = useState(() => localStorage.getItem('ling_resend_api_key') || '');
   const [testEmailTo, setTestEmailTo] = useState('pilotomessi22@gmail.com');
   const [isSendingTestEmail, setIsSendingTestEmail] = useState(false);
   const [testEmailResult, setTestEmailResult] = useState<{ success: boolean; msg: string } | null>(null);
+
+  const [previewModalTemplate, setPreviewModalTemplate] = useState<'confirmation' | 'tracking' | null>(null);
+  const [sandboxEmailStatus, setSandboxEmailStatus] = useState<{ type: 'confirmation' | 'tracking'; loading: boolean; result: { success: boolean; msg: string } | null }>({ type: 'confirmation', loading: false, result: null });
+
+  const handleSendSandboxTemplate = async (templateType: 'confirmation' | 'tracking') => {
+    setSandboxEmailStatus({ type: templateType, loading: true, result: null });
+    try {
+      const res = await fetch('/api/email/send-sandbox', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          templateType,
+          recipient: testEmailTo.trim() || 'pilotomessi22@gmail.com',
+          resendApiKey: resendApiKeyInput.trim() || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSandboxEmailStatus({ type: templateType, loading: false, result: { success: true, msg: `Template "${templateType === 'confirmation' ? 'Order Confirmation' : 'Order Has Shipped'}" enviado com sucesso para ${testEmailTo}!` } });
+      } else {
+        setSandboxEmailStatus({ type: templateType, loading: false, result: { success: false, msg: data.error || 'Erro ao enviar teste.' } });
+      }
+    } catch (err: any) {
+      setSandboxEmailStatus({ type: templateType, loading: false, result: { success: false, msg: err.message || 'Erro de rede.' } });
+    }
+  };
 
   const handleSendTestEmail = async () => {
     setIsSendingTestEmail(true);
@@ -4356,6 +4382,106 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
                     <span>{testEmailResult.msg}</span>
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* Transactional Templates Sandbox & Preview Card (Requirement 1, 2 & 3) */}
+            <div className="bg-white p-6 sm:p-7 rounded-3xl border border-gray-200 shadow-xs space-y-6">
+              <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xl">📋</span>
+                  <div>
+                    <h3 className="text-base font-black text-gray-900">Transactional Email Templates Sandbox</h3>
+                    <p className="text-xs text-gray-500">Preview live HTML layouts and test sandbox emails safely without real customer orders.</p>
+                  </div>
+                </div>
+                <span className="bg-blue-50 text-blue-800 text-xs font-black px-3 py-1 rounded-full border border-blue-200">
+                  Sandbox Mode
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* Template 1: Order Confirmation */}
+                <div className="p-5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-4 flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#2563EB] bg-blue-100 px-2.5 py-1 rounded-md">
+                      Template #1
+                    </span>
+                    <h4 className="font-serif font-bold text-base text-[#0F2942]">
+                      “Your Ling Petshop Order Confirmation”
+                    </h4>
+                    <p className="text-xs text-[#64748B] leading-relaxed">
+                      Sent automatically via webhook immediately after Stripe confirms payment. Includes customer name, order number, items, subtotal, discount, shipping, and delivery address.
+                    </p>
+                  </div>
+
+                  <div className="space-y-3 pt-3 border-t border-[#E2E8F0]">
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setPreviewModalTemplate('confirmation')}
+                        className="flex-1 px-4 py-2.5 bg-white hover:bg-gray-50 text-[#0F2942] border border-gray-300 rounded-xl font-bold text-xs shadow-2xs cursor-pointer transition-all flex items-center justify-center gap-1.5"
+                      >
+                        👁️ Preview HTML
+                      </button>
+                      <button
+                        type="button"
+                        disabled={sandboxEmailStatus.loading && sandboxEmailStatus.type === 'confirmation'}
+                        onClick={() => handleSendSandboxTemplate('confirmation')}
+                        className="flex-1 px-4 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] disabled:opacity-60 text-white rounded-xl font-bold text-xs shadow-sm cursor-pointer transition-all flex items-center justify-center gap-1.5"
+                      >
+                        {sandboxEmailStatus.loading && sandboxEmailStatus.type === 'confirmation' ? 'Sending...' : '📨 Send Test'}
+                      </button>
+                    </div>
+
+                    {sandboxEmailStatus.type === 'confirmation' && sandboxEmailStatus.result && (
+                      <p className={`text-[11px] font-bold ${sandboxEmailStatus.result.success ? 'text-emerald-700' : 'text-rose-700'}`}>
+                        {sandboxEmailStatus.result.msg}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Template 2: Order Has Shipped */}
+                <div className="p-5 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] space-y-4 flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-md">
+                      Template #2
+                    </span>
+                    <h4 className="font-serif font-bold text-base text-[#0F2942]">
+                      “Your Ling Petshop Order Has Shipped!”
+                    </h4>
+                    <p className="text-xs text-[#64748B] leading-relaxed">
+                      Sent automatically when the admin inputs the USPS tracking number. Features carrier info, track order CTA button, and 24-48h tracking scan notice.
+                    </p>
+                  </div>
+
+                  <div className="space-y-3 pt-3 border-t border-[#E2E8F0]">
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setPreviewModalTemplate('tracking')}
+                        className="flex-1 px-4 py-2.5 bg-white hover:bg-gray-50 text-[#0F2942] border border-gray-300 rounded-xl font-bold text-xs shadow-2xs cursor-pointer transition-all flex items-center justify-center gap-1.5"
+                      >
+                        👁️ Preview HTML
+                      </button>
+                      <button
+                        type="button"
+                        disabled={sandboxEmailStatus.loading && sandboxEmailStatus.type === 'tracking'}
+                        onClick={() => handleSendSandboxTemplate('tracking')}
+                        className="flex-1 px-4 py-2.5 bg-[#16A34A] hover:bg-[#15803D] disabled:opacity-60 text-white rounded-xl font-bold text-xs shadow-sm cursor-pointer transition-all flex items-center justify-center gap-1.5"
+                      >
+                        {sandboxEmailStatus.loading && sandboxEmailStatus.type === 'tracking' ? 'Sending...' : '📨 Send Test'}
+                      </button>
+                    </div>
+
+                    {sandboxEmailStatus.type === 'tracking' && sandboxEmailStatus.result && (
+                      <p className={`text-[11px] font-bold ${sandboxEmailStatus.result.success ? 'text-emerald-700' : 'text-rose-700'}`}>
+                        {sandboxEmailStatus.result.msg}
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 

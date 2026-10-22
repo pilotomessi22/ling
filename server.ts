@@ -5,7 +5,15 @@ import fs from 'fs';
 import { Resend } from 'resend';
 import Stripe from 'stripe';
 import { calculateOrderTotals } from './src/utils/storeLogic.ts';
-import { sendOrderConfirmationEmail, sendOrderTrackingEmail } from './src/utils/emailService.ts';
+import { 
+  sendOrderConfirmationEmail, 
+  sendOrderTrackingEmail, 
+  getDemoOrderConfirmationData, 
+  getDemoOrderTrackingData, 
+  generateOrderConfirmationHtml, 
+  generateOrderTrackingHtml, 
+  sendTestEmailDirect 
+} from './src/utils/emailService.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -996,6 +1004,54 @@ app.post('/api/send-email', async (req: Request, res: Response) => {
     return res.json({ success: true, data: response });
   } catch (err: any) {
     console.error('Erro ao enviar e-mail com Resend:', err);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Email Template Preview Endpoint (Requirement 1 & 2)
+app.get('/api/email/preview/:template', (req: Request, res: Response) => {
+  const { template } = req.params;
+  if (template === 'confirmation' || template === 'order-confirmation') {
+    const demoData = getDemoOrderConfirmationData();
+    const html = generateOrderConfirmationHtml(demoData);
+    return res.setHeader('Content-Type', 'text/html').send(html);
+  } else if (template === 'tracking' || template === 'shipping') {
+    const demoData = getDemoOrderTrackingData();
+    const html = generateOrderTrackingHtml(demoData);
+    return res.setHeader('Content-Type', 'text/html').send(html);
+  }
+  return res.status(404.0).send('Template not found. Use "confirmation" or "tracking".');
+});
+
+// Sandbox Test Email Endpoint (Requirement 3)
+app.post('/api/email/send-sandbox', async (req: Request, res: Response) => {
+  try {
+    const { templateType, recipient, resendApiKey } = req.body;
+    const apiKey = (resendApiKey || process.env.RESEND_API_KEY || '').trim();
+    const targetRecipient = (recipient || '').trim();
+
+    if (!apiKey) {
+      return res.status(400).json({
+        success: false,
+        error: 'Resend API Key is required. Please configure RESEND_API_KEY or enter your key in the admin panel.',
+      });
+    }
+
+    if (!targetRecipient || !targetRecipient.includes('@')) {
+      return res.status(400).json({
+        success: false,
+        error: 'Valid recipient email address is required.',
+      });
+    }
+
+    const result = await sendTestEmailDirect(
+      templateType === 'tracking' ? 'tracking' : 'confirmation',
+      targetRecipient,
+      apiKey
+    );
+
+    return res.json(result);
+  } catch (err: any) {
     return res.status(500).json({ success: false, error: err.message });
   }
 });

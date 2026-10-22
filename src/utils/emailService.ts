@@ -682,3 +682,152 @@ export async function sendOrderTrackingEmail(
     };
   }
 }
+
+/**
+ * Demo data for template preview & sandbox testing
+ */
+export function getDemoOrderConfirmationData(): OrderEmailData {
+  return {
+    orderNumber: 'LP-STRIPE-DEMO99',
+    date: 'Today, just now',
+    customerName: 'Sarah Jenkins',
+    customerEmail: 'sandbox-customer@lingpetshop.com',
+    shippingAddress: {
+      street: '742 Evergreen Terrace',
+      city: 'Austin',
+      state: 'TX',
+      zip: '78701',
+      country: 'United States',
+    },
+    items: [
+      {
+        name: 'Anti-Anxiety Calming Dog Bed',
+        quantity: 1,
+        unitPrice: 34.95,
+        size: 'Large (36")',
+        color: 'Plush Grey',
+      },
+      {
+        name: 'Professional Magic Pet Grooming Brush',
+        quantity: 2,
+        unitPrice: 16.50,
+        size: 'Standard',
+        color: 'Teal',
+      },
+    ],
+    subtotalUsd: 67.95,
+    discountUsd: 13.59,
+    shippingUsd: 0.00,
+    totalUsd: 54.36,
+    appliedPromo: 'LING20 (20% OFF)',
+    estimatedTransit: '3–4 Business Days via USPS Ground Advantage',
+  };
+}
+
+export function getDemoOrderTrackingData(): TrackingEmailData {
+  return {
+    orderNumber: 'LP-STRIPE-DEMO99',
+    customerName: 'Sarah Jenkins',
+    customerEmail: 'sandbox-customer@lingpetshop.com',
+    trackingNumber: '9400111899562483921045',
+    carrier: 'USPS Ground Advantage',
+    trackingUrl: 'https://tools.usps.com/go/TrackConfirmAction?tLabels=9400111899562483921045',
+    shippingAddress: {
+      street: '742 Evergreen Terrace',
+      city: 'Austin',
+      state: 'TX',
+      zip: '78701',
+      country: 'United States',
+    },
+    items: [
+      {
+        name: 'Anti-Anxiety Calming Dog Bed',
+        quantity: 1,
+        size: 'Large (36")',
+        color: 'Plush Grey',
+      },
+      {
+        name: 'Professional Magic Pet Grooming Brush',
+        quantity: 2,
+        size: 'Standard',
+        color: 'Teal',
+      },
+    ],
+  };
+}
+
+/**
+ * Sends a sandboxed test email using demo data directly to the specified recipient via Resend
+ */
+export async function sendTestEmailDirect(
+  templateType: 'confirmation' | 'tracking',
+  recipient: string,
+  apiKey: string
+): Promise<EmailSendResult> {
+  const cleanKey = (apiKey || '').trim();
+  const cleanRecipient = (recipient || '').trim();
+
+  if (!cleanKey) {
+    return {
+      success: false,
+      status: 'not_configured',
+      error: 'Resend API Key is required.',
+    };
+  }
+
+  if (!cleanRecipient || !cleanRecipient.includes('@')) {
+    return {
+      success: false,
+      status: 'failed',
+      error: 'Valid recipient email address is required.',
+    };
+  }
+
+  const resend = new Resend(cleanKey);
+
+  if (templateType === 'confirmation') {
+    const data = getDemoOrderConfirmationData();
+    data.customerEmail = cleanRecipient;
+    const html = generateOrderConfirmationHtml(data);
+    const text = generateOrderConfirmationText(data);
+
+    try {
+      const response = await resend.emails.send({
+        from: EMAIL_CONFIG.defaultFrom,
+        to: cleanRecipient,
+        subject: '[DEMO SANDBOX] Your Ling Petshop Order Confirmation',
+        html,
+        text,
+      });
+
+      if (response?.error) {
+        return { success: false, status: 'failed', error: response.error.message };
+      }
+      return { success: true, status: 'sent', messageId: response.data?.id, recipient: cleanRecipient };
+    } catch (err: any) {
+      return { success: false, status: 'failed', error: err.message };
+    }
+  } else {
+    const data = getDemoOrderTrackingData();
+    data.customerEmail = cleanRecipient;
+    const html = generateOrderTrackingHtml(data);
+    const text = generateOrderTrackingText(data);
+
+    try {
+      const response = await resend.emails.send({
+        from: EMAIL_CONFIG.defaultFrom,
+        to: cleanRecipient,
+        subject: '[DEMO SANDBOX] Your Ling Petshop Order Has Shipped!',
+        html,
+        text,
+      });
+
+      if (response?.error) {
+        return { success: false, status: 'failed', error: response.error.message };
+      }
+      return { success: true, status: 'sent', messageId: response.data?.id, recipient: cleanRecipient };
+    } catch (err: any) {
+      return { success: false, status: 'failed', error: err.message };
+    }
+  }
+}
