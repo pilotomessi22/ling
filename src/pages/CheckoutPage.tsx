@@ -7,10 +7,8 @@ import {
   ArrowLeft,
   CreditCard,
   Package,
-  ExternalLink,
-  RotateCcw,
 } from 'lucide-react';
-import { CartItem, calculateOrderTotals, ShippingAddress, EXPRESS_SHIPPING_FEE } from '../utils/storeLogic.ts';
+import { CartItem, calculateOrderTotals, ShippingAddress } from '../utils/storeLogic.ts';
 import { formatCurrency } from '../utils/storeLogic.ts';
 import { US_STATES } from '../data/storeData.ts';
 import { getStateFromZip } from '../utils/shippingCalculator.ts';
@@ -43,25 +41,13 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
   });
 
   const [deliveryOption, setDeliveryOption] = useState<'usps_ground' | 'usps_priority'>('usps_ground');
-  const [paymentMethod, setPaymentMethod] = useState<'apple_pay' | 'klarna' | 'cash_app' | 'link_stripe'>('apple_pay');
+  const [paymentMethod, setPaymentMethod] = useState<'stripe_card' | 'apple_pay' | 'klarna' | 'paypal'>('stripe_card');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState('');
   const [confirmedPaidTotal, setConfirmedPaidTotal] = useState<number>(0);
   const [confirmedCustomerName, setConfirmedCustomerName] = useState<string>('');
   const [confirmedAddressText, setConfirmedAddressText] = useState<string>('');
-
-  // Live Stripe Configuration & Verification Check
-  const [stripeConfig] = useState(() => {
-    const pk = localStorage.getItem('ling_stripe_pk') || '';
-    const sk = localStorage.getItem('ling_stripe_sk') || '';
-    const isConfigured = Boolean(sk.trim());
-    return {
-      isConfigured,
-      isVerified: isConfigured,
-      isLive: sk.startsWith('sk_live_'),
-    };
-  });
 
   const hasOutOfStock = items.some((i) => i.stockCount === 0 || i.inStock === false);
 
@@ -85,110 +71,6 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
     } else {
       setAddress((prev) => ({ ...prev, zipCode: clean }));
     }
-  };
-
-  const playNotificationSound = () => {
-    try {
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.2);
-      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.6);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const handleFast1ClickTestPurchase = () => {
-    if (hasOutOfStock) {
-      alert('Não é possível concluir o pedido: um ou mais itens no seu carrinho estão esgotados no fornecedor Zendrop. Por favor, remova-os da sacola para continuar.');
-      return;
-    }
-    setIsSubmitting(true);
-    const amountToSave = finalTotal > 0 ? finalTotal : 498.95;
-    setConfirmedPaidTotal(amountToSave);
-    setConfirmedCustomerName(address.fullName || 'Express Customer');
-    setConfirmedAddressText(
-      address.streetAddress
-        ? `${address.streetAddress}, ${address.city}, ${address.state} ${address.zipCode}`
-        : 'United States Express Delivery Hub'
-    );
-
-    setTimeout(() => {
-      const generatedId = `LP-US-${Math.floor(100000 + Math.random() * 900000)}`;
-      setOrderId(generatedId);
-
-      try {
-        const existingOrdersRaw = localStorage.getItem('ling_admin_orders');
-        const existingOrders = existingOrdersRaw ? JSON.parse(existingOrdersRaw) : [];
-        const newAdminOrder = {
-          id: `ord-${Date.now()}`,
-          orderNumber: generatedId,
-          date: 'Hoje, agora mesmo',
-          customerName: address.fullName || 'Express Apple Pay Customer',
-          customerEmail: address.email || 'customer@lingpetshop.com',
-          customerPhone: address.phone || '+1 (555) 019-2831',
-          shippingAddress: {
-            street: (address.streetAddress || '102 Express Way') + (address.aptOrSuite ? `, ${address.aptOrSuite}` : ''),
-            city: address.city || 'Austin',
-            state: address.state || 'TX',
-            zip: address.zipCode || '78701',
-            country: 'United States',
-          },
-          items: items.length > 0 ? items.map((it) => ({
-            sku: it.sku,
-            name: it.name,
-            size: it.size,
-            color: it.color,
-            quantity: it.quantity,
-            unitPrice: it.price,
-            supplierCost: it.supplierCost,
-            supplier: 'Zendrop' as const,
-            supplierSku: it.sku,
-            supplierUrl: 'https://zendrop.com',
-          })) : [
-            {
-              sku: 'ZD-FEED-LOCKER-WHT',
-              name: 'PawHut Elevated Pet Feeder Station & Food Storage Locker Cabinet',
-              size: 'Standard',
-              color: 'White',
-              quantity: 1,
-              unitPrice: 498.95,
-              supplierCost: 174.46,
-              supplier: 'Zendrop' as const,
-              supplierSku: 'ZD-FEED-LOCKER-WHT',
-              supplierUrl: 'https://zendrop.com',
-            }
-          ],
-          totalUsd: amountToSave,
-          supplierCostUsd: 174.46,
-          profitUsd: Math.max(0, amountToSave - 174.46),
-          paymentGateway: 'Stripe (1-Click Apple Pay / Vault)',
-          paymentStatus: 'Paid',
-          fulfillmentStatus: 'Aguardando Despacho',
-          shippingMethod: deliveryOption === 'usps_priority' ? 'Express Delivery ($9.95 · 2 to 4 Days)' : 'Standard Delivery ($4.95 / Free · 3 to 5 Days)',
-          dispatchPriority: deliveryOption === 'usps_priority' ? 'urgent_2h' : 'standard_24h',
-        };
-
-        localStorage.setItem('ling_admin_orders', JSON.stringify([newAdminOrder, ...existingOrders]));
-        window.dispatchEvent(new Event('storage'));
-      } catch (err) {
-        console.error('Error saving order:', err);
-      }
-
-      playNotificationSound();
-      setIsSubmitting(false);
-      setOrderComplete(true);
-      onClearCart();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 800);
   };
 
   // Check Stripe return URL status and session_id on mount
@@ -217,7 +99,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
               const newAdminOrder = {
                 id: `ord-${Date.now()}`,
                 orderNumber: generatedId,
-                date: 'Hoje, agora mesmo',
+                date: 'Today, just now',
                 customerName: data.customer_email || 'Stripe Verified Customer',
                 customerEmail: data.customer_email || 'customer@lingpetshop.com',
                 customerPhone: '+1 (555) 019-2831',
@@ -234,7 +116,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                 profitUsd: data.amount_total || finalTotal,
                 paymentGateway: 'Stripe Official Hosted Checkout (USD)',
                 paymentStatus: 'Paid (Stripe Verified)',
-                fulfillmentStatus: 'Aguardando Despacho',
+                fulfillmentStatus: 'Awaiting Dispatch',
               };
               localStorage.setItem('ling_admin_orders', JSON.stringify([newAdminOrder, ...existingOrders]));
               window.dispatchEvent(new Event('storage'));
@@ -256,12 +138,19 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
     }
   }, []);
 
-  const handleSubmitOrder = async (e: React.FormEvent) => {
+  const handleCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (hasOutOfStock) {
-      alert('Não é possível concluir o pedido: um ou mais itens no seu carrinho estão esgotados no fornecedor Zendrop. Por favor, remova-os da sacola para continuar.');
+
+    if (!address.fullName || !address.email || !address.streetAddress || !address.city || !address.zipCode || !address.phone) {
+      alert('Por favor, preencha todos os campos obrigatórios de endereço e contato.');
       return;
     }
+
+    if (hasOutOfStock) {
+      alert('Não é possível concluir o pedido: um ou mais itens no carrinho estão esgotados no fornecedor Zendrop.');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const response = await fetch('/api/checkout/create-session', {
@@ -302,48 +191,45 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
 
           <div>
             <span className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">
-              Order Reservation Received
+              Order Confirmed & Paid
             </span>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0F2942] font-serif mt-1">
               Thank You, {confirmedCustomerName || address.fullName || "Valued Customer"}!
             </h1>
             <p className="text-sm text-[#64748B] mt-2 font-light">
-              Your order reservation <strong className="text-[#0F2942]">#{orderId}</strong> has been recorded in the store system.
+              Your order <strong className="text-[#0F2942]">#{orderId}</strong> has been successfully processed and verified via Stripe.
             </p>
           </div>
 
           <div className="p-6 rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] text-left space-y-3 text-xs">
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-[11px] leading-relaxed mb-1">
-              <strong>ℹ️ Note on Payment:</strong> Direct card processing is temporarily pending Stripe merchant account verification. No funds were charged or deducted. Your items have been reserved in our system.
-            </div>
             <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0]">
-              <span className="text-[#64748B]">USPS Dispatch Tracking:</span>
+              <span className="text-[#64748B]">USPS Tracking Number:</span>
               <strong className="text-[#2563EB] font-mono font-bold">9400 1118 9922 3849 10</strong>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-[#64748B]">Shipping To:</span>
+              <span className="text-[#64748B]">Shipping Address:</span>
               <span className="font-semibold text-[#0F2942]">
-                {confirmedAddressText || "United States Fulfillment Center"}
+                {address.streetAddress}, {address.city}, {address.state} {address.zipCode}
               </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-[#64748B]">Estimated Delivery:</span>
               <span className="font-semibold text-[#16A34A]">
-                {deliveryOption === 'usps_priority' ? '2 to 4 Days (Express Delivery)' : '3 to 5 Days (Standard Delivery)'}
+                {deliveryOption === 'usps_priority' ? '2 to 3 Business Days (Express)' : '3 to 5 Business Days (Ground)'}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-[#64748B]">Reserved Order Total:</span>
+              <span className="text-[#64748B]">Total Paid:</span>
               <span className="font-bold text-[#0F2942]">{formatCurrency(confirmedPaidTotal || finalTotal)}</span>
             </div>
           </div>
 
-          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <div className="pt-2 flex justify-center">
             <button
               onClick={onReturnToHome}
-              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#0F2942] hover:bg-[#1E3A8A] text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md"
+              className="px-8 py-3.5 rounded-full bg-[#0F2942] hover:bg-[#1E3A8A] text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md"
             >
-              Return to Home
+              Return to Store
             </button>
           </div>
         </div>
@@ -352,9 +238,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] pb-24">
-      {/* Checkout Navbar */}
-      <div className="border-b border-[#E2E8F0] bg-white py-6 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] pb-24 font-['Plus_Jakarta_Sans',sans-serif]">
+      {/* Minimalist Professional Header */}
+      <header className="bg-white border-b border-[#E2E8F0] py-5 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <button
             onClick={onReturnToCart}
@@ -363,71 +249,79 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
             <ArrowLeft size={14} />
             <span>Return to Bag</span>
           </button>
-          <div className="flex items-center gap-2 text-xs text-[#64748B]">
+          <div className="flex items-center gap-2">
+            <span className="text-base font-extrabold text-[#0F2942] tracking-tight font-serif">Ling Petshop</span>
+            <span className="text-xs bg-[#EFF6FF] text-[#2563EB] font-bold px-2.5 py-0.5 rounded-full border border-[#BFDBFE]">Secure Checkout</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-xs text-[#64748B]">
             <Lock size={13} className="text-[#16A34A]" />
-            <span className="font-medium">256-Bit SSL Encrypted Checkout</span>
+            <span className="font-medium hidden sm:inline">256-Bit SSL Encrypted</span>
           </div>
         </div>
-      </div>
+      </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        <form onSubmit={handleSubmitOrder} className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-          {/* Left 7 Columns: Form */}
+        <form onSubmit={handleCheckoutSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+          {/* Left Column: Shipping & Payment (7 cols) */}
           <div className="lg:col-span-7 space-y-8">
-            {/* Step 1: Contact & Shipping Address */}
-            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-[#E2E8F0] shadow-sm space-y-5">
+            {/* Shipping Address Card */}
+            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-[#E2E8F0] shadow-2xs space-y-5">
               <div className="flex items-center gap-3 pb-4 border-b border-[#F1F5F9]">
                 <div className="w-8 h-8 rounded-full bg-[#EFF6FF] text-[#2563EB] font-bold text-xs flex items-center justify-center">
                   1
                 </div>
                 <h2 className="text-lg font-bold font-serif text-[#0F2942]">
-                  Shipping Address (All 50 US States)
+                  US Shipping Address
                 </h2>
               </div>
 
               <div className="space-y-4 text-xs">
                 <div>
-                  <label className="block text-[#0F2942] font-semibold mb-1.5">Full Name</label>
+                  <label className="block text-[#0F2942] font-semibold mb-1.5">Full Name *</label>
                   <input
                     type="text"
                     required
+                    placeholder="e.g. Sarah Jenkins"
                     value={address.fullName}
                     onChange={(e) => setAddress({ ...address, fullName: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F2942] focus:outline-hidden focus:border-[#2563EB]"
+                    className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[#0F2942] font-semibold mb-1.5">Email Address</label>
+                    <label className="block text-[#0F2942] font-semibold mb-1.5">Email Address *</label>
                     <input
                       type="email"
                       required
+                      placeholder="sarah@example.com"
                       value={address.email}
                       onChange={(e) => setAddress({ ...address, email: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F2942] focus:outline-hidden focus:border-[#2563EB]"
+                      className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-[#0F2942] font-semibold mb-1.5">Phone (for USPS SMS updates)</label>
+                    <label className="block text-[#0F2942] font-semibold mb-1.5">Phone (USPS SMS) *</label>
                     <input
                       type="tel"
                       required
+                      placeholder="+1 (555) 000-0000"
                       value={address.phone}
                       onChange={(e) => setAddress({ ...address, phone: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F2942] focus:outline-hidden focus:border-[#2563EB]"
+                      className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[#0F2942] font-semibold mb-1.5">Street Address</label>
+                  <label className="block text-[#0F2942] font-semibold mb-1.5">Street Address *</label>
                   <input
                     type="text"
                     required
+                    placeholder="1402 S Congress Ave"
                     value={address.streetAddress}
                     onChange={(e) => setAddress({ ...address, streetAddress: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F2942] focus:outline-hidden focus:border-[#2563EB]"
+                    className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
                   />
                 </div>
 
@@ -436,27 +330,29 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                     <label className="block text-[#0F2942] font-semibold mb-1.5">Apt / Suite</label>
                     <input
                       type="text"
+                      placeholder="Apt 4B"
                       value={address.aptOrSuite}
                       onChange={(e) => setAddress({ ...address, aptOrSuite: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F2942] focus:outline-hidden focus:border-[#2563EB]"
+                      className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-[#0F2942] font-semibold mb-1.5">City</label>
+                    <label className="block text-[#0F2942] font-semibold mb-1.5">City *</label>
                     <input
                       type="text"
                       required
+                      placeholder="Austin"
                       value={address.city}
                       onChange={(e) => setAddress({ ...address, city: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F2942] focus:outline-hidden focus:border-[#2563EB]"
+                      className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-[#0F2942] font-semibold mb-1.5">State</label>
+                    <label className="block text-[#0F2942] font-semibold mb-1.5">State *</label>
                     <select
                       value={address.state}
                       onChange={(e) => setAddress({ ...address, state: e.target.value })}
-                      className="w-full px-3 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F2942] focus:outline-hidden focus:border-[#2563EB]"
+                      className="w-full px-3 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
                     >
                       {US_STATES.map((s) => (
                         <option key={s.code} value={s.code}>
@@ -468,21 +364,21 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                 </div>
 
                 <div className="w-full sm:w-1/3">
-                  <label className="block text-[#0F2942] font-semibold mb-1.5">ZIP Code</label>
+                  <label className="block text-[#0F2942] font-semibold mb-1.5">ZIP Code *</label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. 78701 or 90210"
+                    placeholder="78704"
                     value={address.zipCode}
                     onChange={(e) => handleZipChange(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F2942] focus:outline-hidden focus:border-[#2563EB]"
+                    className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
                   />
                 </div>
               </div>
             </div>
 
-            {/* Step 2: Delivery Option */}
-            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-[#E2E8F0] shadow-sm space-y-4">
+            {/* Shipping Method Card */}
+            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-[#E2E8F0] shadow-2xs space-y-4">
               <div className="flex items-center justify-between pb-4 border-b border-[#F1F5F9]">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-[#EFF6FF] text-[#2563EB] font-bold text-xs flex items-center justify-center">
@@ -492,19 +388,12 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                     Shipping Method
                   </h2>
                 </div>
-
                 {shippingDetails && (
                   <span className="text-[11px] font-bold text-[#2563EB] bg-[#EFF6FF] px-3 py-1 rounded-full border border-[#BFDBFE]">
-                    USPS Zona {shippingDetails.zone} ({shippingDetails.zoneName})
+                    USPS Zone {shippingDetails.zone}
                   </span>
                 )}
               </div>
-
-              {shippingDetails?.isRemote && (
-                <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl text-amber-900 text-xs flex items-center gap-2">
-                  <span>🏝️ <strong>Território / Ilha ({address.state}):</strong> Frete inclui sobretaxa aérea do USPS Zona 9 calculada para o destino.</span>
-                </div>
-              )}
 
               <div className="space-y-3">
                 <label
@@ -524,12 +413,8 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                       className="text-[#2563EB]"
                     />
                     <div>
-                      <p className="text-xs font-bold text-[#0F2942]">
-                        USPS Ground Advantage ({shippingDetails?.estimatedDays || '3 to 5 Days'})
-                      </p>
-                      <p className="text-[11px] text-[#64748B]">
-                        Tarifa precisa para {address.state} {address.zipCode ? `· CEP ${address.zipCode}` : ''}
-                      </p>
+                      <p className="text-xs font-bold text-[#0F2942]">USPS Ground Advantage (3 - 5 Business Days)</p>
+                      <p className="text-[11px] text-[#64748B]">Fast, tracked ground delivery across all 50 US states</p>
                     </div>
                   </div>
                   <span className="text-xs font-bold text-[#0F2942]">
@@ -558,8 +443,8 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                       className="text-[#2563EB]"
                     />
                     <div>
-                      <p className="text-xs font-bold text-[#0F2942]">USPS Priority Mail Express (1 to 3 Days)</p>
-                      <p className="text-[11px] text-[#64748B]">Despacho expresso prioritário em 24h para {address.state}</p>
+                      <p className="text-xs font-bold text-[#0F2942]">USPS Priority Mail Express (1 - 3 Business Days)</p>
+                      <p className="text-[11px] text-[#64748B]">Priority queue handling and expedited transit</p>
                     </div>
                   </div>
                   <span className="text-xs font-bold text-[#0F2942]">
@@ -569,9 +454,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
               </div>
             </div>
 
-            {/* Step 3: Payment Method (Full Stripe Multi-Gateway) */}
-            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-[#E2E8F0] shadow-sm space-y-5">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-[#F1F5F9]">
+            {/* Payment Method Card */}
+            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-[#E2E8F0] shadow-2xs space-y-5">
+              <div className="flex items-center justify-between pb-4 border-b border-[#F1F5F9]">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-[#EFF6FF] text-[#2563EB] font-bold text-xs flex items-center justify-center">
                     3
@@ -580,229 +465,134 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                     Payment Method
                   </h2>
                 </div>
-
-                <span className="text-[10px] bg-[#EFF6FF] text-[#2563EB] border border-[#BFDBFE] font-bold px-3 py-1 rounded-full flex items-center gap-1.5">
-                  <Lock size={12} className="text-[#16A34A]" />
-                  256-Bit SSL Encrypted Bank-Grade Security
-                </span>
+                <div className="flex items-center gap-1.5 text-[11px] font-bold text-[#16A34A]">
+                  <ShieldCheck size={14} />
+                  <span>Stripe Secured</span>
+                </div>
               </div>
 
               {hasOutOfStock && (
-                <div className="p-4 rounded-2xl bg-rose-50 border border-rose-300 text-rose-950 text-xs flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-full bg-rose-200 text-rose-800 font-black flex items-center justify-center flex-shrink-0 text-sm">
-                    ✕
-                  </span>
-                  <div>
-                    <span className="font-extrabold text-sm block text-rose-900">Itens Indisponíveis no Pedido</span>
-                    <span className="text-rose-700 text-[11px] leading-relaxed">
-                      O fornecedor Zendrop registrou estoque 0 para um ou mais produtos no carrinho. O checkout está bloqueado para proteger sua compra contra cancelamentos. Remova os itens esgotados para prosseguir.
-                    </span>
-                  </div>
+                <div className="p-4 rounded-2xl bg-rose-50 border border-rose-300 text-rose-950 text-xs">
+                  <strong>⚠️ Produtos Esgotados:</strong> Um ou mais itens no seu carrinho estão esgotados no fornecedor Zendrop. Remova-os para continuar.
                 </div>
               )}
 
-              {/* Express Checkout Bar */}
-              <div className="space-y-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] block">
-                  Express 1-Click Checkout:
-                </span>
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    type="button"
-                    disabled={hasOutOfStock}
-                    onClick={() => handleFast1ClickTestPurchase()}
-                    className={`py-3.5 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition-transform ${
-                      hasOutOfStock
-                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        : 'bg-black hover:bg-gray-800 text-white cursor-pointer active:scale-98 font-bold text-xs'
-                    }`}
-                  >
-                    <span className="text-sm"> Pay</span>
-                  </button>
-                  <button
-                    type="button"
-                    disabled={hasOutOfStock}
-                    onClick={() => handleFast1ClickTestPurchase()}
-                    className={`py-3.5 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition-transform ${
-                      hasOutOfStock
-                        ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
-                        : 'bg-white hover:bg-gray-50 border border-gray-300 text-gray-800 cursor-pointer active:scale-98 font-bold text-xs'
-                    }`}
-                  >
-                    <span className="text-sm font-black text-[#4285F4]">G</span>
-                    <span className="text-sm font-black text-[#EA4335]">o</span>
-                    <span className="text-sm font-black text-[#FBBC05]">o</span>
-                    <span className="text-sm font-black text-[#4285F4]">g</span>
-                    <span className="text-sm font-black text-[#34A853]">l</span>
-                    <span className="text-sm font-black text-[#EA4335]">e</span>
-                    <span className="text-xs font-bold text-gray-700 ml-0.5">Pay</span>
-                  </button>
-                  <button
-                    type="button"
-                    disabled={hasOutOfStock}
-                    onClick={() => handleFast1ClickTestPurchase()}
-                    className={`py-3.5 px-3 rounded-xl flex items-center justify-center gap-1 shadow-xs transition-transform ${
-                      hasOutOfStock
-                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        : 'bg-[#FFB3C7] hover:bg-[#ffa0b8] text-black font-extrabold text-xs cursor-pointer active:scale-98'
-                    }`}
-                  >
-                    <span>Klarna.</span>
-                  </button>
-                </div>
-                <div className="relative py-2 flex items-center justify-center">
-                  <div className="border-t border-[#E2E8F0] w-full" />
-                  <span className="bg-white px-3 text-[10px] font-bold uppercase tracking-wider text-[#94A3B8] absolute">
-                    EXPRESS GATEWAY PAYMENT
-                  </span>
-                </div>
-              </div>
+              <div className="space-y-3 text-xs">
+                <label
+                  onClick={() => setPaymentMethod('stripe_card')}
+                  className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${
+                    paymentMethod === 'stripe_card'
+                      ? 'border-[#2563EB] bg-[#EFF6FF]/60 ring-2 ring-[#2563EB]/20'
+                      : 'border-[#E2E8F0] hover:border-[#CBD5E1]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="radio"
+                      name="payment"
+                      checked={paymentMethod === 'stripe_card'}
+                      onChange={() => setPaymentMethod('stripe_card')}
+                      className="text-[#2563EB]"
+                    />
+                    <div>
+                      <p className="text-xs font-bold text-[#0F2942]">Credit / Debit Card (Stripe Hosted Checkout)</p>
+                      <p className="text-[11px] text-[#64748B]">Visa, Mastercard, American Express, Discover</p>
+                    </div>
+                  </div>
+                  <CreditCard size={18} className="text-[#2563EB]" />
+                </label>
 
-              {/* Stripe Notice Banner */}
-              <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl text-amber-900 text-xs space-y-1">
-                <div className="font-bold flex items-center gap-1.5 text-amber-950">
-                  <span>⚠️ Stripe Merchant Account Notice:</span>
-                </div>
-                <p className="text-[11px] leading-relaxed text-amber-800">
-                  Direct Credit Card entry has been disabled because merchant identity verification on Stripe is currently pending approval. Express checkout requests are recorded as reserved orders until your Stripe account is fully released.
-                </p>
-              </div>
+                <label
+                  onClick={() => setPaymentMethod('apple_pay')}
+                  className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${
+                    paymentMethod === 'apple_pay'
+                      ? 'border-[#2563EB] bg-[#EFF6FF]/60 ring-2 ring-[#2563EB]/20'
+                      : 'border-[#E2E8F0] hover:border-[#CBD5E1]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="radio"
+                      name="payment"
+                      checked={paymentMethod === 'apple_pay'}
+                      onChange={() => setPaymentMethod('apple_pay')}
+                      className="text-[#2563EB]"
+                    />
+                    <div>
+                      <p className="text-xs font-bold text-[#0F2942]">Apple Pay / Google Pay</p>
+                      <p className="text-[11px] text-[#64748B]">Instant 1-click checkout via Stripe</p>
+                    </div>
+                  </div>
+                  <span className="font-extrabold text-black"> Pay</span>
+                </label>
 
-              {/* Payment Selectors */}
-              <div className="space-y-2.5">
-
-                {/* Option 2: Klarna Buy Now Pay Later */}
                 <label
                   onClick={() => setPaymentMethod('klarna')}
-                  className={`p-4 rounded-2xl border cursor-pointer block transition-all ${
+                  className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${
                     paymentMethod === 'klarna'
-                      ? 'border-[#2563EB] bg-[#EFF6FF]/40 ring-2 ring-[#2563EB]/20'
+                      ? 'border-[#2563EB] bg-[#EFF6FF]/60 ring-2 ring-[#2563EB]/20'
                       : 'border-[#E2E8F0] hover:border-[#CBD5E1]'
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <input
-                        type="radio"
-                        name="pay_method"
-                        checked={paymentMethod === 'klarna'}
-                        onChange={() => setPaymentMethod('klarna')}
-                        className="text-[#2563EB]"
-                      />
-                      <div>
-                        <span className="text-xs font-bold text-[#0F2942]">Klarna / Afterpay (Buy Now, Pay Later)</span>
-                        <p className="text-[11px] text-[#64748B]">
-                          4 interest-free payments of <strong>${(finalTotal / 4).toFixed(2)}/mo</strong>
-                        </p>
-                      </div>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="radio"
+                      name="payment"
+                      checked={paymentMethod === 'klarna'}
+                      onChange={() => setPaymentMethod('klarna')}
+                      className="text-[#2563EB]"
+                    />
+                    <div>
+                      <p className="text-xs font-bold text-[#0F2942]">Klarna (Buy Now, Pay Later)</p>
+                      <p className="text-[11px] text-[#64748B]">4 interest-free payments of ${(finalTotal / 4).toFixed(2)}</p>
                     </div>
-                    <span className="px-2 py-0.5 rounded bg-[#FFB3C7] text-black font-extrabold text-[10px]">Klarna.</span>
                   </div>
-                </label>
-
-                {/* Option 3: 1-Click Express Vault Checkout */}
-                <label
-                  onClick={() => setPaymentMethod('link_stripe')}
-                  className={`p-4 rounded-2xl border cursor-pointer block transition-all ${
-                    paymentMethod === 'link_stripe'
-                      ? 'border-[#2563EB] bg-[#EFF6FF]/40 ring-2 ring-[#2563EB]/20'
-                      : 'border-[#E2E8F0] hover:border-[#CBD5E1]'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <input
-                        type="radio"
-                        name="pay_method"
-                        checked={paymentMethod === 'link_stripe'}
-                        onChange={() => setPaymentMethod('link_stripe')}
-                        className="text-[#2563EB]"
-                      />
-                      <div>
-                        <span className="text-xs font-bold text-[#0F2942]">1-Click Express Vault Checkout</span>
-                        <p className="text-[11px] text-[#64748B]">Auto-fill verified shipping & payment details</p>
-                      </div>
-                    </div>
-                    <span className="px-2 py-0.5 rounded bg-[#00D4B1] text-black font-black text-[10px]">Instant</span>
-                  </div>
-                </label>
-
-                {/* Option 4: Cash App Pay & PayPal */}
-                <label
-                  onClick={() => setPaymentMethod('cash_app')}
-                  className={`p-4 rounded-2xl border cursor-pointer block transition-all ${
-                    paymentMethod === 'cash_app'
-                      ? 'border-[#2563EB] bg-[#EFF6FF]/40 ring-2 ring-[#2563EB]/20'
-                      : 'border-[#E2E8F0] hover:border-[#CBD5E1]'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <input
-                        type="radio"
-                        name="pay_method"
-                        checked={paymentMethod === 'cash_app'}
-                        onChange={() => setPaymentMethod('cash_app')}
-                        className="text-[#2563EB]"
-                      />
-                      <div>
-                        <span className="text-xs font-bold text-[#0F2942]">Cash App Pay & PayPal US</span>
-                        <p className="text-[11px] text-[#64748B]">Pay instantly using $Cashtag or QR code</p>
-                      </div>
-                    </div>
-                    <span className="px-2 py-0.5 rounded bg-[#00D632] text-black font-black text-[10px]">$ Cash App</span>
-                  </div>
+                  <span className="px-2 py-0.5 rounded bg-[#FFB3C7] text-black font-extrabold text-[10px]">Klarna.</span>
                 </label>
               </div>
 
-              {/* Complete Order CTA */}
+              {/* Secure Checkout CTA */}
               <button
                 type="submit"
                 disabled={isSubmitting || items.length === 0 || hasOutOfStock}
-                className={`w-full py-4 rounded-full font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 mt-4 shadow-lg ${
+                className={`w-full py-4 rounded-full font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 mt-4 shadow-lg cursor-pointer ${
                   hasOutOfStock
-                    ? 'bg-slate-300 text-slate-500 cursor-not-allowed border border-slate-300'
-                    : 'bg-[#2563EB] hover:bg-[#1D4ED8] disabled:bg-[#94A3B8] text-white cursor-pointer active:scale-98'
+                    ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                    : 'bg-[#2563EB] hover:bg-[#1D4ED8] text-white active:scale-98 shadow-blue-500/25'
                 }`}
               >
                 {isSubmitting ? (
-                  <span>Authorizing secure payment...</span>
+                  <span>Connecting to Stripe Secure Checkout...</span>
                 ) : hasOutOfStock ? (
-                  <span>Remova Itens Esgotados para Concluir Pedido</span>
+                  <span>Remova Itens Esgotados</span>
                 ) : (
                   <>
                     <Lock size={15} />
-                    <span>Pay {formatCurrency(finalTotal)} & Complete Order</span>
+                    <span>Proceed to Stripe Secure Checkout · {formatCurrency(finalTotal)}</span>
                   </>
                 )}
               </button>
             </div>
           </div>
 
-          {/* Right 5 Columns: Order Summary Card */}
+          {/* Right Column: Order Summary (5 cols) */}
           <div className="lg:col-span-5 space-y-4">
-            <div className="bg-white p-6 sm:p-7 rounded-3xl border border-[#E2E8F0] shadow-sm space-y-4 sticky top-24">
+            <div className="bg-white p-6 sm:p-7 rounded-3xl border border-[#E2E8F0] shadow-2xs space-y-4 sticky top-24">
               <h2 className="text-base font-bold font-serif text-[#0F2942] pb-3 border-b border-[#F1F5F9]">
                 Order Summary ({items.reduce((a, c) => a + c.quantity, 0)} items)
               </h2>
 
-              <div className="max-h-64 overflow-y-auto divide-y divide-[#F1F5F9] pr-1">
-                {items.map((i) => {
-                  const isItemOut = i.stockCount === 0 || i.inStock === false;
-                  return (
-                    <div key={i.id} className="py-3 flex items-center gap-3">
-                      <img src={i.image} alt={i.name} className="w-12 h-12 rounded-xl object-cover border border-[#E2E8F0]" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-[#0F2942] truncate font-serif">{i.name}</p>
-                        <p className="text-[11px] text-[#64748B]">Qty: {i.quantity} {i.size ? `· ${i.size}` : ''}</p>
-                        {isItemOut && (
-                          <span className="text-[10px] font-bold text-rose-600 block mt-0.5">⚠️ Esgotado no fornecedor</span>
-                        )}
-                      </div>
-                      <span className="text-xs font-bold text-[#0F2942]">{formatCurrency(i.price * i.quantity)}</span>
+              <div className="max-h-72 overflow-y-auto divide-y divide-[#F1F5F9] pr-1">
+                {items.map((i) => (
+                  <div key={i.id} className="py-3 flex items-center gap-3">
+                    <img src={i.image} alt={i.name} className="w-12 h-12 rounded-xl object-cover border border-[#E2E8F0]" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-bold text-[#0F2942] truncate font-serif">{i.name}</p>
+                      <p className="text-[11px] text-[#64748B]">Qty: {i.quantity} {i.size ? `· ${i.size}` : ''}</p>
                     </div>
-                  );
-                })}
+                    <span className="text-xs font-bold text-[#0F2942]">{formatCurrency(i.price * i.quantity)}</span>
+                  </div>
+                ))}
               </div>
 
               <div className="space-y-2.5 text-xs text-[#64748B] pt-3 border-t border-[#F1F5F9]">
@@ -823,7 +613,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                   </span>
                 </div>
                 <div className="flex justify-between text-base font-black text-[#0F2942] pt-2 border-t border-[#E2E8F0]">
-                  <span>Total</span>
+                  <span>Total (USD)</span>
                   <span>{formatCurrency(finalTotal)}</span>
                 </div>
               </div>
@@ -832,11 +622,11 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
               <div className="p-4 rounded-2xl bg-[#EFF6FF] border border-[#BFDBFE] space-y-2 text-xs text-[#1E3A8A]">
                 <div className="flex items-center gap-2">
                   <ShieldCheck size={16} className="text-[#2563EB] flex-shrink-0" />
-                  <span className="font-bold">30-Day In-Home Risk-Free Trial Guarantee</span>
+                  <span className="font-bold">30-Day Risk-Free Guarantee</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Truck size={16} className="text-[#2563EB] flex-shrink-0" />
-                  <span>Ships within 24h via USPS Priority tracking</span>
+                  <span>USPS Fast-Tracked Shipping from US Hub</span>
                 </div>
               </div>
             </div>
