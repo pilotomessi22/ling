@@ -381,18 +381,19 @@ export default function App() {
                 alert(`O produto "${p.name}" está temporariamente esgotado no fornecedor Zendrop e indisponível para compra.`);
                 return;
               }
+              const defaultVariant = p.variants && p.variants.length > 0 ? p.variants[0] : null;
               handleAddToCart({
-                sku: p.sku,
+                sku: defaultVariant ? defaultVariant.sku : p.sku,
                 name: p.name,
                 price: p.price,
                 quantity: 1,
-                size: p.sizes ? p.sizes[0].name : 'Standard',
-                color: p.colors ? p.colors[0].name : 'Default',
+                size: defaultVariant?.size || (p.sizes ? p.sizes[0].name : ''),
+                color: defaultVariant?.color || (p.colors ? p.colors[0].name : ''),
                 isRepeatDelivery: false,
                 image: p.heroImage,
                 supplierCost: p.supplierCost,
-                stockCount: p.stockCount,
-                inStock: p.stockCount > 0,
+                stockCount: defaultVariant ? defaultVariant.inventory : p.stockCount,
+                inStock: (defaultVariant ? defaultVariant.inventory : p.stockCount) > 0,
                 productId: p.id,
               });
             }}

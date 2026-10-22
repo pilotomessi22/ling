@@ -9,6 +9,7 @@ import {
   RefreshCcw,
 } from 'lucide-react';
 import { CartItem, calculateOrderTotals, formatCurrency } from '../utils/storeLogic.ts';
+import { getStateFromZip, normalizeStateCode } from '../utils/shippingCalculator.ts';
 
 interface CheckoutPageProps {
   items: CartItem[];
@@ -33,8 +34,8 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
   const [address1, setAddress1] = useState('');
   const [address2, setAddress2] = useState('');
   const [city, setCity] = useState('');
-  const [state, setState] = useState('TX');
-  const [zip, setZip] = useState('78701');
+  const [state, setState] = useState('');
+  const [zip, setZip] = useState('');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
@@ -48,11 +49,11 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
     items,
     appliedPromo,
     'shipping',
-    state || 'FL',
-    zip || '33101',
+    state,
+    zip,
     'usps_ground'
   );
-  const { subtotal, shipping: shippingCost, total: finalTotal } = calc;
+  const { subtotal, shipping: shippingCost, total: finalTotal, isShippingCalculated, freeShippingQualified } = calc;
   const discount = calc.bundleDiscount + calc.repeatDeliverySavings + calc.promoDiscount;
 
   // Check Stripe return URL status and session_id on mount
@@ -175,12 +176,27 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
     } catch (e) {}
 
     if (hasOutOfStock) {
-      alert('Não é possível concluir o pedido: um ou mais itens no carrinho estão esgotados no fornecedor Zendrop.');
+      setCheckoutError('Não é possível concluir o pedido: um ou mais itens no carrinho estão esgotados no fornecedor Zendrop.');
       return;
     }
 
     if (items.length === 0) {
-      alert('Seu carrinho está vazio.');
+      setCheckoutError('Seu carrinho está vazio.');
+      return;
+    }
+
+    if (!customerEmail.trim()) {
+      setCheckoutError('Please provide your email address for order confirmation.');
+      return;
+    }
+
+    if (!freeShippingQualified && (!state.trim() || !zip.trim())) {
+      setCheckoutError('Please enter your shipping State and ZIP code to calculate USPS shipping before proceeding to payment.');
+      return;
+    }
+
+    if (!address1.trim() || !city.trim()) {
+      setCheckoutError('Please provide your complete shipping street address and city.');
       return;
     }
 
@@ -191,11 +207,11 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
     try {
       const customerName = `${firstName.trim()} ${lastName.trim()}`.trim() || 'Valued Customer';
       const shippingAddress = {
-        street: [address1, address2].filter(Boolean).join(', '),
-        city: city || 'Austin',
-        state: state || 'TX',
-        zip: zip || '78701',
-        country: country || 'United States',
+        street: [address1.trim(), address2.trim()].filter(Boolean).join(', '),
+        city: city.trim(),
+        state: state.trim().toUpperCase(),
+        zip: zip.trim(),
+        country: country.trim() || 'United States',
       };
 
       const temporaryOrderId = `LP-PENDING-${Date.now().toString().slice(-6)}`;
@@ -222,6 +238,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
           supplierUrl: `https://app.zendrop.com/product/${i.sku || '2000857'}`,
         })),
         totalUsd: finalTotal,
+        shippingUsd: shippingCost ?? 0,
+        discountUsd: discount,
+        appliedPromo: appliedPromo || '',
         supplierCostUsd: items.reduce((acc, i) => acc + (i.supplierCost || 5) * i.quantity, 0),
         profitUsd: finalTotal - items.reduce((acc, i) => acc + (i.supplierCost || 5) * i.quantity, 0),
         paymentGateway: 'Stripe (Credit Card / Apple Pay)',
@@ -249,6 +268,8 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
           shippingAddress,
           currency: 'usd',
           domainUrl: window.location.origin,
+          appliedPromo,
+          deliveryOption: 'usps_ground',
         }),
         signal: controller.signal,
       });
@@ -511,7 +532,11 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                     required
                     placeholder="TX"
                     value={state}
-                    onChange={(e) => setState(e.target.value)}
+                    onChange={(e) => setState(e.target.value.toUpperCase())}
+                    onBlur={(e) => {
+                      const normalized = normalizeStateCode(e.target.value);
+                      if (normalized) setState(normalized);
+                    }}
                     className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
                   />
                 </div>
@@ -522,7 +547,15 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                     required
                     placeholder="78701"
                     value={zip}
-                    onChange={(e) => setZip(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setZip(val);
+                      const clean = val.replace(/[^0-9]/g, '');
+                      if (clean.length >= 3) {
+                        const inferred = getStateFromZip(clean);
+                        if (inferred) setState(inferred);
+                      }
+                    }}
                     className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
                   />
                 </div>
@@ -562,12 +595,27 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                   <span>-{formatCurrency(discount)}</span>
                 </div>
               )}
-              <div className="flex justify-between text-[#64748B]">
-                <span>USPS Shipping</span>
-                <span className="font-bold text-[#16A34A]">FREE (US Hub)</span>
+              <div className="flex justify-between text-[#64748B] items-baseline">
+                <span>USPS Shipping {state.trim() ? `(${state.trim().toUpperCase()})` : ''}</span>
+                <span className="font-bold text-[#0F2942]">
+                  {shippingCost === 0 || freeShippingQualified ? (
+                    <span className="text-[#16A34A] font-bold">FREE</span>
+                  ) : shippingCost !== null ? (
+                    formatCurrency(shippingCost)
+                  ) : (
+                    <span className="text-[#64748B] italic font-normal text-xs">Enter ZIP to estimate</span>
+                  )}
+                </span>
               </div>
-              <div className="flex justify-between text-base font-black text-[#0F2942] pt-3 border-t border-[#E2E8F0]">
-                <span>Total to Pay (USD)</span>
+              <div className="flex justify-between text-base font-black text-[#0F2942] pt-3 border-t border-[#E2E8F0] items-baseline">
+                <div>
+                  <span className="block">{isShippingCalculated ? 'Total to Pay (USD)' : 'Estimated Total (USD)'}</span>
+                  {!isShippingCalculated && (
+                    <span className="text-[10px] text-[#64748B] font-normal block mt-0.5">
+                      Excludes shipping · Enter ZIP above
+                    </span>
+                  )}
+                </div>
                 <span>{formatCurrency(finalTotal)}</span>
               </div>
             </div>

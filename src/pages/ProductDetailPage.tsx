@@ -45,10 +45,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 }) => {
   const [activeImage, setActiveImage] = useState<string>(product.heroImage);
   const [selectedSize, setSelectedSize] = useState<string>(
-    product.sizes ? product.sizes[0].name : 'Standard'
+    product.sizes && product.sizes.length > 0 ? product.sizes[0].name : ''
   );
   const [selectedColor, setSelectedColor] = useState<string>(
-    product.colors ? product.colors[0].name : 'Original'
+    product.colors && product.colors.length > 0 ? product.colors[0].name : ''
   );
   const [purchaseType, setPurchaseType] = useState<'one-time' | 'repeat'>('one-time');
   const [quantity, setQuantity] = useState(1);
@@ -60,9 +60,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
     setActiveImage(product.heroImage);
     if (product.sizes && product.sizes.length > 0) {
       setSelectedSize(product.sizes[0].name);
+    } else {
+      setSelectedSize('');
     }
     if (product.colors && product.colors.length > 0) {
       setSelectedColor(product.colors[0].name);
+    } else {
+      setSelectedColor('');
     }
     setPurchaseType('one-time');
     setQuantity(1);
@@ -85,21 +89,34 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   const baseUnitPrice = purchaseType === 'repeat' ? repeatPrice : product.price * discountMultiplier;
   const effectivePrice = Number(baseUnitPrice.toFixed(2));
 
-  const isOutOfStock = product.stockCount === 0 || product.inStockAustin === false;
+  // Match exact variant from product.variants
+  const matchedVariant = product.variants?.find((v) => {
+    const matchSize = !product.sizes?.length || (v.size && v.size.trim().toLowerCase() === selectedSize.trim().toLowerCase()) || (!v.size && !selectedSize);
+    const matchColor = !product.colors?.length || (v.color && v.color.trim().toLowerCase() === selectedColor.trim().toLowerCase()) || (!v.color && !selectedColor);
+    return matchSize && matchColor;
+  }) || product.variants?.find((v) => {
+    if (selectedColor && v.color && v.color.trim().toLowerCase() === selectedColor.trim().toLowerCase()) return true;
+    if (selectedSize && v.size && v.size.trim().toLowerCase() === selectedSize.trim().toLowerCase()) return true;
+    return false;
+  });
+
+  const finalSku = matchedVariant?.sku || product.sku;
+  const variantInventory = matchedVariant ? matchedVariant.inventory : product.stockCount;
+  const isOutOfStock = product.stockCount === 0 || product.inStockAustin === false || (matchedVariant && variantInventory === 0);
 
   const handleAdd = () => {
     if (isOutOfStock) return;
     onAddToCart({
-      sku: `${product.sku}-${selectedSize.slice(0, 3).replace(/\s/g, '')}`,
+      sku: finalSku,
       name: product.name,
       price: effectivePrice,
       quantity,
-      size: selectedSize,
-      color: selectedColor,
+      size: selectedSize || '',
+      color: selectedColor || '',
       isRepeatDelivery: purchaseType === 'repeat',
       image: activeImage,
       supplierCost: product.supplierCost,
-      stockCount: product.stockCount,
+      stockCount: variantInventory,
       inStock: !isOutOfStock,
       productId: product.id,
     });
@@ -194,24 +211,17 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 )}
               </div>
 
-              {/* Real-time Central Warehouse Stock Banner */}
+              {/* Stock Availability Badge */}
               <div className="mt-3 pt-3 border-t border-[#F1F5F9]">
                 {isOutOfStock ? (
-                  <div className="bg-rose-50 border border-rose-200 p-3.5 rounded-2xl flex items-center gap-3 text-xs text-rose-800">
-                    <span className="w-7 h-7 rounded-full bg-rose-200 text-rose-800 font-black flex items-center justify-center flex-shrink-0 text-sm">
-                      ✕
-                    </span>
-                    <div>
-                      <span className="font-extrabold text-rose-950 block">Produto Temporariamente Indisponível</span>
-                      <span className="text-[11px] text-rose-700">
-                        Esgotado na Central Warehouse (0 unidades em estoque).
-                      </span>
-                    </div>
+                  <div className="flex items-center gap-2 text-xs text-rose-700 font-semibold bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-full w-fit">
+                    <span className="w-2 h-2 rounded-full bg-rose-500" />
+                    <span>Out of Stock</span>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2 text-xs text-emerald-800 font-bold bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full w-fit">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span>Em Estoque · {product.stockCount} unidades na Central Warehouse</span>
+                  <div className="flex items-center gap-2 text-xs text-emerald-800 font-semibold bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full w-fit">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                    <span>In Stock · Ready to Ship</span>
                   </div>
                 )}
               </div>
@@ -243,7 +253,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                       }`}
                     >
                       <div className="font-bold">{s.name}</div>
-                      <div className="text-[10px] text-[#64748B] mt-0.5">{s.weightLabel}</div>
+                      {s.weightLabel && !s.weightLabel.includes('US Hub') && (
+                        <div className="text-[10px] text-[#64748B] mt-0.5">{s.weightLabel}</div>
+                      )}
                     </button>
                   ))}
                 </div>

@@ -39,7 +39,14 @@ export const CartPage: React.FC<CartPageProps> = ({
   const [promoMsg, setPromoMsg] = useState<string | null>(null);
 
   const calc = calculateOrderTotals(items, appliedPromo);
-  const { subtotal, shipping, total, amountNeededForFreeShipping } = calc;
+  const {
+    subtotal,
+    shipping,
+    total,
+    amountNeededForFreeShipping,
+    freeShippingQualified,
+    isShippingCalculated,
+  } = calc;
   const discount = calc.bundleDiscount + calc.repeatDeliverySavings + calc.promoDiscount;
   const isFreeShipping = calc.freeShippingQualified;
 
@@ -249,16 +256,31 @@ export const CartPage: React.FC<CartPageProps> = ({
                     </div>
                   )}
 
-                  <div className="flex justify-between">
-                    <span>Estimated US Shipping</span>
+                  <div className="flex justify-between items-baseline">
+                    <span>Shipping</span>
                     <span className="font-bold text-[#0F2942]">
-                      {shipping === 0 ? <strong className="text-[#16A34A]">FREE</strong> : formatCurrency(shipping)}
+                      {freeShippingQualified || shipping === 0 ? (
+                        <strong className="text-[#16A34A]">FREE</strong>
+                      ) : shipping !== null ? (
+                        formatCurrency(shipping)
+                      ) : (
+                        <span className="text-[#64748B] font-normal text-xs italic">Calculated at checkout</span>
+                      )}
                     </span>
                   </div>
                 </div>
 
                 <div className="flex items-baseline justify-between pt-1">
-                  <span className="text-base font-bold text-[#0F2942]">Total</span>
+                  <div>
+                    <span className="text-base font-bold text-[#0F2942] block">
+                      {isShippingCalculated ? 'Total' : 'Estimated Total'}
+                    </span>
+                    {!isShippingCalculated && (
+                      <span className="text-[11px] text-[#64748B] font-normal">
+                        Excludes shipping · Calculated at checkout
+                      </span>
+                    )}
+                  </div>
                   <span className="text-2xl font-black text-[#0F2942] tracking-tight">
                     {formatCurrency(total)}
                   </span>

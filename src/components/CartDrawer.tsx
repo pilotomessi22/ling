@@ -54,6 +54,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
     promoDiscount,
     shipping,
     total,
+    isShippingCalculated,
     freeShippingQualified,
     amountNeededForFreeShipping,
     appliedPromo: activePromoLabel,
@@ -269,25 +270,31 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   </div>
                 )}
 
-                <div className="flex justify-between">
-                  <span>Estimated US Shipping</span>
-                  <span className="font-bold text-[#2C2724]">
-                    {shipping === 0 ? (
+                <div className="flex justify-between items-baseline">
+                  <span>Shipping</span>
+                  <span className="font-semibold text-[#2C2724]">
+                    {freeShippingQualified || shipping === 0 ? (
                       <span className="text-[#4E664D] font-bold">FREE</span>
-                    ) : (
+                    ) : shipping !== null ? (
                       formatCurrency(shipping)
+                    ) : (
+                      <span className="text-[#8E867C] font-normal text-[11px]">Calculated at checkout</span>
                     )}
                   </span>
                 </div>
 
                 <div className="pt-2 border-t border-[#E8E2D7] flex justify-between items-baseline">
-                  <span className="text-sm font-bold text-[#2C2724]">Total</span>
+                  <span className="text-sm font-bold text-[#2C2724]">
+                    {isShippingCalculated ? 'Total' : 'Estimated Total'}
+                  </span>
                   <div className="text-right">
                     <span className="text-xl font-black text-[#2C2724] tabular-nums">
                       {formatCurrency(total)}
                     </span>
                     <span className="block text-[10px] text-[#8E867C] font-medium">
-                      USPS Tracked Shipping included
+                      {isShippingCalculated
+                        ? (freeShippingQualified ? 'Free US Delivery' : 'USPS Tracked Shipping included')
+                        : 'Excludes shipping · Calculated at checkout'}
                     </span>
                   </div>
                 </div>

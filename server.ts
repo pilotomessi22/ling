@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { Resend } from 'resend';
 import Stripe from 'stripe';
+import { calculateOrderTotals } from './src/utils/storeLogic.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -448,7 +449,7 @@ const getStripeInstance = () => {
 const handleCreateCheckoutSession = async (req: Request, res: Response) => {
   console.log('[Stripe Diagnostic] POST /api/checkout/create-session called');
   try {
-    const { items, customerEmail, domainUrl, currency } = req.body;
+    const { items, customerEmail, domainUrl, currency, shippingAddress, appliedPromo, deliveryOption } = req.body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       console.warn('[Stripe Diagnostic] Cart items missing or empty');
@@ -465,6 +466,29 @@ const handleCreateCheckoutSession = async (req: Request, res: Response) => {
           item: item.name,
         });
       }
+    }
+
+    // Recalculate true order totals using the single source of truth
+    const destState = (shippingAddress?.state || '').trim().toUpperCase();
+    const destZip = (shippingAddress?.zip || '').trim();
+    const calc = calculateOrderTotals(
+      items,
+      appliedPromo,
+      'shipping',
+      destState,
+      destZip,
+      deliveryOption || 'usps_ground'
+    );
+    const { subtotal, shipping: shippingCost, total: finalOrderTotal, isShippingCalculated, freeShippingQualified } = calc;
+    const discount = calc.bundleDiscount + calc.repeatDeliverySavings + calc.promoDiscount;
+
+    // Enforce real address requirement if free shipping does not apply
+    if (!freeShippingQualified && !isShippingCalculated) {
+      console.warn('[Stripe Diagnostic] Attempt to create session without destination address for non-free shipping order.');
+      return res.status(400).json({
+        error: 'Shipping address (State and ZIP code) is required to calculate accurate shipping and initiate checkout.',
+        requiresAddress: true,
+      });
     }
 
     // Sanitize domainUrl (in case frontend sends literal 'null' or 'undefined')
@@ -510,17 +534,63 @@ const handleCreateCheckoutSession = async (req: Request, res: Response) => {
 
     const selectedCurrency = (currency || 'usd').toLowerCase();
 
-    const lineItems = items.map((item: any) => ({
-      price_data: {
-        currency: selectedCurrency,
-        unit_amount: Math.round((Number(item.price) || 10) * 100),
-        product_data: {
-          name: item.name || 'Pet Product',
-          images: item.image && typeof item.image === 'string' && item.image.startsWith('http') ? [item.image] : [],
+    // Calculate line items ensuring discounts are applied and totals match finalOrderTotal
+    const itemsTargetCents = Math.round(Math.max(0, subtotal - discount) * 100);
+    const rawItemsTotalCents = Math.round(subtotal * 100);
+
+    let allocatedCents = 0;
+    const lineItems: any[] = [];
+
+    items.forEach((item: any, idx: number) => {
+      const isLast = idx === items.length - 1;
+      const itemRawCents = Math.round((Number(item.price) || 0) * (Number(item.quantity) || 1) * 100);
+      let itemShareCents = 0;
+
+      if (rawItemsTotalCents > 0) {
+        if (isLast) {
+          itemShareCents = itemsTargetCents - allocatedCents;
+        } else {
+          itemShareCents = Math.round(itemsTargetCents * (itemRawCents / rawItemsTotalCents));
+          allocatedCents += itemShareCents;
+        }
+      } else {
+        itemShareCents = itemRawCents;
+      }
+
+      const qty = Math.max(1, Number(item.quantity) || 1);
+      const unitCents = Math.max(1, Math.round(itemShareCents / qty));
+
+      const variantDesc = [item.size ? `Size: ${item.size}` : null, item.color ? `Color: ${item.color}` : null]
+        .filter(Boolean)
+        .join(' / ');
+      const displayName = variantDesc ? `${item.name} (${variantDesc})` : (item.name || 'Pet Product');
+
+      lineItems.push({
+        price_data: {
+          currency: selectedCurrency,
+          unit_amount: unitCents,
+          product_data: {
+            name: displayName,
+            images: item.image && typeof item.image === 'string' && item.image.startsWith('http') ? [item.image] : [],
+          },
         },
-      },
-      quantity: Number(item.quantity) || 1,
-    }));
+        quantity: qty,
+      });
+    });
+
+    if (shippingCost !== null && shippingCost > 0) {
+      lineItems.push({
+        price_data: {
+          currency: selectedCurrency,
+          unit_amount: Math.round(shippingCost * 100),
+          product_data: {
+            name: `USPS Shipping ${destState ? `(${destState})` : ''} · Tracked US Delivery`.trim(),
+            images: [],
+          },
+        },
+        quantity: 1,
+      });
+    }
 
     let stripe;
     try {
@@ -533,7 +603,7 @@ const handleCreateCheckoutSession = async (req: Request, res: Response) => {
       });
     }
 
-    console.log(`[Stripe Diagnostic] Creating Stripe Checkout session with ${lineItems.length} line items...`);
+    console.log(`[Stripe Diagnostic] Creating Stripe Checkout session with ${lineItems.length} line items (total $${finalOrderTotal})...`);
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',
@@ -545,7 +615,18 @@ const handleCreateCheckoutSession = async (req: Request, res: Response) => {
         allowed_countries: ['US', 'BR', 'CA', 'GB', 'AU', 'FR', 'DE', 'IT', 'ES'],
       },
       metadata: {
-        itemsSummary: JSON.stringify(items.map((i: any) => ({ sku: i.sku || i.id, qty: i.quantity }))),
+        itemsSummary: JSON.stringify(items.map((i: any) => ({
+          sku: i.sku || i.id,
+          size: i.size || '',
+          color: i.color || '',
+          qty: i.quantity,
+        }))),
+        subtotalUsd: subtotal.toFixed(2),
+        discountUsd: discount.toFixed(2),
+        shippingUsd: (shippingCost ?? 0).toFixed(2),
+        finalTotalUsd: finalOrderTotal.toFixed(2),
+        appliedPromo: appliedPromo || '',
+        customerEmail: customerEmail || '',
       },
     } as any);
 

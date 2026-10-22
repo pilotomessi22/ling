@@ -88,6 +88,11 @@ export const ShopPage: React.FC<ShopPageProps> = ({
       alert(`O produto "${p.name}" está esgotado no fornecedor e indisponível para compra.`);
       return;
     }
+    // If product has options to choose from (sizes or colors), direct user to PDP to choose exact variant
+    if ((p.sizes && p.sizes.length > 1) || (p.colors && p.colors.length > 1)) {
+      onSelectProduct(p);
+      return;
+    }
     onQuickAdd(p, false);
     setAddedId(p.id);
     setTimeout(() => setAddedId(null), 1800);
@@ -308,7 +313,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                             ? 'bg-[#16A34A] text-white'
                             : 'bg-[#0F2942] hover:bg-[#2563EB] text-white'
                         }`}
-                        title="Quick Add to Bag"
+                        title={(p.sizes && p.sizes.length > 1) || (p.colors && p.colors.length > 1) ? "Select Size / Color" : "Quick Add to Bag"}
                       >
                         {isAdded ? <Check size={16} /> : <ShoppingBag size={15} />}
                       </button>

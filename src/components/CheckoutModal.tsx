@@ -19,6 +19,7 @@ import {
   formatCurrency,
   formatDropshippingOrderPayload,
 } from '../utils/storeLogic.ts';
+import { getStateFromZip } from '../utils/shippingCalculator.ts';
 import { US_STATES, PRODUCT_SUPPLIER_CATALOG } from '../data/storeData.ts';
 
 interface CheckoutModalProps {
@@ -41,7 +42,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     streetAddress: '',
     aptOrSuite: '',
     city: '',
-    state: 'FL',
+    state: '',
     zipCode: '',
     email: '',
     phone: '',
@@ -171,7 +172,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                         USPS Ground Advantage
                       </span>
                       <span className="text-xs font-black text-emerald-700">
-                        {baseCalculations.freeShippingQualified ? 'FREE' : '$4.95'}
+                        {baseCalculations.freeShippingQualified || shippingCost === 0
+                          ? 'FREE'
+                          : shippingCost !== null
+                          ? formatCurrency(shippingCost)
+                          : 'Enter ZIP'}
                       </span>
                     </div>
                     <p className="text-[11px] text-gray-500 mt-1">
@@ -277,8 +282,17 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       required
                       pattern="[0-9]{5}"
                       value={address.zipCode}
-                      onChange={(e) => setAddress({ ...address, zipCode: e.target.value })}
-                      placeholder="78704"
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        const clean = val.replace(/[^0-9]/g, '');
+                        const inferred = clean.length >= 3 ? getStateFromZip(clean) : null;
+                        setAddress({
+                          ...address,
+                          zipCode: val,
+                          ...(inferred ? { state: inferred } : {}),
+                        });
+                      }}
+                      placeholder="78701"
                       className="w-full p-2.5 rounded-lg border border-gray-300 focus:outline-none focus:border-[#002855]"
                     />
                   </div>
@@ -362,7 +376,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
                   <span className="font-bold text-gray-900">
-                    {shippingCost === 0 ? 'FREE' : formatCurrency(shippingCost)}
+                    {baseCalculations.freeShippingQualified || shippingCost === 0
+                      ? 'FREE'
+                      : shippingCost !== null
+                      ? formatCurrency(shippingCost)
+                      : 'Calculated at checkout'}
                   </span>
                 </div>
 

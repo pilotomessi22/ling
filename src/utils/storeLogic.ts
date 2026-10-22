@@ -80,19 +80,21 @@ export function getItemUnitPrice(
   return Number(total.toFixed(2));
 }
 
-import { calculatePreciseShipping, ShippingRateCalculation } from './shippingCalculator.ts';
+import { calculatePreciseShipping, type ShippingRateCalculation } from './shippingCalculator.ts';
 
 export interface OrderCalculationResult {
   subtotal: number;
   bundleDiscount: number;
   repeatDeliverySavings: number;
   promoDiscount: number;
-  shipping: number;
+  shipping: number | null;
   total: number;
+  isShippingCalculated: boolean;
   freeShippingQualified: boolean;
   amountNeededForFreeShipping: number;
   appliedPromo: string | null;
   totalEstimatedProfit: number;
+  shippingLabel: string;
   shippingDetails?: {
     zone: number;
     zoneName: string;
@@ -111,7 +113,7 @@ export function calculateOrderTotals(
   items: CartItem[],
   promoCode?: string | null,
   deliveryMethod?: string,
-  stateCode: string = 'FL',
+  stateCode: string = '',
   zipCode: string = '',
   deliveryOption: 'usps_ground' | 'usps_priority' = 'usps_ground'
 ): OrderCalculationResult {
@@ -157,16 +159,20 @@ export function calculateOrderTotals(
     appliedPromo = 'FREESHIP (FRETE GRÁTIS)';
   }
 
+  // Merchandise net value after promo coupon (for honest free shipping qualification)
+  const netMerchandiseTotal = Math.max(0, discountedSubtotal - promoDiscount);
+
   // Precise shipping calculation based on customer destination address (State & ZIP)
   const hasFreeShipCoupon = cleanPromo === 'FREESHIP';
   const shippingCalculation: ShippingRateCalculation = calculatePreciseShipping(
     stateCode,
     zipCode,
-    discountedSubtotal,
+    netMerchandiseTotal,
     deliveryOption,
     hasFreeShipCoupon
   );
 
+  const isShippingCalculated = items.length === 0 ? true : shippingCalculation.isCalculated;
   const shipping = items.length === 0 ? 0 : shippingCalculation.effectiveFee;
   const freeShippingQualified = shippingCalculation.freeShippingQualified;
 
@@ -186,13 +192,22 @@ export function calculateOrderTotals(
 
   const amountNeededForFreeShipping = Math.max(
     0,
-    Number((FREE_SHIPPING_THRESHOLD - discountedSubtotal).toFixed(2))
+    Number((FREE_SHIPPING_THRESHOLD - effectiveGoodsTotal).toFixed(2))
   );
 
-  const total = Number((effectiveGoodsTotal + shipping).toFixed(2));
+  const total = Number((effectiveGoodsTotal + (shipping !== null ? shipping : 0)).toFixed(2));
   const totalEstimatedProfit = Number(
     Math.max(0, effectiveGoodsTotal - totalBaseCostWithShipping).toFixed(2)
   );
+
+  let shippingLabel = 'Calculated at checkout';
+  if (items.length === 0) {
+    shippingLabel = '$0.00';
+  } else if (freeShippingQualified) {
+    shippingLabel = hasFreeShipCoupon ? 'FREE (FREESHIP Coupon)' : 'FREE (Orders $45+)';
+  } else if (isShippingCalculated && shipping !== null) {
+    shippingLabel = shippingCalculation.transitDescription;
+  }
 
   return {
     subtotal: Number(subtotal.toFixed(2)),
@@ -201,10 +216,12 @@ export function calculateOrderTotals(
     promoDiscount,
     shipping,
     total,
+    isShippingCalculated,
     freeShippingQualified,
     amountNeededForFreeShipping,
     appliedPromo,
     totalEstimatedProfit,
+    shippingLabel,
     shippingDetails: {
       zone: shippingCalculation.zone,
       zoneName: shippingCalculation.zoneName,

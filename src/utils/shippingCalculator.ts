@@ -8,12 +8,13 @@ export interface ShippingRateCalculation {
   zoneName: string;
   groundFee: number;
   priorityFee: number;
-  effectiveGroundFee: number; // Accounting for free shipping threshold
-  effectiveFee: number; // The fee for the selected deliveryOption
+  effectiveGroundFee: number | null; // null if address not provided and not qualified for free shipping
+  effectiveFee: number | null; // null if not yet calculated
   estimatedDays: string;
   isRemoteOrIslands: boolean;
   freeShippingQualified: boolean;
   transitDescription: string;
+  isCalculated: boolean;
 }
 
 // Contiguous US State Zone Mapping (relative to US Central/West Fulfillment Hubs)
@@ -80,6 +81,81 @@ const STATE_ZONE_MAP: Record<string, { zone: number; name: string; isRemote?: bo
   GU: { zone: 9, name: 'Guam Pacific Territory', isRemote: true },
   VI: { zone: 9, name: 'US Virgin Islands Territory', isRemote: true },
 };
+
+/**
+ * Complete map of US full state names and territories to 2-letter postal abbreviations
+ */
+export const US_STATE_NAME_TO_CODE: Record<string, string> = {
+  ALABAMA: 'AL',
+  ALASKA: 'AK',
+  ARIZONA: 'AZ',
+  ARKANSAS: 'AR',
+  CALIFORNIA: 'CA',
+  COLORADO: 'CO',
+  CONNECTICUT: 'CT',
+  DELAWARE: 'DE',
+  'DISTRICT OF COLUMBIA': 'DC',
+  FLORIDA: 'FL',
+  GEORGIA: 'GA',
+  HAWAII: 'HI',
+  IDAHO: 'ID',
+  ILLINOIS: 'IL',
+  INDIANA: 'IN',
+  IOWA: 'IA',
+  KANSAS: 'KS',
+  KENTUCKY: 'KY',
+  LOUISIANA: 'LA',
+  MAINE: 'ME',
+  MARYLAND: 'MD',
+  MASSACHUSETTS: 'MA',
+  MICHIGAN: 'MI',
+  MINNESOTA: 'MN',
+  MISSISSIPPI: 'MS',
+  MISSOURI: 'MO',
+  MONTANA: 'MT',
+  NEBRASKA: 'NE',
+  NEVADA: 'NV',
+  'NEW HAMPSHIRE': 'NH',
+  'NEW JERSEY': 'NJ',
+  'NEW MEXICO': 'NM',
+  'NEW YORK': 'NY',
+  'NORTH CAROLINA': 'NC',
+  'NORTH DAKOTA': 'ND',
+  OHIO: 'OH',
+  OKLAHOMA: 'OK',
+  OREGON: 'OR',
+  PENNSYLVANIA: 'PA',
+  'RHODE ISLAND': 'RI',
+  'SOUTH CAROLINA': 'SC',
+  'SOUTH DAKOTA': 'SD',
+  TENNESSEE: 'TN',
+  TEXAS: 'TX',
+  UTAH: 'UT',
+  VERMONT: 'VT',
+  VIRGINIA: 'VA',
+  WASHINGTON: 'WA',
+  'WEST VIRGINIA': 'WV',
+  WISCONSIN: 'WI',
+  WYOMING: 'WY',
+  'PUERTO RICO': 'PR',
+  GUAM: 'GU',
+  'VIRGIN ISLANDS': 'VI',
+};
+
+/**
+ * Normalizes state input to standard 2-letter USPS postal code
+ */
+export function normalizeStateCode(input: string = ''): string {
+  const clean = (input || '').trim().toUpperCase().replace(/[^A-Z\s]/g, '');
+  if (!clean) return '';
+  if (clean.length === 2 && STATE_ZONE_MAP[clean]) {
+    return clean;
+  }
+  if (US_STATE_NAME_TO_CODE[clean]) {
+    return US_STATE_NAME_TO_CODE[clean];
+  }
+  return clean;
+}
 
 /**
  * Infer state code from US 5-digit ZIP prefix if state is empty or needs auto-fill
@@ -149,82 +225,111 @@ export function getStateFromZip(zip: string): string | null {
  * Calculates exact USPS shipping rate based on customer destination address
  */
 export function calculatePreciseShipping(
-  stateCode: string = 'TX',
+  stateCode: string = '',
   zipCode: string = '',
   discountedSubtotal: number = 0,
   deliveryOption: 'usps_ground' | 'usps_priority' = 'usps_ground',
   hasFreeShippingCoupon: boolean = false
 ): ShippingRateCalculation {
-  const cleanState = (stateCode || '').trim().toUpperCase();
-  const inferredState = !cleanState && zipCode ? getStateFromZip(zipCode) : null;
-  const effectiveState = cleanState || inferredState || 'TX';
+  const cleanZip = (zipCode || '').replace(/[^0-9]/g, '');
+  const zipState = cleanZip.length >= 3 ? getStateFromZip(cleanZip) : null;
+  const normalizedState = normalizeStateCode(stateCode);
 
-  const zoneInfo = STATE_ZONE_MAP[effectiveState] || { zone: 4, name: 'Standard US Zone' };
+  // Authoritative USPS destination resolution:
+  // If a valid ZIP code is provided, its postal routing takes precedence.
+  // Otherwise, fallback to the normalized state code.
+  const effectiveState = zipState || (normalizedState && STATE_ZONE_MAP[normalizedState] ? normalizedState : normalizedState) || '';
+  const isAddressProvided = Boolean(effectiveState);
+
+  // Free shipping threshold for contiguous US is $45
+  const freeThreshold = 45.0;
+  const qualifiesForFreeShippingByAmount = discountedSubtotal >= freeThreshold;
+
+  const zoneInfo = effectiveState && STATE_ZONE_MAP[effectiveState]
+    ? STATE_ZONE_MAP[effectiveState]
+    : { zone: 4, name: isAddressProvided ? 'Standard US Zone' : 'Standard Shipping' };
   const isRemote = Boolean(zoneInfo.isRemote);
 
   let groundFee = 4.95;
   let priorityFee = 9.95;
-  let estimatedDays = '3–4 Business Days';
-  let transitDescription = `USPS Ground Advantage (${zoneInfo.name})`;
+  let estimatedDays = isAddressProvided ? '3–4 Business Days' : '3–4 Business Days (Estimated)';
+  let transitDescription = isAddressProvided
+    ? `USPS Ground Advantage (${zoneInfo.name})`
+    : 'Calculated at checkout';
 
-  switch (zoneInfo.zone) {
-    case 2:
-      // Local/Nearby
-      groundFee = 3.95;
-      priorityFee = 7.95;
-      estimatedDays = '2–3 Business Days';
-      transitDescription = `USPS Ground Advantage · ${zoneInfo.name} (Direct Dispatch)`;
-      break;
-    case 3:
-    case 4:
-    case 5:
-      // Moderate distance
-      groundFee = 4.95;
-      priorityFee = 9.95;
-      estimatedDays = '3–4 Business Days';
-      transitDescription = `USPS Ground Advantage · ${zoneInfo.name}`;
-      break;
-    case 6:
-    case 7:
-    case 8:
-      // Coast-to-Coast / Extended
-      groundFee = 5.95;
-      priorityFee = 11.95;
-      estimatedDays = '3–5 Business Days';
-      transitDescription = `USPS Ground Advantage · ${zoneInfo.name} (Coast to Coast)`;
-      break;
-    case 9:
-      // Non-contiguous (Alaska, Hawaii, Islands)
-      groundFee = 8.95;
-      priorityFee = 15.95;
-      estimatedDays = '4–7 Business Days';
-      transitDescription = `USPS Air Freight · ${zoneInfo.name} (Non-Contiguous)`;
-      break;
-    default:
-      groundFee = 4.95;
-      priorityFee = 9.95;
-      estimatedDays = '3–5 Business Days';
-      transitDescription = `USPS Ground Advantage (${effectiveState})`;
+  if (effectiveState) {
+    switch (zoneInfo.zone) {
+      case 2:
+        groundFee = 3.95;
+        priorityFee = 7.95;
+        estimatedDays = '2–3 Business Days';
+        transitDescription = `USPS Ground Advantage · ${zoneInfo.name}`;
+        break;
+      case 3:
+      case 4:
+      case 5:
+        groundFee = 4.95;
+        priorityFee = 9.95;
+        estimatedDays = '3–4 Business Days';
+        transitDescription = `USPS Ground Advantage · ${zoneInfo.name}`;
+        break;
+      case 6:
+      case 7:
+      case 8:
+        groundFee = 5.95;
+        priorityFee = 11.95;
+        estimatedDays = '3–5 Business Days';
+        transitDescription = `USPS Ground Advantage · ${zoneInfo.name}`;
+        break;
+      case 9:
+        groundFee = 8.95;
+        priorityFee = 15.95;
+        estimatedDays = '4–7 Business Days';
+        transitDescription = `USPS Air Freight · ${zoneInfo.name}`;
+        break;
+      default:
+        groundFee = 4.95;
+        priorityFee = 9.95;
+        estimatedDays = '3–5 Business Days';
+        transitDescription = `USPS Ground Advantage (${effectiveState})`;
+    }
   }
 
-  // Free shipping threshold for contiguous US is $45
-  const freeThreshold = 45.0;
   let freeShippingQualified = false;
-  let effectiveGroundFee = groundFee;
+  let effectiveGroundFee: number | null = null;
+  let isCalculated = false;
 
   if (hasFreeShippingCoupon) {
     freeShippingQualified = true;
     effectiveGroundFee = 0;
-  } else if (!isRemote && discountedSubtotal >= freeThreshold) {
+    isCalculated = true;
+    transitDescription = 'FREE (FREESHIP Coupon)';
+  } else if (!isRemote && qualifiesForFreeShippingByAmount) {
     freeShippingQualified = true;
     effectiveGroundFee = 0;
-  } else if (isRemote && discountedSubtotal >= freeThreshold) {
-    // For remote territories (AK/HI/PR), carriers require a reduced air surcharge of $4.95
+    isCalculated = true;
+    transitDescription = 'FREE (Orders $45+)';
+  } else if (isRemote && qualifiesForFreeShippingByAmount) {
     freeShippingQualified = true;
-    effectiveGroundFee = 4.95;
+    effectiveGroundFee = 4.95; // reduced air surcharge for remote non-contiguous
+    isCalculated = true;
+    transitDescription = `USPS Reduced Air · ${zoneInfo.name}`;
+  } else if (isAddressProvided) {
+    // Address provided and order < $45
+    effectiveGroundFee = groundFee;
+    isCalculated = true;
+  } else {
+    // No address provided and not qualified for free shipping
+    effectiveGroundFee = null;
+    isCalculated = false;
+    transitDescription = 'Calculated at checkout';
   }
 
-  const effectiveFee = deliveryOption === 'usps_priority' ? priorityFee : effectiveGroundFee;
+  const effectiveFee: number | null = !isCalculated
+    ? null
+    : deliveryOption === 'usps_priority'
+    ? priorityFee
+    : effectiveGroundFee;
 
   return {
     zone: zoneInfo.zone,
@@ -240,5 +345,6 @@ export function calculatePreciseShipping(
       deliveryOption === 'usps_priority'
         ? `USPS Priority Express (1–3 Days · Tracked Air)`
         : transitDescription,
+    isCalculated,
   };
 }

@@ -1,3 +1,12 @@
+import zendropInventory from './zendrop_real_inventory.json';
+
+export interface ProductVariant {
+  sku: string;
+  color?: string | null;
+  size?: string | null;
+  inventory: number;
+}
+
 export interface SupplierAgent {
   id: string;
   name: string;
@@ -72,6 +81,7 @@ export interface Product {
   keyFeatures: string[];
   specifications: ProductSpecifications;
   volumeTiers: ProductVolumePricing[];
+  variants?: ProductVariant[];
   sizes?: { name: string; weightLabel: string }[];
   colors?: { name: string; hex: string; class: string }[];
   addOns?: { name: string; price: number; description: string }[];
@@ -139,7 +149,7 @@ export const SUPPLIER_AGENTS: SupplierAgent[] = [
 ];
 
 // Complete 34 Aligned Zendrop Product Catalog with 60% Margin & Real-Time Stock Tracking
-export const DEFAULT_REAL_PRODUCTS: Product[] = [
+const RAW_DEFAULT_REAL_PRODUCTS: Product[] = [
   {
     "id": "ultimate-pet-cleanup-kit",
     "sku": "KIT-CLEANUP-3IN1",
@@ -3171,6 +3181,63 @@ export const DEFAULT_REAL_PRODUCTS: Product[] = [
   }
 ];
 
+export function getColorHex(colorName: string): string {
+  const c = colorName.toLowerCase();
+  if (c.includes('blue') || c.includes('cyan') || c.includes('navy')) return '#3B82F6';
+  if (c.includes('orange')) return '#F97316';
+  if (c.includes('green') || c.includes('olive') || c.includes('mint')) return '#22C55E';
+  if (c.includes('grey') || c.includes('gray')) return '#64748B';
+  if (c.includes('yellow')) return '#EAB308';
+  if (c.includes('red') || c.includes('crimson')) return '#EF4444';
+  if (c.includes('pink') || c.includes('rose')) return '#EC4899';
+  if (c.includes('purple') || c.includes('violet')) return '#8B5CF6';
+  if (c.includes('coffee') || c.includes('brown')) return '#78350F';
+  if (c.includes('black') || c.includes('dark')) return '#1E293B';
+  if (c.includes('white') || c.includes('cream')) return '#F8FAFC';
+  return '#94A3B8';
+}
+
+export const DEFAULT_REAL_PRODUCTS: Product[] = RAW_DEFAULT_REAL_PRODUCTS.map((p) => {
+  const rawId = p.id.replace('zendrop-', '');
+  const zData = (zendropInventory as any)[rawId] || (zendropInventory as any)[p.id];
+  if (!zData || !Array.isArray(zData.variants) || zData.variants.length === 0) {
+    return p;
+  }
+
+  const realVariants: ProductVariant[] = zData.variants.map((v: any) => ({
+    sku: v.sku,
+    color: v.color ? v.color.trim() : null,
+    size: v.size ? v.size.trim() : null,
+    inventory: Number(v.inventory) || 0,
+  }));
+
+  const uniqueSizes = Array.from(
+    new Set(realVariants.map((v) => v.size).filter(Boolean) as string[])
+  ).map((name) => ({
+    name,
+    weightLabel: 'In Stock (US Hub)',
+  }));
+
+  const uniqueColors = Array.from(
+    new Set(realVariants.map((v) => v.color).filter(Boolean) as string[])
+  ).map((name) => ({
+    name,
+    hex: getColorHex(name),
+    class: '',
+  }));
+
+  const totalStock = typeof zData.totalStock === 'number' ? zData.totalStock : p.stockCount;
+
+  return {
+    ...p,
+    variants: realVariants,
+    sizes: uniqueSizes.length > 0 ? uniqueSizes : p.sizes,
+    colors: uniqueColors.length > 0 ? uniqueColors : p.colors,
+    stockCount: totalStock,
+    inStockAustin: totalStock > 0,
+  };
+});
+
 export const PRODUCT_SUPPLIER_CATALOG: Record<string, any> = {};
 
 export const PRODUCTS: Product[] = DEFAULT_REAL_PRODUCTS;
@@ -3178,10 +3245,10 @@ export const PRODUCTS: Product[] = DEFAULT_REAL_PRODUCTS;
 export function getSavedProducts(): Product[] {
   if (typeof window === 'undefined') return DEFAULT_REAL_PRODUCTS;
   try {
-    // Reset to load official catalog including The Ultimate Pet Cleanup Kit campaign bundle
-    if (!localStorage.getItem('ling_catalog_zendrop_aligned_v38_clean_cards')) {
+    // Reset to load official catalog including real Zendrop variants and inventory
+    if (!localStorage.getItem('ling_catalog_zendrop_aligned_v42_real_variants')) {
       localStorage.setItem('ling_admin_products', JSON.stringify(DEFAULT_REAL_PRODUCTS));
-      localStorage.setItem('ling_catalog_zendrop_aligned_v38_clean_cards', 'true');
+      localStorage.setItem('ling_catalog_zendrop_aligned_v42_real_variants', 'true');
       return DEFAULT_REAL_PRODUCTS;
     }
     const saved = localStorage.getItem('ling_admin_products');
@@ -3190,16 +3257,14 @@ export function getSavedProducts(): Product[] {
       if (Array.isArray(parsed) && parsed.length > 0) {
         return parsed.map((p) => {
           const fresh = DEFAULT_REAL_PRODUCTS.find((def) => def.id === p.id);
-          if (
-            fresh &&
-            (p.isCampaignBundle ||
-              p.id === 'ultimate-pet-cleanup-kit' ||
-              p.id === 'zendrop-1603576' ||
-              p.id === 'zendrop-2053714' ||
-              p.id === 'zendrop-2058716')
-          ) {
+          if (fresh) {
             return {
               ...p,
+              variants: fresh.variants,
+              sizes: fresh.sizes,
+              colors: fresh.colors,
+              stockCount: fresh.stockCount,
+              inStockAustin: fresh.inStockAustin,
               price: fresh.price,
               compareAt: fresh.compareAt,
               netProfit: fresh.netProfit,
