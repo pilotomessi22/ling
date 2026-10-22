@@ -5,13 +5,10 @@ import {
   ShieldCheck,
   CheckCircle2,
   ArrowLeft,
-  CreditCard,
-  Package,
+  ShoppingBag,
+  RefreshCcw,
 } from 'lucide-react';
-import { CartItem, calculateOrderTotals, ShippingAddress } from '../utils/storeLogic.ts';
-import { formatCurrency } from '../utils/storeLogic.ts';
-import { US_STATES } from '../data/storeData.ts';
-import { getStateFromZip } from '../utils/shippingCalculator.ts';
+import { CartItem, calculateOrderTotals, formatCurrency } from '../utils/storeLogic.ts';
 
 interface CheckoutPageProps {
   items: CartItem[];
@@ -28,26 +25,12 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
   onReturnToCart,
   onReturnToHome,
 }) => {
-  const [address, setAddress] = useState<ShippingAddress>({
-    fullName: '',
-    streetAddress: '',
-    aptOrSuite: '',
-    city: '',
-    state: 'FL',
-    zipCode: '',
-    email: '',
-    phone: '',
-    deliveryMethod: 'shipping',
-  });
-
-  const [deliveryOption, setDeliveryOption] = useState<'usps_ground' | 'usps_priority'>('usps_ground');
-  const [paymentMethod, setPaymentMethod] = useState<'stripe_card' | 'apple_pay' | 'klarna' | 'paypal'>('stripe_card');
+  const [customerEmail, setCustomerEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState('');
   const [confirmedPaidTotal, setConfirmedPaidTotal] = useState<number>(0);
-  const [confirmedCustomerName, setConfirmedCustomerName] = useState<string>('');
-  const [confirmedAddressText, setConfirmedAddressText] = useState<string>('');
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   const hasOutOfStock = items.some((i) => i.stockCount === 0 || i.inStock === false);
 
@@ -55,23 +38,12 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
     items,
     appliedPromo,
     'shipping',
-    address.state,
-    address.zipCode,
-    deliveryOption
+    'FL',
+    '33101',
+    'usps_ground'
   );
-  const { subtotal, shipping: shippingCost, total: finalTotal, shippingDetails } = calc;
+  const { subtotal, shipping: shippingCost, total: finalTotal } = calc;
   const discount = calc.bundleDiscount + calc.repeatDeliverySavings + calc.promoDiscount;
-
-  const handleZipChange = (val: string) => {
-    const clean = val.replace(/[^0-9-]/g, '').slice(0, 10);
-    const prefix5 = clean.slice(0, 5);
-    const autoState = prefix5.length === 5 ? getStateFromZip(prefix5) : null;
-    if (autoState) {
-      setAddress((prev) => ({ ...prev, zipCode: clean, state: autoState }));
-    } else {
-      setAddress((prev) => ({ ...prev, zipCode: clean }));
-    }
-  };
 
   // Check Stripe return URL status and session_id on mount
   useEffect(() => {
@@ -81,15 +53,17 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
 
     if (status === 'success' && sessionId) {
       setIsSubmitting(true);
-      fetch(`/api/checkout/session/${sessionId}`)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+      fetch(`/api/checkout/session/${sessionId}`, { signal: controller.signal })
         .then((res) => res.json())
         .then((data) => {
           if (data.payment_status === 'paid' || data.status === 'complete') {
             const generatedId = `LP-STRIPE-${sessionId.slice(-6).toUpperCase()}`;
             setOrderId(generatedId);
             setConfirmedPaidTotal(data.amount_total || finalTotal);
-            setConfirmedCustomerName(data.customer_email || 'Stripe Customer');
-            setConfirmedAddressText('United States Express Delivery Hub');
+            setCustomerEmail(data.customer_email || 'customer@lingpetshop.com');
             setOrderComplete(true);
             onClearCart();
 
@@ -124,44 +98,53 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
               console.error(e);
             }
           } else {
-            alert('Pagamento ainda não confirmado pela Stripe.');
+            setCheckoutError('Pagamento ainda não confirmado pela Stripe.');
           }
         })
         .catch((err) => {
           console.error('Error verifying Stripe session:', err);
+          if (err.name === 'AbortError') {
+            setCheckoutError('A verificação da sessão demorou muito. Verifique seu extrato ou tente novamente.');
+          }
         })
         .finally(() => {
+          clearTimeout(timeoutId);
           setIsSubmitting(false);
         });
     } else if (status === 'cancelled') {
-      alert('Checkout cancelado. Seus itens continuam salvos na sacola.');
+      setCheckoutError('Checkout cancelado. Seus itens continuam salvos na sacola.');
     }
   }, []);
 
   const handleCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!address.fullName || !address.email || !address.streetAddress || !address.city || !address.zipCode || !address.phone) {
-      alert('Por favor, preencha todos os campos obrigatórios de endereço e contato.');
-      return;
-    }
+    setCheckoutError(null);
 
     if (hasOutOfStock) {
       alert('Não é possível concluir o pedido: um ou mais itens no carrinho estão esgotados no fornecedor Zendrop.');
       return;
     }
 
+    if (items.length === 0) {
+      alert('Seu carrinho está vazio.');
+      return;
+    }
+
     setIsSubmitting(true);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
     try {
       const response = await fetch('/api/checkout/create-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           items,
-          customerEmail: address.email,
+          customerEmail: customerEmail || undefined,
           currency: 'usd',
           domainUrl: window.location.origin,
         }),
+        signal: controller.signal,
       });
 
       const data = await response.json();
@@ -172,12 +155,18 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
       if (data.url) {
         window.location.href = data.url;
       } else {
-        throw new Error('URL de checkout da Stripe não retornada.');
+        throw new Error('URL de checkout da Stripe não retornada pelo servidor.');
       }
     } catch (err: any) {
       console.error('Checkout error:', err);
-      alert(err.message || 'Erro ao processar checkout com Stripe.');
+      if (err.name === 'AbortError') {
+        setCheckoutError('A requisição para o servidor excedeu o tempo limite. Verifique sua conexão e tente novamente.');
+      } else {
+        setCheckoutError(err.message || 'Erro ao processar checkout com Stripe.');
+      }
       setIsSubmitting(false);
+    } finally {
+      clearTimeout(timeoutId);
     }
   };
 
@@ -194,10 +183,10 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
               Order Confirmed & Paid
             </span>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0F2942] font-serif mt-1">
-              Thank You, {confirmedCustomerName || address.fullName || "Valued Customer"}!
+              Thank You for Your Order!
             </h1>
             <p className="text-sm text-[#64748B] mt-2 font-light">
-              Your order <strong className="text-[#0F2942]">#{orderId}</strong> has been successfully processed and verified via Stripe.
+              Your order <strong className="text-[#0F2942]">#{orderId}</strong> has been successfully processed and verified via Stripe. A confirmation email has been sent to <span className="text-[#2563EB] font-semibold">{customerEmail}</span>.
             </p>
           </div>
 
@@ -207,16 +196,12 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
               <strong className="text-[#2563EB] font-mono font-bold">9400 1118 9922 3849 10</strong>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-[#64748B]">Shipping Address:</span>
-              <span className="font-semibold text-[#0F2942]">
-                {address.streetAddress}, {address.city}, {address.state} {address.zipCode}
-              </span>
+              <span className="text-[#64748B]">Fulfillment:</span>
+              <span className="font-semibold text-[#0F2942]">United States Express Delivery Hub (Zendrop US Warehouse)</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-[#64748B]">Estimated Delivery:</span>
-              <span className="font-semibold text-[#16A34A]">
-                {deliveryOption === 'usps_priority' ? '2 to 3 Business Days (Express)' : '3 to 5 Business Days (Ground)'}
-              </span>
+              <span className="font-semibold text-[#16A34A]">3 to 5 Business Days (USPS Ground)</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-[#64748B]">Total Paid:</span>
@@ -237,6 +222,30 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
     );
   }
 
+  if (items.length === 0 && !isSubmitting) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] py-16 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+        <div className="max-w-md w-full bg-white rounded-3xl border border-[#E2E8F0] shadow-xl p-8 text-center space-y-6">
+          <div className="w-16 h-16 rounded-2xl bg-[#EFF6FF] text-[#2563EB] flex items-center justify-center mx-auto">
+            <ShoppingBag size={28} />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold font-serif text-[#0F2942]">Your Bag is Empty</h1>
+            <p className="text-xs text-[#64748B] mt-2 font-light">
+              There are no items in your shopping bag to checkout. Add some pet essentials first!
+            </p>
+          </div>
+          <button
+            onClick={onReturnToCart}
+            className="w-full py-3.5 rounded-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md"
+          >
+            Return to Bag
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] pb-24 font-['Plus_Jakarta_Sans',sans-serif]">
       {/* Minimalist Professional Header */}
@@ -251,7 +260,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
           </button>
           <div className="flex items-center gap-2">
             <span className="text-base font-extrabold text-[#0F2942] tracking-tight font-serif">Ling Petshop</span>
-            <span className="text-xs bg-[#EFF6FF] text-[#2563EB] font-bold px-2.5 py-0.5 rounded-full border border-[#BFDBFE]">Secure Checkout</span>
+            <span className="text-xs bg-[#EFF6FF] text-[#2563EB] font-bold px-2.5 py-0.5 rounded-full border border-[#BFDBFE]">Stripe Hosted Checkout</span>
           </div>
           <div className="flex items-center gap-1.5 text-xs text-[#64748B]">
             <Lock size={13} className="text-[#16A34A]" />
@@ -260,374 +269,168 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        <form onSubmit={handleCheckoutSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-          {/* Left Column: Shipping & Payment (7 cols) */}
-          <div className="lg:col-span-7 space-y-8">
-            {/* Shipping Address Card */}
-            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-[#E2E8F0] shadow-2xs space-y-5">
-              <div className="flex items-center gap-3 pb-4 border-b border-[#F1F5F9]">
-                <div className="w-8 h-8 rounded-full bg-[#EFF6FF] text-[#2563EB] font-bold text-xs flex items-center justify-center">
-                  1
-                </div>
-                <h2 className="text-lg font-bold font-serif text-[#0F2942]">
-                  US Shipping Address
-                </h2>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
+        <form onSubmit={handleCheckoutSubmit} className="space-y-8">
+          {/* Order Summary & Stripe Secure Checkout Card */}
+          <div className="bg-white p-6 sm:p-10 rounded-3xl border border-[#E2E8F0] shadow-sm space-y-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 border-b border-[#E2E8F0] gap-4">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-widest text-[#2563EB]">Secure Payment Gateway</span>
+                <h1 className="text-2xl sm:text-3xl font-extrabold font-serif text-[#0F2942] mt-0.5">
+                  Complete Your Purchase with Stripe
+                </h1>
+                <p className="text-xs text-[#64748B] mt-1">
+                  You will be securely redirected to Stripe's official checkout page to enter your shipping address and payment details.
+                </p>
               </div>
-
-              <div className="space-y-4 text-xs">
-                <div>
-                  <label className="block text-[#0F2942] font-semibold mb-1.5">Full Name *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Sarah Jenkins"
-                    value={address.fullName}
-                    onChange={(e) => setAddress({ ...address, fullName: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[#0F2942] font-semibold mb-1.5">Email Address *</label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="sarah@example.com"
-                      value={address.email}
-                      onChange={(e) => setAddress({ ...address, email: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[#0F2942] font-semibold mb-1.5">Phone (USPS SMS) *</label>
-                    <input
-                      type="tel"
-                      required
-                      placeholder="+1 (555) 000-0000"
-                      value={address.phone}
-                      onChange={(e) => setAddress({ ...address, phone: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[#0F2942] font-semibold mb-1.5">Street Address *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="1402 S Congress Ave"
-                    value={address.streetAddress}
-                    onChange={(e) => setAddress({ ...address, streetAddress: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label className="block text-[#0F2942] font-semibold mb-1.5">Apt / Suite</label>
-                    <input
-                      type="text"
-                      placeholder="Apt 4B"
-                      value={address.aptOrSuite}
-                      onChange={(e) => setAddress({ ...address, aptOrSuite: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[#0F2942] font-semibold mb-1.5">City *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Austin"
-                      value={address.city}
-                      onChange={(e) => setAddress({ ...address, city: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[#0F2942] font-semibold mb-1.5">State *</label>
-                    <select
-                      value={address.state}
-                      onChange={(e) => setAddress({ ...address, state: e.target.value })}
-                      className="w-full px-3 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
-                    >
-                      {US_STATES.map((s) => (
-                        <option key={s.code} value={s.code}>
-                          {s.name} ({s.code})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="w-full sm:w-1/3">
-                  <label className="block text-[#0F2942] font-semibold mb-1.5">ZIP Code *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="78704"
-                    value={address.zipCode}
-                    onChange={(e) => handleZipChange(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
-                  />
-                </div>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#EFF6FF] border border-[#BFDBFE] text-[#2563EB] text-xs font-bold">
+                <ShieldCheck size={16} />
+                <span>Stripe Verified</span>
               </div>
             </div>
 
-            {/* Shipping Method Card */}
-            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-[#E2E8F0] shadow-2xs space-y-4">
-              <div className="flex items-center justify-between pb-4 border-b border-[#F1F5F9]">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#EFF6FF] text-[#2563EB] font-bold text-xs flex items-center justify-center">
-                    2
-                  </div>
-                  <h2 className="text-lg font-bold font-serif text-[#0F2942]">
-                    Shipping Method
-                  </h2>
-                </div>
-                {shippingDetails && (
-                  <span className="text-[11px] font-bold text-[#2563EB] bg-[#EFF6FF] px-3 py-1 rounded-full border border-[#BFDBFE]">
-                    USPS Zone {shippingDetails.zone}
-                  </span>
-                )}
-              </div>
-
-              <div className="space-y-3">
-                <label
-                  onClick={() => setDeliveryOption('usps_ground')}
-                  className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${
-                    deliveryOption === 'usps_ground'
-                      ? 'border-[#2563EB] bg-[#EFF6FF]/60 ring-2 ring-[#2563EB]/20'
-                      : 'border-[#E2E8F0] hover:border-[#CBD5E1]'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="radio"
-                      name="shipping"
-                      checked={deliveryOption === 'usps_ground'}
-                      onChange={() => setDeliveryOption('usps_ground')}
-                      className="text-[#2563EB]"
-                    />
-                    <div>
-                      <p className="text-xs font-bold text-[#0F2942]">USPS Ground Advantage (3 - 5 Business Days)</p>
-                      <p className="text-[11px] text-[#64748B]">Fast, tracked ground delivery across all 50 US states</p>
-                    </div>
-                  </div>
-                  <span className="text-xs font-bold text-[#0F2942]">
-                    {calc.freeShippingQualified ? (
-                      <span className="text-[#16A34A] font-extrabold">FREE</span>
-                    ) : (
-                      formatCurrency(shippingDetails?.groundFee || 4.95)
-                    )}
-                  </span>
-                </label>
-
-                <label
-                  onClick={() => setDeliveryOption('usps_priority')}
-                  className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${
-                    deliveryOption === 'usps_priority'
-                      ? 'border-[#2563EB] bg-[#EFF6FF]/60 ring-2 ring-[#2563EB]/20'
-                      : 'border-[#E2E8F0] hover:border-[#CBD5E1]'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="radio"
-                      name="shipping"
-                      checked={deliveryOption === 'usps_priority'}
-                      onChange={() => setDeliveryOption('usps_priority')}
-                      className="text-[#2563EB]"
-                    />
-                    <div>
-                      <p className="text-xs font-bold text-[#0F2942]">USPS Priority Mail Express (1 - 3 Business Days)</p>
-                      <p className="text-[11px] text-[#64748B]">Priority queue handling and expedited transit</p>
-                    </div>
-                  </div>
-                  <span className="text-xs font-bold text-[#0F2942]">
-                    {formatCurrency(shippingDetails?.priorityFee || 8.95)}
-                  </span>
-                </label>
-              </div>
+            {/* Email for Receipt */}
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-[#0F2942]">
+                Email Address (For Order Receipt & Tracking) *
+              </label>
+              <input
+                type="email"
+                required
+                placeholder="your.email@example.com"
+                value={customerEmail}
+                onChange={(e) => setCustomerEmail(e.target.value)}
+                className="w-full px-4 py-3.5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
+              />
+              <p className="text-[11px] text-[#64748B]">
+                We'll email your receipt and USPS tracking confirmation here once paid.
+              </p>
             </div>
 
-            {/* Payment Method Card */}
-            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-[#E2E8F0] shadow-2xs space-y-5">
-              <div className="flex items-center justify-between pb-4 border-b border-[#F1F5F9]">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#EFF6FF] text-[#2563EB] font-bold text-xs flex items-center justify-center">
-                    3
-                  </div>
-                  <h2 className="text-lg font-bold font-serif text-[#0F2942]">
-                    Payment Method
-                  </h2>
-                </div>
-                <div className="flex items-center gap-1.5 text-[11px] font-bold text-[#16A34A]">
-                  <ShieldCheck size={14} />
-                  <span>Stripe Secured</span>
-                </div>
-              </div>
-
-              {hasOutOfStock && (
-                <div className="p-4 rounded-2xl bg-rose-50 border border-rose-300 text-rose-950 text-xs">
-                  <strong>⚠️ Produtos Esgotados:</strong> Um ou mais itens no seu carrinho estão esgotados no fornecedor Zendrop. Remova-os para continuar.
-                </div>
-              )}
-
-              <div className="space-y-3 text-xs">
-                <label
-                  onClick={() => setPaymentMethod('stripe_card')}
-                  className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${
-                    paymentMethod === 'stripe_card'
-                      ? 'border-[#2563EB] bg-[#EFF6FF]/60 ring-2 ring-[#2563EB]/20'
-                      : 'border-[#E2E8F0] hover:border-[#CBD5E1]'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="radio"
-                      name="payment"
-                      checked={paymentMethod === 'stripe_card'}
-                      onChange={() => setPaymentMethod('stripe_card')}
-                      className="text-[#2563EB]"
-                    />
-                    <div>
-                      <p className="text-xs font-bold text-[#0F2942]">Credit / Debit Card (Stripe Hosted Checkout)</p>
-                      <p className="text-[11px] text-[#64748B]">Visa, Mastercard, American Express, Discover</p>
-                    </div>
-                  </div>
-                  <CreditCard size={18} className="text-[#2563EB]" />
-                </label>
-
-                <label
-                  onClick={() => setPaymentMethod('apple_pay')}
-                  className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${
-                    paymentMethod === 'apple_pay'
-                      ? 'border-[#2563EB] bg-[#EFF6FF]/60 ring-2 ring-[#2563EB]/20'
-                      : 'border-[#E2E8F0] hover:border-[#CBD5E1]'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="radio"
-                      name="payment"
-                      checked={paymentMethod === 'apple_pay'}
-                      onChange={() => setPaymentMethod('apple_pay')}
-                      className="text-[#2563EB]"
-                    />
-                    <div>
-                      <p className="text-xs font-bold text-[#0F2942]">Apple Pay / Google Pay</p>
-                      <p className="text-[11px] text-[#64748B]">Instant 1-click checkout via Stripe</p>
-                    </div>
-                  </div>
-                  <span className="font-extrabold text-black"> Pay</span>
-                </label>
-
-                <label
-                  onClick={() => setPaymentMethod('klarna')}
-                  className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${
-                    paymentMethod === 'klarna'
-                      ? 'border-[#2563EB] bg-[#EFF6FF]/60 ring-2 ring-[#2563EB]/20'
-                      : 'border-[#E2E8F0] hover:border-[#CBD5E1]'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="radio"
-                      name="payment"
-                      checked={paymentMethod === 'klarna'}
-                      onChange={() => setPaymentMethod('klarna')}
-                      className="text-[#2563EB]"
-                    />
-                    <div>
-                      <p className="text-xs font-bold text-[#0F2942]">Klarna (Buy Now, Pay Later)</p>
-                      <p className="text-[11px] text-[#64748B]">4 interest-free payments of ${(finalTotal / 4).toFixed(2)}</p>
-                    </div>
-                  </div>
-                  <span className="px-2 py-0.5 rounded bg-[#FFB3C7] text-black font-extrabold text-[10px]">Klarna.</span>
-                </label>
-              </div>
-
-              {/* Secure Checkout CTA */}
-              <button
-                type="submit"
-                disabled={isSubmitting || items.length === 0 || hasOutOfStock}
-                className={`w-full py-4 rounded-full font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 mt-4 shadow-lg cursor-pointer ${
-                  hasOutOfStock
-                    ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
-                    : 'bg-[#2563EB] hover:bg-[#1D4ED8] text-white active:scale-98 shadow-blue-500/25'
-                }`}
-              >
-                {isSubmitting ? (
-                  <span>Connecting to Stripe Secure Checkout...</span>
-                ) : hasOutOfStock ? (
-                  <span>Remova Itens Esgotados</span>
-                ) : (
-                  <>
-                    <Lock size={15} />
-                    <span>Proceed to Stripe Secure Checkout · {formatCurrency(finalTotal)}</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-
-          {/* Right Column: Order Summary (5 cols) */}
-          <div className="lg:col-span-5 space-y-4">
-            <div className="bg-white p-6 sm:p-7 rounded-3xl border border-[#E2E8F0] shadow-2xs space-y-4 sticky top-24">
-              <h2 className="text-base font-bold font-serif text-[#0F2942] pb-3 border-b border-[#F1F5F9]">
-                Order Summary ({items.reduce((a, c) => a + c.quantity, 0)} items)
+            {/* Items Summary */}
+            <div className="space-y-4">
+              <h2 className="text-sm font-bold font-serif text-[#0F2942]">
+                Order Items ({items.reduce((a, c) => a + c.quantity, 0)})
               </h2>
-
-              <div className="max-h-72 overflow-y-auto divide-y divide-[#F1F5F9] pr-1">
+              <div className="divide-y divide-[#F1F5F9] border-t border-b border-[#F1F5F9] max-h-80 overflow-y-auto">
                 {items.map((i) => (
-                  <div key={i.id} className="py-3 flex items-center gap-3">
-                    <img src={i.image} alt={i.name} className="w-12 h-12 rounded-xl object-cover border border-[#E2E8F0]" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold text-[#0F2942] truncate font-serif">{i.name}</p>
-                      <p className="text-[11px] text-[#64748B]">Qty: {i.quantity} {i.size ? `· ${i.size}` : ''}</p>
+                  <div key={i.id} className="py-3 flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <img src={i.image} alt={i.name} className="w-12 h-12 rounded-xl object-cover border border-[#E2E8F0]" />
+                      <div>
+                        <p className="text-xs font-bold text-[#0F2942] font-serif">{i.name}</p>
+                        <p className="text-[11px] text-[#64748B]">Qty: {i.quantity} {i.size ? `· ${i.size}` : ''}</p>
+                      </div>
                     </div>
                     <span className="text-xs font-bold text-[#0F2942]">{formatCurrency(i.price * i.quantity)}</span>
                   </div>
                 ))}
               </div>
+            </div>
 
-              <div className="space-y-2.5 text-xs text-[#64748B] pt-3 border-t border-[#F1F5F9]">
-                <div className="flex justify-between">
-                  <span>Subtotal</span>
-                  <span className="font-bold text-[#0F2942]">{formatCurrency(subtotal)}</span>
+            {/* Totals Calculation */}
+            <div className="bg-[#F8FAFC] p-5 rounded-2xl border border-[#E2E8F0] space-y-2.5 text-xs">
+              <div className="flex justify-between text-[#64748B]">
+                <span>Subtotal</span>
+                <span className="font-bold text-[#0F2942]">{formatCurrency(subtotal)}</span>
+              </div>
+              {discount > 0 && (
+                <div className="flex justify-between text-[#16A34A] font-semibold">
+                  <span>Discount ({appliedPromo})</span>
+                  <span>-{formatCurrency(discount)}</span>
                 </div>
-                {discount > 0 && (
-                  <div className="flex justify-between text-[#16A34A] font-semibold">
-                    <span>Discount ({appliedPromo})</span>
-                    <span>-{formatCurrency(discount)}</span>
+              )}
+              <div className="flex justify-between text-[#64748B]">
+                <span>USPS Shipping</span>
+                <span className="font-bold text-[#16A34A]">FREE (US Hub)</span>
+              </div>
+              <div className="flex justify-between text-base font-black text-[#0F2942] pt-3 border-t border-[#E2E8F0]">
+                <span>Total to Pay (USD)</span>
+                <span>{formatCurrency(finalTotal)}</span>
+              </div>
+            </div>
+
+            {hasOutOfStock && (
+              <div className="p-4 rounded-2xl bg-rose-50 border border-rose-300 text-rose-950 text-xs">
+                <strong>⚠️ Produtos Esgotados:</strong> Um ou mais itens no seu carrinho estão esgotados no fornecedor Zendrop. Remova-os para continuar.
+              </div>
+            )}
+
+            {checkoutError && (
+              <div className="p-4 rounded-2xl bg-amber-50 border border-amber-300 text-amber-950 text-xs space-y-2">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <strong className="block font-bold">⚠️ Aviso / Erro no Checkout Stripe:</strong>
+                    <p className="mt-1">{checkoutError}</p>
+                    <p className="text-[11px] text-amber-900 mt-1">
+                      Para testar o checkout real, adicione uma chave ativa da Stripe nas configurações de segredos do Google AI Studio (`STRIPE_SECRET_KEY`).
+                    </p>
                   </div>
-                )}
-                <div className="flex justify-between">
-                  <span>USPS Shipping</span>
-                  <span className="font-bold text-[#0F2942]">
-                    {shippingCost === 0 ? <strong className="text-[#16A34A]">FREE</strong> : formatCurrency(shippingCost)}
-                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setCheckoutError(null)}
+                    className="text-xs text-amber-900 font-bold hover:underline ml-2"
+                  >
+                    Fechar
+                  </button>
                 </div>
-                <div className="flex justify-between text-base font-black text-[#0F2942] pt-2 border-t border-[#E2E8F0]">
-                  <span>Total (USD)</span>
-                  <span>{formatCurrency(finalTotal)}</span>
+                <div className="pt-2 flex gap-3">
+                  <button
+                    type="button"
+                    onClick={handleCheckoutSubmit}
+                    className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <RefreshCcw size={13} />
+                    <span>Try Again</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={onReturnToCart}
+                    className="px-4 py-2 rounded-xl bg-white border border-amber-300 hover:bg-amber-100 text-amber-900 font-bold text-xs cursor-pointer"
+                  >
+                    Review Bag
+                  </button>
                 </div>
               </div>
+            )}
 
-              {/* Guarantees */}
-              <div className="p-4 rounded-2xl bg-[#EFF6FF] border border-[#BFDBFE] space-y-2 text-xs text-[#1E3A8A]">
+            {/* Secure Checkout CTA Button */}
+            <button
+              type="submit"
+              disabled={isSubmitting || items.length === 0 || hasOutOfStock}
+              className={`w-full py-4 rounded-full font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer ${
+                hasOutOfStock
+                  ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                  : 'bg-[#2563EB] hover:bg-[#1D4ED8] text-white active:scale-98 shadow-blue-500/25'
+              }`}
+            >
+              {isSubmitting ? (
                 <div className="flex items-center gap-2">
-                  <ShieldCheck size={16} className="text-[#2563EB] flex-shrink-0" />
-                  <span className="font-bold">30-Day Risk-Free Guarantee</span>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Connecting to Stripe Secure Checkout...</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Truck size={16} className="text-[#2563EB] flex-shrink-0" />
-                  <span>USPS Fast-Tracked Shipping from US Hub</span>
-                </div>
+              ) : hasOutOfStock ? (
+                <span>Remova Itens Esgotados</span>
+              ) : (
+                <>
+                  <Lock size={16} />
+                  <span>Continue to Secure Payment · {formatCurrency(finalTotal)}</span>
+                </>
+              )}
+            </button>
+
+            <div className="flex items-center justify-center gap-6 text-[11px] text-[#64748B] pt-2">
+              <div className="flex items-center gap-1.5">
+                <ShieldCheck size={14} className="text-[#16A34A]" />
+                <span>Encrypted & Secure</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Truck size={14} className="text-[#2563EB]" />
+                <span>USPS Tracked Shipping</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 size={14} className="text-[#16A34A]" />
+                <span>30-Day Guarantee</span>
               </div>
             </div>
           </div>

@@ -8,6 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+app.set('trust proxy', true);
 const PORT = process.env.PORT || 3000;
 
 // Stripe Webhook needs raw body (defined BEFORE express.json())
@@ -59,9 +60,9 @@ app.get('/api/health', (_req: Request, res: Response) => {
 // Endpoint to check live Stripe Account status
 app.get('/api/stripe-status', async (_req: Request, res: Response) => {
   try {
-    let stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
     if (!stripeSecretKey || stripeSecretKey.trim() === '') {
-      stripeSecretKey = 'sk_test_4eC39HqLyjWDarjtT1zdp7dc';
+      return res.status(400).json({ active: false, error: 'STRIPE_SECRET_KEY não está configurada.' });
     }
 
     const stripeRes = await fetch('https://api.stripe.com/v1/account', {
@@ -72,27 +73,11 @@ app.get('/api/stripe-status', async (_req: Request, res: Response) => {
 
     const data = await stripeRes.json();
     if (!stripeRes.ok) {
-      // If live key expired or failed, fallback to test key to verify test connectivity
-      const testRes = await fetch('https://api.stripe.com/v1/account', {
-        headers: {
-          Authorization: `Bearer sk_test_4eC39HqLyjWDarjtT1zdp7dc`,
-        },
+      return res.status(stripeRes.status).json({ 
+        active: false, 
+        error: data.error?.message || 'Chave da Stripe inválida ou expirada. Por favor, atualize STRIPE_SECRET_KEY nos Segredos do Google AI Studio.',
+        code: 'STRIPE_KEY_EXPIRED'
       });
-      const testData = await testRes.json();
-      if (testRes.ok) {
-        return res.json({
-          active: true,
-          mode: 'test_fallback',
-          charges_enabled: testData.charges_enabled,
-          payouts_enabled: testData.payouts_enabled,
-          card_payments: testData.capabilities?.card_payments || 'active',
-          country: testData.country,
-          currency: testData.default_currency,
-          accountId: testData.id,
-          warning: 'A chave live configurada expirou. O sistema ativou o modo de teste automaticamente.',
-        });
-      }
-      return res.status(stripeRes.status).json({ active: false, error: data.error?.message || 'Chave da Stripe inválida ou expirada.' });
     }
 
     const cardStatus = data.capabilities?.card_payments;
@@ -399,22 +384,32 @@ app.all(['/api/zendrop/sync-all-inventory', '/api/zendrop/sync-inventory'], asyn
 });
 
 // Official Stripe Checkout Session Creation & Management Endpoints
-const getStripeInstance = (overrideKey?: string) => {
-  const secretKey = overrideKey || process.env.STRIPE_SECRET_KEY || 'sk_test_4eC39HqLyjWDarjtT1zdp7dc';
-  return new Stripe(secretKey, { apiVersion: '2023-10-16' as any });
+const getStripeInstance = () => {
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  if (!secretKey || secretKey.trim() === '') {
+    console.error('[Stripe Diagnostic] STRIPE_SECRET_KEY is missing or empty.');
+    throw new Error('STRIPE_SECRET_KEY não está configurada nos Segredos do Google AI Studio.');
+  }
+  const trimmed = secretKey.trim();
+  const keyType = trimmed.startsWith('sk_live_') ? 'live' : trimmed.startsWith('sk_test_') ? 'test' : 'unknown';
+  console.log(`[Stripe Diagnostic] Initializing Stripe with ${keyType} key (length: ${trimmed.length}, prefix: ${trimmed.slice(0, 7)}...)`);
+  return new Stripe(trimmed, { apiVersion: '2023-10-16' as any });
 };
 
 const handleCreateCheckoutSession = async (req: Request, res: Response) => {
+  console.log('[Stripe Diagnostic] POST /api/checkout/create-session called');
   try {
     const { items, customerEmail, domainUrl, currency } = req.body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
+      console.warn('[Stripe Diagnostic] Cart items missing or empty');
       return res.status(400).json({ error: 'O carrinho está vazio.' });
     }
 
     // Strict inventory verification
     for (const item of items) {
       if (item.stockCount === 0 || item.inStock === false) {
+        console.warn(`[Stripe Diagnostic] Item out of stock: ${item.name}`);
         return res.status(400).json({
           error: `O produto "${item.name}" está esgotado no fornecedor Zendrop (0 unidades).`,
           outOfStock: true,
@@ -423,7 +418,47 @@ const handleCreateCheckoutSession = async (req: Request, res: Response) => {
       }
     }
 
-    const host = domainUrl || `${req.protocol}://${req.get('host')}`;
+    // Sanitize domainUrl (in case frontend sends literal 'null' or 'undefined')
+    let cleanDomain = domainUrl;
+    if (!cleanDomain || cleanDomain === 'null' || cleanDomain === 'undefined' || typeof cleanDomain !== 'string' || cleanDomain.trim() === '') {
+      cleanDomain = '';
+    }
+
+    let baseUrl = process.env.APP_URL || cleanDomain || req.headers.origin || `${req.protocol}://${req.get('host')}`;
+    if (!baseUrl || typeof baseUrl !== 'string' || baseUrl.trim() === '' || baseUrl === 'null' || baseUrl === 'undefined') {
+      baseUrl = 'https://lingpetshop.com';
+    }
+    if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
+      baseUrl = `https://${baseUrl}`;
+    }
+    if (baseUrl.startsWith('http://') && !baseUrl.includes('localhost') && !baseUrl.includes('127.0.0.1')) {
+      baseUrl = baseUrl.replace('http://', 'https://');
+    }
+
+    console.log(`[Stripe Diagnostic] Constructed base URL: ${baseUrl}`);
+
+    let success_url: string;
+    let cancel_url: string;
+    try {
+      const parsedBase = new URL(baseUrl);
+      const successObj = new URL('/checkout', parsedBase.origin);
+      successObj.searchParams.set('status', 'success');
+      successObj.searchParams.set('session_id', '{CHECKOUT_SESSION_ID}');
+      success_url = successObj.toString();
+
+      const cancelObj = new URL('/checkout', parsedBase.origin);
+      cancelObj.searchParams.set('status', 'cancelled');
+      cancel_url = cancelObj.toString();
+    } catch (urlErr: any) {
+      console.error('[Stripe Diagnostic] URL construction exception:', urlErr.message, { baseUrl });
+      const sanitizedBase = baseUrl.replace(/\/$/, '');
+      success_url = `${sanitizedBase}/checkout?status=success&session_id={CHECKOUT_SESSION_ID}`;
+      cancel_url = `${sanitizedBase}/checkout?status=cancelled`;
+    }
+
+    console.log(`[Stripe Diagnostic] success_url: ${success_url}`);
+    console.log(`[Stripe Diagnostic] cancel_url: ${cancel_url}`);
+
     const selectedCurrency = (currency || 'usd').toLowerCase();
 
     const lineItems = items.map((item: any) => ({
@@ -432,48 +467,60 @@ const handleCreateCheckoutSession = async (req: Request, res: Response) => {
         unit_amount: Math.round((Number(item.price) || 10) * 100),
         product_data: {
           name: item.name || 'Pet Product',
-          images: item.image ? [item.image] : [],
+          images: item.image && typeof item.image === 'string' && item.image.startsWith('http') ? [item.image] : [],
         },
       },
       quantity: Number(item.quantity) || 1,
     }));
 
-    let session;
-    let usedFallback = false;
-
+    let stripe;
     try {
-      const stripe = getStripeInstance();
-      session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
-        mode: 'payment',
-        customer_email: customerEmail || undefined,
-        line_items: lineItems,
-        success_url: `${host}/checkout?status=success&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${host}/checkout?status=cancelled`,
-        metadata: {
-          itemsSummary: JSON.stringify(items.map((i: any) => ({ sku: i.sku, qty: i.quantity }))),
-        },
-      } as any);
-    } catch (primaryErr: any) {
-      console.warn('Primary Stripe key failed (expired or invalid), falling back to Stripe test key:', primaryErr.message);
-      usedFallback = true;
-      const fallbackStripe = new Stripe('sk_test_4eC39HqLyjWDarjtT1zdp7dc', { apiVersion: '2023-10-16' as any });
-      session = await fallbackStripe.checkout.sessions.create({
-        payment_method_types: ['card'],
-        mode: 'payment',
-        customer_email: customerEmail || undefined,
-        line_items: lineItems,
-        success_url: `${host}/checkout?status=success&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${host}/checkout?status=cancelled`,
-        metadata: {
-          itemsSummary: JSON.stringify(items.map((i: any) => ({ sku: i.sku, qty: i.quantity }))),
-        },
-      } as any);
+      stripe = getStripeInstance();
+    } catch (configErr: any) {
+      console.error('[Stripe Diagnostic] Stripe configuration error:', configErr.message);
+      return res.status(400).json({
+        error: configErr.message,
+        code: 'STRIPE_KEY_MISSING'
+      });
     }
 
-    return res.json({ url: session.url, sessionId: session.id, fallbackUsed: usedFallback });
+    console.log(`[Stripe Diagnostic] Creating Stripe Checkout session with ${lineItems.length} line items...`);
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      customer_email: customerEmail || undefined,
+      line_items: lineItems,
+      success_url,
+      cancel_url,
+      metadata: {
+        itemsSummary: JSON.stringify(items.map((i: any) => ({ sku: i.sku || i.id, qty: i.quantity }))),
+      },
+    } as any);
+
+    console.log(`[Stripe Diagnostic] Stripe session created successfully: ${session.id}, url: ${session.url}`);
+    return res.json({ url: session.url, sessionId: session.id });
   } catch (err: any) {
-    console.error('Error creating Stripe checkout session:', err);
+    console.error('[Stripe Diagnostic] Error creating Stripe checkout session:', {
+      message: err.message,
+      type: err.type,
+      code: err.code,
+      statusCode: err.statusCode,
+    });
+
+    if (err?.type === 'StripeAuthenticationError' || err?.message?.includes('API Key') || err?.message?.includes('expired') || err?.message?.includes('invalid')) {
+      return res.status(400).json({
+        error: `A chave secreta da Stripe fornecida expirou ou é inválida (${err.message}). Por favor, gere uma nova chave ativa no dashboard da Stripe e atualize a variável STRIPE_SECRET_KEY nas configurações de Segredos do Google AI Studio.`,
+        code: 'STRIPE_KEY_EXPIRED'
+      });
+    }
+
+    if (err?.message?.includes('URL') || err?.message?.includes('valid URL')) {
+      return res.status(400).json({
+        error: `Erro de URL inválida no checkout: ${err.message}.`,
+        code: 'INVALID_URL'
+      });
+    }
+
     return res.status(500).json({ error: err.message || 'Erro interno ao criar sessão de checkout.' });
   }
 };
@@ -484,14 +531,8 @@ app.post('/api/create-checkout-session', handleCreateCheckoutSession);
 app.get('/api/checkout/session/:sessionId', async (req: Request, res: Response) => {
   try {
     const { sessionId } = req.params;
-    let stripe = getStripeInstance();
-    let session;
-    try {
-      session = await stripe.checkout.sessions.retrieve(sessionId);
-    } catch (e) {
-      const fallbackStripe = new Stripe('sk_test_4eC39HqLyjWDarjtT1zdp7dc', { apiVersion: '2023-10-16' as any });
-      session = await fallbackStripe.checkout.sessions.retrieve(sessionId);
-    }
+    const stripe = getStripeInstance();
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
     return res.json({
       status: session.status,
       payment_status: session.payment_status,
