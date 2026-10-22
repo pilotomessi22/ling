@@ -133,12 +133,24 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
         });
     } else if (status === 'cancelled') {
       setCheckoutError('Checkout cancelado. Seus itens continuam salvos na sacola.');
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('status');
+        url.searchParams.delete('session_id');
+        window.history.replaceState({}, document.title, url.pathname + (url.search ? url.search : ''));
+      } catch (e) {}
     }
   }, []);
 
   const handleCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setCheckoutError(null);
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('status');
+      url.searchParams.delete('session_id');
+      window.history.replaceState({}, document.title, url.pathname + (url.search ? url.search : ''));
+    } catch (e) {}
 
     if (hasOutOfStock) {
       alert('Não é possível concluir o pedido: um ou mais itens no carrinho estão esgotados no fornecedor Zendrop.');
@@ -388,8 +400,16 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                   </div>
                   <button
                     type="button"
-                    onClick={() => setCheckoutError(null)}
-                    className="text-xs text-amber-900 font-bold hover:underline ml-2"
+                    onClick={() => {
+                      setCheckoutError(null);
+                      try {
+                        const url = new URL(window.location.href);
+                        url.searchParams.delete('status');
+                        url.searchParams.delete('session_id');
+                        window.history.replaceState({}, document.title, url.pathname + (url.search ? url.search : ''));
+                      } catch (e) {}
+                    }}
+                    className="text-xs text-amber-900 font-bold hover:underline ml-2 cursor-pointer"
                   >
                     Fechar
                   </button>
