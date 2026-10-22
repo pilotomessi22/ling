@@ -541,7 +541,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                       <img src={i.image} alt={i.name} className="w-12 h-12 rounded-xl object-cover border border-[#E2E8F0]" />
                       <div>
                         <p className="text-xs font-bold text-[#0F2942] font-serif">{i.name}</p>
-                        <p className="text-[11px] text-[#64748B]">Qty: {i.quantity} {i.size ? `· ${i.size}` : ''} {i.sku ? `· SKU: ${i.sku}` : ''}</p>
+                        <p className="text-[11px] text-[#64748B]">Qty: {i.quantity} {i.size ? `· ${i.size}` : ''} {i.color ? `· Color: ${i.color}` : ''}</p>
                       </div>
                     </div>
                     <span className="text-xs font-bold text-[#0F2942]">{formatCurrency(i.price * i.quantity)}</span>

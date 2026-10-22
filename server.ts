@@ -622,9 +622,16 @@ const getStoredOrders = () => {
 
 const saveStoredOrders = (orders: any[]) => {
   try {
-    fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2), 'utf8');
+    const tempFile = `${ORDERS_FILE}.tmp`;
+    fs.writeFileSync(tempFile, JSON.stringify(orders, null, 2), 'utf8');
+    fs.renameSync(tempFile, ORDERS_FILE);
   } catch (e) {
-    console.error('Error writing orders.json:', e);
+    console.error('Error writing orders.json atomically:', e);
+    try {
+      fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2), 'utf8');
+    } catch (innerE) {
+      console.error('Error writing orders.json directly:', innerE);
+    }
   }
 };
 
