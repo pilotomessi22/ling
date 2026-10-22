@@ -549,7 +549,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
     try {
       const res = await fetch('/api/orders/update-status', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-token': 'ling_admin_authenticated',
+        },
         body: JSON.stringify({
           orderId,
           fulfillmentStatus: 'Despachado',
@@ -562,24 +565,26 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
         const updated = orders.map((o) => (o.id === orderId || o.orderNumber === orderId ? data.order : o));
         setOrders(updated);
         localStorage.setItem('ling_admin_orders', JSON.stringify(updated));
-        setImportSuccessMsg(`✓ Pedido ${dispatchModalOrder.orderNumber} despachado com sucesso! Rastreio USPS gerado.`);
+        
+        let msg = `✓ Pedido ${dispatchModalOrder.orderNumber} despachado com sucesso! Rastreio USPS gerado.`;
+        if (data.emailResult) {
+          if (data.emailResult.success && data.emailResult.status === 'sent') {
+            msg += ` ✉️ E-mail de rastreamento enviado para ${dispatchModalOrder.customerEmail}!`;
+          } else if (data.emailResult.status === 'skipped') {
+            msg += ` (E-mail de rastreamento já havia sido enviado anteriormente).`;
+          } else {
+            msg += ` ⚠️ Falha ao enviar e-mail: ${data.emailResult.error || data.emailResult.reason}`;
+          }
+        }
+        setImportSuccessMsg(msg);
         setDispatchModalOrder(null);
-        setTimeout(() => setImportSuccessMsg(null), 4000);
+        setTimeout(() => setImportSuccessMsg(null), 6000);
+      } else {
+        alert(data.error || 'Erro ao atualizar status do pedido no servidor.');
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      const updated = orders.map((o) => (o.id === orderId || o.orderNumber === orderId ? {
-        ...o,
-        fulfillmentStatus: 'Despachado' as const,
-        trackingNumber: dispatchTrackingInput,
-        carrier: dispatchCarrierInput,
-        dispatchedAt: new Date().toISOString(),
-      } : o));
-      setOrders(updated);
-      localStorage.setItem('ling_admin_orders', JSON.stringify(updated));
-      setImportSuccessMsg(`✓ Pedido ${dispatchModalOrder.orderNumber} despachado localmente!`);
-      setDispatchModalOrder(null);
-      setTimeout(() => setImportSuccessMsg(null), 4000);
+      alert(`Erro de conexão com o servidor ao despachar: ${e.message}`);
     }
   };
 
