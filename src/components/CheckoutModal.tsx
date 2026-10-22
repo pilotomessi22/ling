@@ -70,70 +70,38 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const shippingCost = baseCalculations.shipping;
   const finalTotal = baseCalculations.total;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (hasOutOfStock) {
       alert('Não é possível concluir o pedido: um ou mais itens no carrinho estão esgotados no fornecedor Zendrop.');
       return;
     }
-    const newOrderId = `LP-AUS-${Math.floor(100000 + Math.random() * 900000)}`;
-    setOrderId(newOrderId);
-
-    // Save order into localStorage for the Admin Panel
     try {
-      const existingOrdersRaw = localStorage.getItem('ling_admin_orders');
-      const existingOrders = existingOrdersRaw ? JSON.parse(existingOrdersRaw) : [];
-      const newAdminOrder = {
-        id: `ord-${Date.now()}`,
-        orderNumber: newOrderId,
-        date: 'Hoje, agora mesmo',
-        customerName: address.fullName,
-        customerEmail: address.email,
-        customerPhone: address.phone,
-        shippingAddress: {
-          street: address.streetAddress + (address.aptOrSuite ? `, ${address.aptOrSuite}` : ''),
-          city: address.city,
-          state: address.state,
-          zip: address.zipCode,
-          country: 'United States',
-        },
-        items: items.map((it) => {
-          const supMeta = PRODUCT_SUPPLIER_CATALOG[it.sku.split('-')[0]] || {
-            supplier: 'CJ Dropshipping',
-            supplierSku: it.sku,
-            supplierUrl: 'https://cjdropshipping.com',
-          };
-          return {
-            sku: it.sku,
-            name: it.name,
-            size: it.size,
-            color: it.color,
-            quantity: it.quantity,
-            unitPrice: it.price,
-            supplierCost: it.supplierCost,
-            supplier: supMeta.supplier,
-            supplierSku: supMeta.supplierSku || it.sku,
-            supplierUrl: supMeta.supplierUrl || 'https://cjdropshipping.com',
-          };
+      const response = await fetch('/api/checkout/create-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items,
+          customerEmail: address.email,
+          currency: 'usd',
+          domainUrl: window.location.origin,
         }),
-        totalUsd: finalTotal,
-        supplierCostUsd: items.reduce((acc, curr) => acc + curr.supplierCost * curr.quantity, 0),
-        paymentGateway: (() => {
-          const pk = localStorage.getItem('ling_stripe_pk') || '';
-          return pk ? 'Stripe Official (USD · lingpetshop.com)' : 'Stripe Gateway (USD)';
-        })(),
-        paymentStatus: 'Paid (Stripe Live)',
-        fulfillmentStatus: 'Aguardando Despacho',
-      };
+      });
 
-      localStorage.setItem('ling_admin_orders', JSON.stringify([newAdminOrder, ...existingOrders]));
-      window.dispatchEvent(new Event('storage'));
-    } catch (err) {
-      console.error('Error saving order to localStorage:', err);
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro ao criar sessão de checkout na Stripe.');
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('URL de checkout da Stripe não retornada.');
+      }
+    } catch (err: any) {
+      console.error('Checkout error:', err);
+      alert(err.message || 'Erro ao processar checkout com Stripe.');
     }
-
-    setOrderComplete(true);
-    onClearCart();
   };
 
   const supplierPayload = formatDropshippingOrderPayload(

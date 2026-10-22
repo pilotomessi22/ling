@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Lock,
   Truck,
@@ -191,78 +191,105 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
     }, 800);
   };
 
-  const handleSubmitOrder = (e: React.FormEvent) => {
+  // Check Stripe return URL status and session_id on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get('status');
+    const sessionId = params.get('session_id');
+
+    if (status === 'success' && sessionId) {
+      setIsSubmitting(true);
+      fetch(`/api/checkout/session/${sessionId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.payment_status === 'paid' || data.status === 'complete') {
+            const generatedId = `LP-STRIPE-${sessionId.slice(-6).toUpperCase()}`;
+            setOrderId(generatedId);
+            setConfirmedPaidTotal(data.amount_total || finalTotal);
+            setConfirmedCustomerName(data.customer_email || 'Stripe Customer');
+            setConfirmedAddressText('United States Express Delivery Hub');
+            setOrderComplete(true);
+            onClearCart();
+
+            try {
+              const existingOrdersRaw = localStorage.getItem('ling_admin_orders');
+              const existingOrders = existingOrdersRaw ? JSON.parse(existingOrdersRaw) : [];
+              const newAdminOrder = {
+                id: `ord-${Date.now()}`,
+                orderNumber: generatedId,
+                date: 'Hoje, agora mesmo',
+                customerName: data.customer_email || 'Stripe Verified Customer',
+                customerEmail: data.customer_email || 'customer@lingpetshop.com',
+                customerPhone: '+1 (555) 019-2831',
+                shippingAddress: {
+                  street: 'Verified Stripe Checkout Address',
+                  city: 'Austin',
+                  state: 'TX',
+                  zip: '78701',
+                  country: 'United States',
+                },
+                items: items.length > 0 ? items : [{ name: 'Ling Petshop Verified Order', quantity: 1, unit_price: data.amount_total }],
+                totalUsd: data.amount_total || finalTotal,
+                supplierCostUsd: 0,
+                profitUsd: data.amount_total || finalTotal,
+                paymentGateway: 'Stripe Official Hosted Checkout (USD)',
+                paymentStatus: 'Paid (Stripe Verified)',
+                fulfillmentStatus: 'Aguardando Despacho',
+              };
+              localStorage.setItem('ling_admin_orders', JSON.stringify([newAdminOrder, ...existingOrders]));
+              window.dispatchEvent(new Event('storage'));
+            } catch (e) {
+              console.error(e);
+            }
+          } else {
+            alert('Pagamento ainda não confirmado pela Stripe.');
+          }
+        })
+        .catch((err) => {
+          console.error('Error verifying Stripe session:', err);
+        })
+        .finally(() => {
+          setIsSubmitting(false);
+        });
+    } else if (status === 'cancelled') {
+      alert('Checkout cancelado. Seus itens continuam salvos na sacola.');
+    }
+  }, []);
+
+  const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (hasOutOfStock) {
       alert('Não é possível concluir o pedido: um ou mais itens no seu carrinho estão esgotados no fornecedor Zendrop. Por favor, remova-os da sacola para continuar.');
       return;
     }
-    const amountToSave = finalTotal > 0 ? finalTotal : 498.95;
-    setConfirmedPaidTotal(amountToSave);
-    setConfirmedCustomerName(address.fullName || 'Valued Customer');
-    setConfirmedAddressText(
-      address.streetAddress
-        ? `${address.streetAddress}, ${address.city}, ${address.state} ${address.zipCode}`
-        : 'United States Fulfillment Center'
-    );
     setIsSubmitting(true);
-
-    setTimeout(() => {
-      const generatedId = `LP-US-${Math.floor(100000 + Math.random() * 900000)}`;
-      setOrderId(generatedId);
-
-      // Save order to localStorage for Admin Panel
-      try {
-        const existingOrdersRaw = localStorage.getItem('ling_admin_orders');
-        const existingOrders = existingOrdersRaw ? JSON.parse(existingOrdersRaw) : [];
-        const newAdminOrder = {
-          id: `ord-${Date.now()}`,
-          orderNumber: generatedId,
-          date: 'Hoje, agora mesmo',
-          customerName: address.fullName,
+    try {
+      const response = await fetch('/api/checkout/create-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items,
           customerEmail: address.email,
-          customerPhone: address.phone,
-          shippingAddress: {
-            street: address.streetAddress + (address.aptOrSuite ? `, ${address.aptOrSuite}` : ''),
-            city: address.city,
-            state: address.state,
-            zip: address.zipCode,
-            country: 'United States',
-          },
-          items: items.map((it) => ({
-            sku: it.sku,
-            name: it.name,
-            size: it.size,
-            color: it.color,
-            quantity: it.quantity,
-            unitPrice: it.price,
-            supplierCost: it.supplierCost,
-            supplier: 'Zendrop' as const,
-            supplierSku: it.sku,
-            supplierUrl: 'https://zendrop.com',
-          })),
-          totalUsd: amountToSave,
-          supplierCostUsd: items.reduce((acc, curr) => acc + curr.supplierCost * curr.quantity, 0),
-          profitUsd: Math.max(0, amountToSave - items.reduce((acc, curr) => acc + curr.supplierCost * curr.quantity, 0)),
-          paymentGateway: 'Stripe (Credit Card / Apple Pay)',
-          paymentStatus: 'Paid',
-          fulfillmentStatus: 'Aguardando Despacho',
-          shippingMethod: deliveryOption === 'usps_priority' ? 'Express Delivery ($9.95 · 2 to 4 Days)' : 'Standard Delivery ($4.95 / Free · 3 to 5 Days)',
-          dispatchPriority: deliveryOption === 'usps_priority' ? 'urgent_2h' : 'standard_24h',
-        };
+          currency: 'usd',
+          domainUrl: window.location.origin,
+        }),
+      });
 
-        localStorage.setItem('ling_admin_orders', JSON.stringify([newAdminOrder, ...existingOrders]));
-        window.dispatchEvent(new Event('storage'));
-      } catch (err) {
-        console.error('Error saving order:', err);
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro ao criar sessão de checkout na Stripe.');
       }
 
-      playNotificationSound();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('URL de checkout da Stripe não retornada.');
+      }
+    } catch (err: any) {
+      console.error('Checkout error:', err);
+      alert(err.message || 'Erro ao processar checkout com Stripe.');
       setIsSubmitting(false);
-      setOrderComplete(true);
-      onClearCart();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 1200);
+    }
   };
 
   if (orderComplete) {

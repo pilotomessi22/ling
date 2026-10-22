@@ -1,12 +1,48 @@
 import express, { Request, Response } from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { Resend } from 'resend';
+import Stripe from 'stripe';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Stripe Webhook needs raw body (defined BEFORE express.json())
+app.post(
+  '/api/stripe/webhook',
+  express.raw({ type: 'application/json' }),
+  async (req: Request, res: Response) => {
+    const sig = req.headers['stripe-signature'];
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    if (!webhookSecret) {
+      console.warn('STRIPE_WEBHOOK_SECRET is not configured.');
+      return res.status(400).json({ error: 'STRIPE_WEBHOOK_SECRET is missing in environment variables.' });
+    }
+
+    try {
+      const secretKey = process.env.STRIPE_SECRET_KEY;
+      if (!secretKey) {
+        return res.status(500).json({ error: 'STRIPE_SECRET_KEY is missing.' });
+      }
+      const stripe = new Stripe(secretKey, { apiVersion: '2023-10-16' as any });
+      const event = stripe.webhooks.constructEvent(req.body, sig as string, webhookSecret);
+
+      if (event.type === 'checkout.session.completed') {
+        const session = event.data.object as Stripe.Checkout.Session;
+        console.log(`[Stripe Webhook] Checkout Session Completed: ${session.id}, payment_status: ${session.payment_status}`);
+      }
+
+      return res.json({ received: true });
+    } catch (err: any) {
+      console.error(`Webhook signature verification failed: ${err.message}`);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+  }
+);
 
 app.use(express.json());
 
@@ -341,87 +377,125 @@ app.all(['/api/zendrop/sync-all-inventory', '/api/zendrop/sync-inventory'], asyn
   }
 });
 
-// Automatic Stripe Checkout Session Creation Endpoint
-app.post('/api/create-checkout-session', async (req: Request, res: Response) => {
-  try {
-    const { items, customerEmail, customStripeKey, domainUrl, currency } = req.body;
-    const stripeSecretKey =
-      customStripeKey ||
-      process.env.STRIPE_SECRET_KEY ||
-      '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';
+// Official Stripe Checkout Session Creation & Management Endpoints
+const getStripeInstance = () => {
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  if (!secretKey || secretKey.trim() === '') {
+    throw new Error('STRIPE_SECRET_KEY não configurada. Adicione STRIPE_SECRET_KEY em Settings > Secrets do Google AI Studio ou no sistema de secrets da implantação.');
+  }
+  return new Stripe(secretKey, { apiVersion: '2023-10-16' as any });
+};
 
-    if (!items || !Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ error: 'Cart is empty' });
+const handleCreateCheckoutSession = async (req: Request, res: Response) => {
+  try {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      return res.status(500).json({
+        error: 'STRIPE_SECRET_KEY não configurada no servidor. Adicione STRIPE_SECRET_KEY em Settings > Secrets do Google AI Studio ou no sistema de secrets da implantação.',
+      });
     }
 
-    // Strict inventory verification: reject payment session if any item is out of stock (stockCount === 0)
+    const { items, customerEmail, domainUrl, currency } = req.body;
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'O carrinho está vazio.' });
+    }
+
+    // Strict inventory verification
     for (const item of items) {
       if (item.stockCount === 0 || item.inStock === false) {
         return res.status(400).json({
-          error: `O produto "${item.name}" está sem estoque no fornecedor Zendrop (0 unidades disponíveis). Não é possível processar o pagamento para produtos indisponíveis.`,
+          error: `O produto "${item.name}" está esgotado no fornecedor Zendrop (0 unidades).`,
           outOfStock: true,
           item: item.name,
         });
       }
-      if (inventoryCache?.data && item.productId) {
-        const cached = inventoryCache.data[String(item.productId)];
-        if (cached && (cached.stockCount === 0 || !cached.inStock)) {
-          return res.status(400).json({
-            error: `O produto "${item.name}" está esgotado no armazém central Zendrop. Remova-o para continuar.`,
-            outOfStock: true,
-            item: item.name,
-          });
-        }
-      }
     }
 
+    const stripe = getStripeInstance();
     const host = domainUrl || `${req.protocol}://${req.get('host')}`;
     const selectedCurrency = (currency || 'usd').toLowerCase();
 
-    // Construct x-www-form-urlencoded params for Stripe API v1/checkout/sessions
-    const params = new URLSearchParams();
-    params.append('mode', 'payment');
-    params.append('success_url', `${host}/checkout?status=success&session_id={CHECKOUT_SESSION_ID}`);
-    params.append('cancel_url', `${host}/checkout?status=cancelled`);
-
-    if (customerEmail) {
-      params.append('customer_email', customerEmail);
-    }
-
-    items.forEach((item: any, index: number) => {
-      const unitAmount = Math.round((item.price || 10) * 100);
-      params.append(`line_items[${index}][price_data][currency]`, selectedCurrency);
-      params.append(`line_items[${index}][price_data][unit_amount]`, unitAmount.toString());
-      params.append(`line_items[${index}][price_data][product_data][name]`, item.name || 'Pet Product');
-      if (item.image) {
-        params.append(`line_items[${index}][price_data][product_data][images][0]`, item.image);
-      }
-      params.append(`line_items[${index}][quantity]`, (item.quantity || 1).toString());
-    });
-
-    const stripeRes = await fetch('https://api.stripe.com/v1/checkout/sessions', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${stripeSecretKey.trim()}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
+    const lineItems = items.map((item: any) => ({
+      price_data: {
+        currency: selectedCurrency,
+        unit_amount: Math.round((Number(item.price) || 10) * 100),
+        product_data: {
+          name: item.name || 'Pet Product',
+          images: item.image ? [item.image] : [],
+        },
       },
-      body: params.toString(),
+      quantity: Number(item.quantity) || 1,
+    }));
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      customer_email: customerEmail || undefined,
+      line_items: lineItems,
+      success_url: `${host}/checkout?status=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${host}/checkout?status=cancelled`,
+      metadata: {
+        itemsSummary: JSON.stringify(items.map((i: any) => ({ sku: i.sku, qty: i.quantity }))),
+      },
+    } as any);
+
+    return res.json({ url: session.url, sessionId: session.id });
+  } catch (err: any) {
+    console.error('Error creating Stripe checkout session:', err);
+    return res.status(500).json({ error: err.message || 'Erro interno ao criar sessão de checkout.' });
+  }
+};
+
+app.post('/api/checkout/create-session', handleCreateCheckoutSession);
+app.post('/api/create-checkout-session', handleCreateCheckoutSession);
+
+app.get('/api/checkout/session/:sessionId', async (req: Request, res: Response) => {
+  try {
+    const { sessionId } = req.params;
+    if (!process.env.STRIPE_SECRET_KEY) {
+      return res.status(500).json({ error: 'STRIPE_SECRET_KEY não configurada.' });
+    }
+    const stripe = getStripeInstance();
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    return res.json({
+      status: session.status,
+      payment_status: session.payment_status,
+      customer_email: session.customer_email || session.customer_details?.email,
+      amount_total: session.amount_total ? session.amount_total / 100 : 0,
+      metadata: session.metadata,
     });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
 
-    const data = await stripeRes.json();
+// Resend Email Sending Endpoint for support@lingpetshop.com
+app.post('/api/send-email', async (req: Request, res: Response) => {
+  try {
+    const { to, subject, html, text, fromName, resendApiKey } = req.body;
+    const apiKey = resendApiKey || process.env.RESEND_API_KEY || 're_aNjipU2c_DDU5j6EJ823rfmwpAdBNEuCN';
 
-    if (!stripeRes.ok) {
-      console.error('Stripe API Error:', data);
-      return res.status(stripeRes.status).json({
-        error: data.error?.message || 'Failed to create Stripe checkout session',
-        raw: data.error,
+    if (!apiKey) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'RESEND_API_KEY não configurada. Configure a variável de ambiente RESEND_API_KEY ou insira sua chave da Resend no painel admin.' 
       });
     }
 
-    return res.json({ url: data.url, sessionId: data.id });
+    const resend = new Resend(apiKey);
+
+    const response = await resend.emails.send({
+      from: `${fromName || 'Ling Petshop Support'} <support@lingpetshop.com>`,
+      to: to || 'support@lingpetshop.com',
+      subject: subject || 'Nova mensagem - Ling Petshop',
+      html: html || '<p>Nova mensagem enviada pelo site Ling Petshop.</p>',
+      text: text,
+    });
+
+    return res.json({ success: true, data: response });
   } catch (err: any) {
-    console.error('Server error creating checkout session:', err);
-    return res.status(500).json({ error: err.message || 'Internal server error' });
+    console.error('Erro ao enviar e-mail com Resend:', err);
+    return res.status(500).json({ success: false, error: err.message });
   }
 });
 
