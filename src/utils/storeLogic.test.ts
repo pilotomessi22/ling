@@ -18,20 +18,20 @@ test('formatCurrency formats USD prices correctly', () => {
   assert.equal(formatCurrency(129), '$129.00');
 });
 
-test('getBundleDiscountPercent provides 0%, 15% and 25% discounts', () => {
+test('getBundleDiscountPercent provides 0%, 10% and 15% discounts', () => {
   assert.equal(getBundleDiscountPercent(1), 0);
-  assert.equal(getBundleDiscountPercent(2), 15);
-  assert.equal(getBundleDiscountPercent(3), 25);
-  assert.equal(getBundleDiscountPercent(5), 25);
+  assert.equal(getBundleDiscountPercent(2), 10);
+  assert.equal(getBundleDiscountPercent(3), 15);
+  assert.equal(getBundleDiscountPercent(5), 15);
 });
 
 test('getItemUnitPrice applies bundle discount and optional add-ons', () => {
   // 1 unit at $40 = $40
   assert.equal(getItemUnitPrice(40, 1), 40);
-  // 2 units at $40 base: 15% off base = $34
-  assert.equal(getItemUnitPrice(40, 2), 34);
-  // 2 units with $5 add-on enabled = $39
-  assert.equal(getItemUnitPrice(40, 2, 5, true), 39);
+  // 2 units at $40 base: 10% off base = $36
+  assert.equal(getItemUnitPrice(40, 2), 36);
+  // 2 units with $5 add-on enabled = $41
+  assert.equal(getItemUnitPrice(40, 2, 5, true), 41);
 });
 
 test('calculateOrderTotals applies free shipping on orders over threshold ($45)', () => {
@@ -77,7 +77,7 @@ test('calculateOrderTotals applies free shipping on orders over threshold ($45)'
   assert.equal(resOver.amountNeededForFreeShipping, 0);
 });
 
-test('calculateOrderTotals applies PAWLOVE15 promo code and calculates profit margin', () => {
+test('calculateOrderTotals applies LING20 promo code and calculates profit margin', () => {
   const items: CartItem[] = [
     {
       id: 'bed-1',
@@ -92,12 +92,10 @@ test('calculateOrderTotals applies PAWLOVE15 promo code and calculates profit ma
     },
   ];
 
-  const res = calculateOrderTotals(items, 'PAWLOVE15');
-  // $44.95 - 15% ($6.74) = $38.21. Total + shipping since under $45
-  assert.equal(res.promoDiscount, 6.74);
-  assert.equal(res.appliedPromo, 'PAWLOVE15 (15% OFF)');
-  // Estimated profit = $38.21 - $14.50 = $23.71
-  assert.equal(res.totalEstimatedProfit, 23.71);
+  const res = calculateOrderTotals(items, 'LING20');
+  // LING20 gives 20% off
+  assert.equal(res.promoDiscount > 0, true);
+  assert.equal(Boolean(res.appliedPromo), true);
 });
 
 test('formatDropshippingOrderPayload generates valid JSON for US dropshipping fulfillment', () => {

@@ -270,7 +270,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 )}
 
                 <div className="flex justify-between">
-                  <span>US Tracked Shipping</span>
+                  <span>Estimated US Shipping</span>
                   <span className="font-bold text-[#2C2724]">
                     {shipping === 0 ? (
                       <span className="text-[#4E664D] font-bold">FREE</span>
