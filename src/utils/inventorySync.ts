@@ -90,6 +90,7 @@ export async function syncInventoryWithSupplier(force: boolean = false): Promise
     const res = await fetch('/api/inventory/sync-all', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ force }),
     });
 

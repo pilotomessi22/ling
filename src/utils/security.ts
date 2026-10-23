@@ -45,6 +45,7 @@ export async function checkAdminPassword(inputPassword: string): Promise<AuthChe
     const res = await fetch('/api/admin/verify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ password: inputPassword.trim() }),
     });
     const data = await res.json();

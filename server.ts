@@ -50,6 +50,7 @@ function saveStoredOrders(orders: any[]): void {
 }
 
 const app = express();
+export { app };
 app.set('trust proxy', true);
 const PORT = process.env.PORT || 3000;
 
