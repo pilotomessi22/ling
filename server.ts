@@ -647,9 +647,15 @@ const getStripeInstance = () => {
   const secretKey = process.env.STRIPE_SECRET_KEY;
   if (!secretKey || secretKey.trim() === '') {
     console.error('[Stripe Diagnostic] STRIPE_SECRET_KEY is missing or empty.');
-    throw new Error('STRIPE_SECRET_KEY não está configurada nos Segredos do Google AI Studio.');
+    throw new Error('STRIPE_SECRET_KEY não está configurada.');
   }
   const trimmed = secretKey.trim();
+  const isTestMode = process.env.NODE_ENV === 'test' || process.env.ORDERS_FILE?.includes('test') || process.env.USE_ENV_TEST === 'true';
+  if (isTestMode && !trimmed.startsWith('sk_test_')) {
+    const errorMsg = `[FATAL ERROR] Test environment violation! STRIPE_SECRET_KEY must start with 'sk_test_' in test mode. Live keys are prohibited in test environments.`;
+    console.error(errorMsg);
+    throw new Error(errorMsg);
+  }
   const keyType = trimmed.startsWith('sk_live_') ? 'live' : trimmed.startsWith('sk_test_') ? 'test' : 'unknown';
   console.log(`[Stripe Diagnostic] Initializing Stripe with ${keyType} key (length: ${trimmed.length}, prefix: ${trimmed.slice(0, 7)}...)`);
   return new Stripe(trimmed, { apiVersion: '2023-10-16' as any });
