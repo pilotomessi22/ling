@@ -1,7 +1,17 @@
-import 'dotenv/config';
-import express, { Request, Response } from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+if (process.env.NODE_ENV === 'test' || process.env.ORDERS_FILE?.includes('test') || process.env.USE_ENV_TEST === 'true') {
+  dotenv.config({ path: path.resolve(__dirname, '.env.test'), override: true });
+} else {
+  dotenv.config();
+}
+
+import express, { Request, Response } from 'express';
 import fs from 'fs';
 import crypto from 'crypto';
 import { Resend } from 'resend';
@@ -17,10 +27,7 @@ import {
   sendTestEmailDirect 
 } from './src/utils/emailService.ts';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const ORDERS_FILE = path.join(__dirname, 'orders.json');
+const ORDERS_FILE = path.join(__dirname, process.env.ORDERS_FILE || 'orders.json');
 
 function getStoredOrders(): any[] {
   try {
