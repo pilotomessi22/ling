@@ -315,16 +315,15 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanPwd = loginPassword.trim();
-    const storedPwd = localStorage.getItem('ling_admin_password') || 'admin123';
-    if (cleanPwd === storedPwd) {
+    const result = await checkAdminPassword(cleanPwd);
+    if (result.success) {
       setIsAuthenticated(true);
-      localStorage.setItem('ling_admin_authenticated', 'true');
       setLoginError('');
     } else {
-      setLoginError('Senha incorreta. Acesso restrito.');
+      setLoginError(result.error || 'Senha incorreta. Acesso restrito.');
     }
   };
 
@@ -513,7 +512,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   });
 
   useEffect(() => {
-    fetch('/api/orders')
+    fetch('/api/orders', { credentials: 'include' })
       .then((res) => res.json())
       .then((data) => {
         if (data.success && Array.isArray(data.orders)) {
@@ -551,8 +550,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-admin-token': 'ling_admin_authenticated',
         },
+        credentials: 'include',
         body: JSON.stringify({
           orderId,
           fulfillmentStatus: 'Despachado',
@@ -1729,7 +1728,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
 
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/logout', { method: 'POST', credentials: 'include' });
+    } catch (e) {}
     setIsAuthenticated(false);
     localStorage.removeItem('ling_admin_authenticated');
   };

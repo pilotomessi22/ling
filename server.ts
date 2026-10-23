@@ -3,6 +3,7 @@ import express, { Request, Response } from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import crypto from 'crypto';
 import { Resend } from 'resend';
 import Stripe from 'stripe';
 import { calculateOrderTotals } from './src/utils/storeLogic.ts';
@@ -208,6 +209,114 @@ app.get('/api/health', (_req: Request, res: Response) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+// Secure Admin Sessions Map & Cookie Helper
+const adminSessions = new Map<string, { expiresAt: number }>();
+
+function getCookie(req: Request, name: string): string | null {
+  const cookieHeader = req.headers.cookie;
+  if (!cookieHeader) return null;
+  const cookies = cookieHeader.split(';');
+  for (let cookie of cookies) {
+    const parts = cookie.trim().split('=');
+    if (parts[0] === name) {
+      return decodeURIComponent(parts.slice(1).join('='));
+    }
+  }
+  return null;
+}
+
+// Helper for secure admin authorization check (ADMIN_SECRET_TOKEN & Session ID)
+function verifyAdminAuth(req: Request): boolean {
+  const adminSecret = process.env.ADMIN_SECRET_TOKEN;
+  if (!adminSecret || typeof adminSecret !== 'string' || adminSecret.trim() === '') {
+    return false; // Deny by default if ADMIN_SECRET_TOKEN is missing or empty
+  }
+
+  // 1. Check session cookie or header session ID
+  const sessionId = getCookie(req, 'ling_admin_session') || req.headers['x-admin-session'] || req.headers['x-admin-token'];
+  if (sessionId && typeof sessionId === 'string') {
+    const session = adminSessions.get(sessionId.trim());
+    if (session && Date.now() <= session.expiresAt) {
+      return true;
+    }
+    if (session) {
+      adminSessions.delete(sessionId.trim());
+    }
+  }
+
+  // 2. Fallback to direct ADMIN_SECRET_TOKEN in header if provided (for API/scripts)
+  const authHeader = req.headers['x-admin-token'] || req.headers.authorization;
+  if (authHeader && typeof authHeader === 'string') {
+    let token = authHeader;
+    if (token.startsWith('Bearer ')) {
+      token = token.slice(7);
+    }
+    try {
+      const secretBuffer = Buffer.from(adminSecret.trim());
+      const tokenBuffer = Buffer.from(token.trim());
+      if (secretBuffer.length === tokenBuffer.length) {
+        return crypto.timingSafeEqual(secretBuffer, tokenBuffer);
+      }
+    } catch (e) {
+      return false;
+    }
+  }
+
+  return false;
+}
+
+// Admin Password Verification & Session Generation Endpoint
+app.post('/api/admin/verify', async (req: Request, res: Response) => {
+  try {
+    const adminSecret = process.env.ADMIN_SECRET_TOKEN;
+    if (!adminSecret || typeof adminSecret !== 'string' || adminSecret.trim() === '') {
+      return res.status(401).json({ success: false, error: 'Unauthorized. ADMIN_SECRET_TOKEN is not configured on the server.' });
+    }
+
+    const { password } = req.body;
+    if (!password || typeof password !== 'string') {
+      return res.status(400).json({ success: false, error: 'Password is required.' });
+    }
+
+    const secretBuffer = Buffer.from(adminSecret.trim());
+    const passwordBuffer = Buffer.from(password.trim());
+    let isValid = false;
+    if (secretBuffer.length === passwordBuffer.length) {
+      isValid = crypto.timingSafeEqual(secretBuffer, passwordBuffer);
+    }
+
+    if (!isValid) {
+      return res.status(401).json({ success: false, error: 'Incorrect password.' });
+    }
+
+    // Generate secure session ID (NEVER return the password!)
+    const sessionId = crypto.randomBytes(32).toString('hex');
+    adminSessions.set(sessionId, { expiresAt: Date.now() + 2 * 60 * 60 * 1000 }); // 2 hours expiration
+
+    const isProd = process.env.NODE_ENV === 'production';
+    res.setHeader(
+      'Set-Cookie',
+      `ling_admin_session=${sessionId}; HttpOnly; Path=/; Max-Age=7200; SameSite=Lax${isProd ? '; Secure' : ''}`
+    );
+
+    return res.json({ success: true });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Admin Logout Endpoint
+app.post('/api/admin/logout', (req: Request, res: Response) => {
+  const sessionId = getCookie(req, 'ling_admin_session') || req.headers['x-admin-session'];
+  if (sessionId && typeof sessionId === 'string') {
+    adminSessions.delete(sessionId.trim());
+  }
+  res.setHeader('Set-Cookie', 'ling_admin_session=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax');
+  return res.json({ success: true });
+});
+
+
 
 // Endpoint to check live Stripe Account status
 app.get('/api/stripe-status', async (_req: Request, res: Response) => {
@@ -791,7 +900,10 @@ app.get('/api/checkout/session/:sessionId', async (req: Request, res: Response) 
 
 
 
-app.get('/api/orders', (_req: Request, res: Response) => {
+app.get('/api/orders', (req: Request, res: Response) => {
+  if (!verifyAdminAuth(req)) {
+    return res.status(401).json({ success: false, error: 'Unauthorized. Admin authentication required.' });
+  }
   const orders = getStoredOrders();
   res.json({ success: true, orders });
 });
@@ -862,17 +974,10 @@ app.post('/api/orders', async (req: Request, res: Response) => {
 app.post('/api/orders/update-status', async (req: Request, res: Response) => {
   try {
     // Security check: Only authenticated admins can modify fulfillment & tracking
-    const adminToken = req.headers['x-admin-token'] || req.headers.authorization;
-    const isAuthorized =
-      adminToken === 'ling_admin_authenticated' ||
-      adminToken === 'Bearer ling_admin_authenticated' ||
-      (process.env.ADMIN_SECRET_TOKEN && adminToken === process.env.ADMIN_SECRET_TOKEN) ||
-      process.env.NODE_ENV !== 'production';
-
-    if (!isAuthorized) {
+    if (!verifyAdminAuth(req)) {
       return res.status(401).json({
         success: false,
-        error: 'Unauthorized. Admin credentials required to modify tracking.'
+        error: 'Unauthorized. Valid ADMIN_SECRET_TOKEN credentials required.'
       });
     }
 
@@ -954,14 +1059,7 @@ app.post('/api/orders/update-status', async (req: Request, res: Response) => {
 // Resend tracking email endpoint for manual controlled retries
 app.post('/api/orders/resend-tracking-email', async (req: Request, res: Response) => {
   try {
-    const adminToken = req.headers['x-admin-token'] || req.headers.authorization;
-    const isAuthorized =
-      adminToken === 'ling_admin_authenticated' ||
-      adminToken === 'Bearer ling_admin_authenticated' ||
-      (process.env.ADMIN_SECRET_TOKEN && adminToken === process.env.ADMIN_SECRET_TOKEN) ||
-      process.env.NODE_ENV !== 'production';
-
-    if (!isAuthorized) {
+    if (!verifyAdminAuth(req)) {
       return res.status(401).json({ success: false, error: 'Unauthorized.' });
     }
 

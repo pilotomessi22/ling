@@ -16,8 +16,7 @@ export function sanitizeInput(str: string): string {
     .trim();
 }
 
-// 2. Admin Rate Limiting & Password Protection
-const ADMIN_CORRECT_PASSWORD = '26733089';
+// 2. Admin Rate Limiting & Secure Backend Verification
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 60000; // 60 seconds
 
@@ -28,7 +27,7 @@ export interface AuthCheckResult {
   remainingLockoutSeconds?: number;
 }
 
-export function checkAdminPassword(inputPassword: string): AuthCheckResult {
+export async function checkAdminPassword(inputPassword: string): Promise<AuthCheckResult> {
   const now = Date.now();
   const lockoutUntil = parseInt(localStorage.getItem('ling_admin_lockout_until') || '0', 10);
 
@@ -42,14 +41,25 @@ export function checkAdminPassword(inputPassword: string): AuthCheckResult {
     };
   }
 
-  const cleanInput = inputPassword.trim();
+  try {
+    const res = await fetch('/api/admin/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: inputPassword.trim() }),
+    });
+    const data = await res.json();
 
-  if (cleanInput === ADMIN_CORRECT_PASSWORD) {
-    // Reset failed attempts upon success
-    localStorage.removeItem('ling_admin_failed_attempts');
-    localStorage.removeItem('ling_admin_lockout_until');
-    localStorage.setItem('ling_admin_authenticated', 'true');
-    return { success: true };
+    if (res.ok && data.success) {
+      localStorage.removeItem('ling_admin_failed_attempts');
+      localStorage.removeItem('ling_admin_lockout_until');
+      localStorage.setItem('ling_admin_authenticated', 'true');
+      if (data.token) {
+        sessionStorage.setItem('ling_admin_token', data.token);
+      }
+      return { success: true };
+    }
+  } catch (err) {
+    // Network or server error
   }
 
   // Handle failure
@@ -87,13 +97,11 @@ export function initSiteSecurity(): () => void {
 
   // Prevent keyboard shortcuts for raw source inspection if desired
   const handleKeyDown = (e: KeyboardEvent) => {
-    // F12 or Ctrl+Shift+I / Cmd+Option+I on images
     if (
       e.key === 'F12' ||
       (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
       (e.metaKey && e.altKey && (e.key === 'I' || e.key === 'J' || e.key === 'C'))
     ) {
-      // Allow for dev inspection in dev environment, but log security status
       console.warn('🔒 Ling Petshop Shield: Standard 256-Bit SSL & Asset Protection Active');
     }
   };
