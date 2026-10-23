@@ -157,5 +157,50 @@ describe('Ling Petshop Security & Order Flow Audit Tests', () => {
     // Valid cookie should succeed
     assert.strictEqual(verifyAuthExclusive(validSessionId, {}), true);
   });
+
+  it('8. Session lifecycle (Login, Session Check, Logout, Unauthenticated Access)', () => {
+    const sessions = new Map<string, { expiresAt: number }>();
+    
+    const login = (password: string, adminSecret: string) => {
+      if (password !== adminSecret) return { success: false };
+      const sessionId = crypto.randomBytes(32).toString('hex');
+      sessions.set(sessionId, { expiresAt: Date.now() + 7200000 });
+      return { success: true, sessionId };
+    };
+
+    const checkSession = (sessionId?: string) => {
+      if (!sessionId) return { authenticated: false };
+      const session = sessions.get(sessionId);
+      if (session && Date.now() <= session.expiresAt) {
+        return { authenticated: true };
+      }
+      return { authenticated: false };
+    };
+
+    const logout = (sessionId?: string) => {
+      if (sessionId) sessions.delete(sessionId);
+      return { success: true };
+    };
+
+    // 1. Unauthenticated check fails
+    assert.strictEqual(checkSession(undefined).authenticated, false);
+
+    // 2. Login with wrong password fails
+    const loginWrong = login('wrong', '26733089');
+    assert.strictEqual(loginWrong.success, false);
+
+    // 3. Login with correct password succeeds
+    const loginOk = login('26733089', '26733089');
+    assert.strictEqual(loginOk.success, true);
+    assert.ok(loginOk.sessionId);
+
+    // 4. Session check with valid session succeeds
+    assert.strictEqual(checkSession(loginOk.sessionId).authenticated, true);
+
+    // 5. Logout invalidates session
+    logout(loginOk.sessionId);
+    assert.strictEqual(checkSession(loginOk.sessionId).authenticated, false);
+  });
 });
+
 

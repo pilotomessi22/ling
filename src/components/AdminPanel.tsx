@@ -309,11 +309,31 @@ interface AdminPanelProps {
 
 export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   // Authentication state
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    return localStorage.getItem('ling_admin_authenticated') === 'true';
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isCheckingSession, setIsCheckingSession] = useState<boolean>(true);
   const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
+
+  useEffect(() => {
+    fetch('/api/admin/session', { credentials: 'include' })
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        }
+        throw new Error('Unauthorized');
+      })
+      .then((data) => {
+        if (data.authenticated) {
+          setIsAuthenticated(true);
+        }
+      })
+      .catch(() => {
+        setIsAuthenticated(false);
+      })
+      .finally(() => {
+        setIsCheckingSession(false);
+      });
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -397,25 +417,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
   const handleChangePassword = (e: React.FormEvent) => {
     e.preventDefault();
-    const currentActual = localStorage.getItem('ling_admin_password') || 'admin123';
-    if (currentPwdInput.trim() !== currentActual) {
-      setPwdFeedback({ type: 'error', msg: 'Senha atual incorreta.' });
-      return;
-    }
-    if (newPwdInput.trim().length < 4) {
-      setPwdFeedback({ type: 'error', msg: 'A nova senha deve ter no mínimo 4 caracteres.' });
-      return;
-    }
-    if (newPwdInput.trim() !== confirmPwdInput.trim()) {
-      setPwdFeedback({ type: 'error', msg: 'A nova senha e a confirmação não conferem.' });
-      return;
-    }
-    localStorage.setItem('ling_admin_password', newPwdInput.trim());
-    setCurrentPwdInput('');
-    setNewPwdInput('');
-    setConfirmPwdInput('');
-    setPwdFeedback({ type: 'success', msg: 'Senha de administrador alterada com sucesso!' });
-    setTimeout(() => setPwdFeedback(null), 6000);
+    setPwdFeedback({
+      type: 'error',
+      msg: 'A alteração de senha deve ser gerenciada diretamente no servidor através da variável de ambiente ADMIN_SECRET_TOKEN.',
+    });
   };
 
   // Catalog & CJ Margins Tab State
@@ -1861,6 +1866,17 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
       if (catalogSort === 'bestsellers') return b.reviewsCount - a.reviewsCount;
       return 0;
     });
+
+  if (isCheckingSession) {
+    return (
+      <div className="fixed inset-0 z-50 bg-[#00142A] text-white flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <div className="w-10 h-10 border-4 border-emerald-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-xs font-bold text-blue-200 tracking-wider uppercase">Verificando sessão segura...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Render Login Wall if not authenticated
   if (!isAuthenticated) {
@@ -4670,76 +4686,18 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
               </div>
             </div>
 
-            {/* Change Password Card */}
-            <div className="bg-white p-6 sm:p-7 rounded-3xl border border-gray-200 shadow-xs space-y-5">
+            {/* Change Password Card (Server Managed Security) */}
+            <div className="bg-white p-6 sm:p-7 rounded-3xl border border-gray-200 shadow-xs space-y-4">
               <div className="flex items-center gap-2 border-b border-gray-100 pb-4">
                 <Key size={18} className="text-[#2563EB]" />
-                <h3 className="text-base font-bold text-gray-900">Alterar Senha de Administrador</h3>
+                <h3 className="text-base font-bold text-gray-900">Segurança da Senha Administrativa</h3>
               </div>
-
-              {pwdFeedback && (
-                <div
-                  className={`p-4 rounded-2xl text-xs font-bold flex items-center gap-2 ${
-                    pwdFeedback.type === 'success'
-                      ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                      : 'bg-rose-50 text-rose-800 border border-rose-200'
-                  }`}
-                >
-                  <AlertCircle size={16} className="shrink-0" />
-                  <span>{pwdFeedback.msg}</span>
-                </div>
-              )}
-
-              <form onSubmit={handleChangePassword} className="space-y-4 max-w-md">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
-                    Senha Atual
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    value={currentPwdInput}
-                    onChange={(e) => setCurrentPwdInput(e.target.value)}
-                    placeholder="Digite a senha atual..."
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs text-gray-900 focus:outline-none focus:border-blue-500 font-mono"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
-                    Nova Senha
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    value={newPwdInput}
-                    onChange={(e) => setNewPwdInput(e.target.value)}
-                    placeholder="Digite a nova senha (mínimo 4 caracteres)..."
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs text-gray-900 focus:outline-none focus:border-blue-500 font-mono"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
-                    Confirmar Nova Senha
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    value={confirmPwdInput}
-                    onChange={(e) => setConfirmPwdInput(e.target.value)}
-                    placeholder="Confirme a nova senha..."
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs text-gray-900 focus:outline-none focus:border-blue-500 font-mono"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs px-6 py-3 rounded-xl shadow-md transition-all cursor-pointer"
-                >
-                  Atualizar Senha
-                </button>
-              </form>
+              <p className="text-xs text-gray-600 leading-relaxed">
+                Por motivos de segurança estrita ("Blindagem 100%"), a senha administrativa do Ling Petshop é gerenciada exclusivamente no servidor através da variável de ambiente <strong>ADMIN_SECRET_TOKEN</strong> e não pode ser modificada por scripts do navegador.
+              </p>
+              <div className="p-4 rounded-2xl bg-blue-50 border border-blue-100 text-xs text-blue-900 font-medium">
+                🔒 Sessões protegidas por cookies HttpOnly de 2 horas e criptografia em trânsito.
+              </div>
             </div>
 
             {/* General Info Card */}

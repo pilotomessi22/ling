@@ -52,10 +52,6 @@ export async function checkAdminPassword(inputPassword: string): Promise<AuthChe
     if (res.ok && data.success) {
       localStorage.removeItem('ling_admin_failed_attempts');
       localStorage.removeItem('ling_admin_lockout_until');
-      localStorage.setItem('ling_admin_authenticated', 'true');
-      if (data.token) {
-        sessionStorage.setItem('ling_admin_token', data.token);
-      }
       return { success: true };
     }
   } catch (err) {

@@ -297,6 +297,15 @@ app.post('/api/admin/logout', (req: Request, res: Response) => {
   return res.json({ success: true });
 });
 
+// Admin Session Validation Endpoint
+app.get('/api/admin/session', (req: Request, res: Response) => {
+  if (verifyAdminAuth(req)) {
+    return res.json({ authenticated: true });
+  }
+  return res.status(401).json({ authenticated: false, error: 'Unauthorized' });
+});
+
+
 
 
 // Endpoint to check live Stripe Account status
