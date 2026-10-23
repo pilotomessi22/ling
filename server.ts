@@ -226,15 +226,14 @@ function getCookie(req: Request, name: string): string | null {
   return null;
 }
 
-// Helper for secure admin authorization check (ADMIN_SECRET_TOKEN & Session ID)
+// Helper for secure admin authorization check (exclusively via ling_admin_session cookie)
 function verifyAdminAuth(req: Request): boolean {
   const adminSecret = process.env.ADMIN_SECRET_TOKEN;
   if (!adminSecret || typeof adminSecret !== 'string' || adminSecret.trim() === '') {
     return false; // Deny by default if ADMIN_SECRET_TOKEN is missing or empty
   }
 
-  // 1. Check session cookie or header session ID
-  const sessionId = getCookie(req, 'ling_admin_session') || req.headers['x-admin-session'] || req.headers['x-admin-token'];
+  const sessionId = getCookie(req, 'ling_admin_session');
   if (sessionId && typeof sessionId === 'string') {
     const session = adminSessions.get(sessionId.trim());
     if (session && Date.now() <= session.expiresAt) {
@@ -242,24 +241,6 @@ function verifyAdminAuth(req: Request): boolean {
     }
     if (session) {
       adminSessions.delete(sessionId.trim());
-    }
-  }
-
-  // 2. Fallback to direct ADMIN_SECRET_TOKEN in header if provided (for API/scripts)
-  const authHeader = req.headers['x-admin-token'] || req.headers.authorization;
-  if (authHeader && typeof authHeader === 'string') {
-    let token = authHeader;
-    if (token.startsWith('Bearer ')) {
-      token = token.slice(7);
-    }
-    try {
-      const secretBuffer = Buffer.from(adminSecret.trim());
-      const tokenBuffer = Buffer.from(token.trim());
-      if (secretBuffer.length === tokenBuffer.length) {
-        return crypto.timingSafeEqual(secretBuffer, tokenBuffer);
-      }
-    } catch (e) {
-      return false;
     }
   }
 

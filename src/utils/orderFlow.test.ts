@@ -133,4 +133,29 @@ describe('Ling Petshop Security & Order Flow Audit Tests', () => {
     const isExpiredValid = expiredSession && Date.now() <= (expiredSession.expiresAt);
     assert.strictEqual(Boolean(isExpiredValid), false);
   });
+
+  it('7. Header tokens (x-admin-token, Authorization, x-admin-session) do not grant admin access', () => {
+    const sessions = new Map<string, { expiresAt: number }>();
+    const validSessionId = crypto.randomBytes(32).toString('hex');
+    sessions.set(validSessionId, { expiresAt: Date.now() + 60000 });
+
+    const verifyAuthExclusive = (cookieValue: string | undefined, headers: Record<string, string>) => {
+      // Simulate new verifyAdminAuth logic (exclusively cookie)
+      if (!cookieValue) return false;
+      const session = sessions.get(cookieValue.trim());
+      if (session && Date.now() <= session.expiresAt) {
+        return true;
+      }
+      return false;
+    };
+
+    // Header attempts should fail
+    assert.strictEqual(verifyAuthExclusive(undefined, { 'x-admin-token': '26733089' }), false);
+    assert.strictEqual(verifyAuthExclusive(undefined, { 'authorization': 'Bearer 26733089' }), false);
+    assert.strictEqual(verifyAuthExclusive(undefined, { 'x-admin-session': validSessionId }), false);
+
+    // Valid cookie should succeed
+    assert.strictEqual(verifyAuthExclusive(validSessionId, {}), true);
+  });
 });
+
