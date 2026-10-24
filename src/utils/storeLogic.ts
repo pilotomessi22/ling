@@ -1,4 +1,4 @@
-import { getSavedCoupons } from '../data/storeData.ts';
+import { DEFAULT_COUPONS, getCheckoutCoupons, type Coupon } from '../data/storeData.ts';
 
 export interface CartItem {
   id: string;
@@ -19,6 +19,7 @@ export interface CartItem {
   stockCount?: number;
   inStock?: boolean;
   productId?: string;
+  volumeTiers?: { qty: number; discountPercent: number }[];
 }
 
 export interface ShippingAddress {
@@ -58,6 +59,17 @@ export function getBundleDiscountPercent(itemQuantity: number): number {
   if (itemQuantity >= 3) return 15;
   if (itemQuantity >= 2) return 10;
   return 0;
+}
+
+/**
+ * Desconto por quantidade do item: usa a tabela do próprio produto (a mesma mostrada na página do produto)
+ * e cai na regra geral quando o produto não tem tabela.
+ */
+export function getItemBundleDiscountPercent(item: Pick<CartItem, 'quantity' | 'volumeTiers'>): number {
+  const tiers = (item.volumeTiers || []).filter((t) => t.qty <= item.quantity);
+  if (tiers.length === 0) return getBundleDiscountPercent(item.quantity);
+  const best = tiers.reduce((acc, t) => (t.qty > acc.qty ? t : acc));
+  return Math.min(90, Math.max(0, Number(best.discountPercent) || 0));
 }
 
 /**
@@ -115,7 +127,8 @@ export function calculateOrderTotals(
   deliveryMethod?: string,
   stateCode: string = '',
   zipCode: string = '',
-  deliveryOption: 'usps_ground' | 'usps_priority' = 'usps_ground'
+  deliveryOption: 'usps_ground' | 'usps_priority' = 'usps_ground',
+  coupons?: Coupon[]
 ): OrderCalculationResult {
   let subtotal = 0;
   let bundleDiscount = 0;
@@ -133,7 +146,7 @@ export function calculateOrderTotals(
     if (item.isRepeatDelivery) {
       repeatDeliverySavings += rawTotal * (REPEAT_DELIVERY_DISCOUNT_PERCENT / 100);
     } else {
-      const discountPct = getBundleDiscountPercent(item.quantity);
+      const discountPct = getItemBundleDiscountPercent(item);
       const itemDiscount = (item.price * (discountPct / 100)) * item.quantity;
       bundleDiscount += itemDiscount;
     }
@@ -146,7 +159,9 @@ export function calculateOrderTotals(
   const discountedSubtotal = Math.max(0, subtotal - bundleDiscount - repeatDeliverySavings);
 
   // Dynamic coupon lookup
-  const availableCoupons = getSavedCoupons();
+  // No servidor a lista vem do coupons.json; no navegador, só cupons já validados pelo servidor
+  const availableCoupons =
+    coupons ?? (typeof window === 'undefined' ? DEFAULT_COUPONS : getCheckoutCoupons());
   const matchedCoupon = availableCoupons.find(
     (c) => c.active && c.code.trim().toUpperCase() === cleanPromo
   );

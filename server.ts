@@ -17,6 +17,8 @@ import crypto from 'crypto';
 import { Resend } from 'resend';
 import Stripe from 'stripe';
 import { calculateOrderTotals } from './src/utils/storeLogic.ts';
+import { DEFAULT_COUPONS, PRODUCTS, type Coupon, type Product } from './src/data/storeData.ts';
+import { buildServerCart, validateCheckoutAddress, CheckoutValidationError } from './src/utils/checkoutPricing.ts';
 import { 
   sendOrderConfirmationEmail, 
   sendOrderTrackingEmail, 
@@ -41,6 +43,15 @@ function getStoredOrders(): any[] {
   return [];
 }
 
+// Serializa leitura+escrita do orders.json: sem isso, duas requisições ao mesmo tempo
+// (ex.: webhook e admin) leem a mesma versão e a última a salvar apaga a outra.
+let ordersLock: Promise<unknown> = Promise.resolve();
+function withOrdersLock<T>(fn: () => T | Promise<T>): Promise<T> {
+  const run = ordersLock.then(fn, fn);
+  ordersLock = run.catch(() => undefined);
+  return run;
+}
+
 function saveStoredOrders(orders: any[]): void {
   try {
     const tempFile = `${ORDERS_FILE}.tmp`;
@@ -56,12 +67,42 @@ function saveStoredOrders(orders: any[]): void {
   }
 }
 
+const COUPONS_FILE = path.join(__dirname, process.env.COUPONS_FILE || 'coupons.json');
+
+function getServerCoupons(): Coupon[] {
+  try {
+    if (fs.existsSync(COUPONS_FILE)) {
+      const parsed = JSON.parse(fs.readFileSync(COUPONS_FILE, 'utf8'));
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch (e) {
+    console.error('Error reading coupons.json:', e);
+  }
+  return DEFAULT_COUPONS;
+}
+
+function saveServerCoupons(coupons: Coupon[]): void {
+  const tempFile = `${COUPONS_FILE}.tmp`;
+  fs.writeFileSync(tempFile, JSON.stringify(coupons, null, 2), 'utf8');
+  fs.renameSync(tempFile, COUPONS_FILE);
+}
+
 const app = express();
 export { app };
-app.set('trust proxy', true);
+// Só confia no X-Forwarded-For do nginx (1 salto). Com `true`, qualquer um forja o próprio IP.
+app.set('trust proxy', Number(process.env.TRUST_PROXY_HOPS || 1));
+app.disable('x-powered-by');
 const PORT = process.env.PORT || 3000;
 
+app.use((_req: Request, res: Response, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
+
 // Stripe Webhook needs raw body (defined BEFORE express.json())
+// É o ÚNICO lugar que marca um pedido como pago. O navegador nunca cria nem altera pedido.
 app.post(
   '/api/stripe/webhook',
   express.raw({ type: 'application/json' }),
@@ -71,142 +112,144 @@ app.post(
 
     if (!webhookSecret) {
       console.warn('[Stripe Webhook] STRIPE_WEBHOOK_SECRET is not configured.');
-      return res.status(400).json({ error: 'STRIPE_WEBHOOK_SECRET is missing in environment variables.' });
+      return res.status(500).json({ error: 'Webhook not configured.' });
+    }
+
+    let event: Stripe.Event;
+    try {
+      event = getStripeInstance().webhooks.constructEvent(req.body, sig as string, webhookSecret);
+    } catch (err: any) {
+      console.error(`Webhook signature verification failed: ${err.message}`);
+      return res.status(400).send('Webhook signature verification failed.');
     }
 
     try {
-      const secretKey = process.env.STRIPE_SECRET_KEY;
-      if (!secretKey) {
-        return res.status(500).json({ error: 'STRIPE_SECRET_KEY is missing.' });
-      }
-      const stripe = new Stripe(secretKey, { apiVersion: '2023-10-16' as any });
-      const event = stripe.webhooks.constructEvent(req.body, sig as string, webhookSecret);
-
-      if (event.type === 'checkout.session.completed') {
+      if (
+        event.type === 'checkout.session.completed' ||
+        event.type === 'checkout.session.async_payment_succeeded'
+      ) {
         const session = event.data.object as Stripe.Checkout.Session;
-        const anySess = session as any;
-        console.log(`[Stripe Webhook] Checkout Session Completed: ${session.id}, payment_status: ${session.payment_status}`);
-
-        // Requirement 2: Only process paid orders (Never send confirmation for unpaid/failed sessions)
+        console.log(`[Stripe Webhook] ${event.type}: ${session.id}, payment_status: ${session.payment_status}`);
         if (session.payment_status === 'paid') {
-          try {
-            const orders = getStoredOrders();
-            let targetOrder: any = null;
-            const idx = orders.findIndex((o: any) => o.sessionId === session.id || (session.id && o.orderNumber?.includes(session.id.slice(-6).toUpperCase())));
-            
-            // Parse items metadata if stored during checkout session creation
-            let parsedItems: any[] = [];
-            try {
-              if (session.metadata?.itemsSummary) {
-                parsedItems = JSON.parse(session.metadata.itemsSummary);
-              }
-            } catch (e) {}
-
-            if (idx >= 0) {
-              orders[idx].paymentStatus = 'Paid (Stripe Verified)';
-              orders[idx].fulfillmentStatus = orders[idx].fulfillmentStatus || 'Aguardando Despacho';
-              orders[idx].totalUsd = session.amount_total ? session.amount_total / 100 : orders[idx].totalUsd;
-              orders[idx].sessionId = session.id;
-              if (session.metadata?.subtotalUsd) orders[idx].subtotalUsd = parseFloat(session.metadata.subtotalUsd);
-              if (session.metadata?.discountUsd) orders[idx].discountUsd = parseFloat(session.metadata.discountUsd);
-              if (session.metadata?.shippingUsd) orders[idx].shippingUsd = parseFloat(session.metadata.shippingUsd);
-              if (session.metadata?.appliedPromo) orders[idx].appliedPromo = session.metadata.appliedPromo;
-              if (parsedItems.length > 0 && (!orders[idx].items || orders[idx].items.length === 0 || orders[idx].items[0].sku === 'LP-VERIFIED')) {
-                orders[idx].items = parsedItems.map((pi: any) => ({
-                  name: pi.name || 'Pet Product',
-                  quantity: pi.qty || pi.quantity || 1,
-                  unitPrice: pi.unitPrice || 0,
-                  size: pi.size,
-                  color: pi.color,
-                  sku: pi.sku,
-                }));
-              }
-              targetOrder = orders[idx];
-            } else {
-              const generatedId = `LP-STRIPE-${session.id.slice(-6).toUpperCase()}`;
-              const newOrder: any = {
-                id: `ord-${Date.now()}`,
-                orderNumber: generatedId,
-                date: 'Today, just now',
-                customerName: anySess.customer_details?.name || anySess.shipping_details?.name || 'Valued Customer',
-                customerEmail: session.customer_email || anySess.customer_details?.email || '',
-                customerPhone: anySess.customer_details?.phone || anySess.shipping_details?.phone || '',
-                shippingAddress: anySess.shipping_details?.address ? {
-                  street: [anySess.shipping_details.address.line1, anySess.shipping_details.address.line2].filter(Boolean).join(', '),
-                  city: anySess.shipping_details.address.city || 'Austin',
-                  state: anySess.shipping_details.address.state || 'TX',
-                  zip: anySess.shipping_details.address.postal_code || '78701',
-                  country: anySess.shipping_details.address.country || 'United States',
-                } : {
-                  street: 'Verified Stripe Address',
-                  city: 'Austin',
-                  state: 'TX',
-                  zip: '78701',
-                  country: 'United States',
-                },
-                items: parsedItems.length > 0 ? parsedItems.map((pi: any) => ({
-                  name: pi.name || 'Pet Product',
-                  quantity: pi.qty || pi.quantity || 1,
-                  unitPrice: pi.unitPrice || 0,
-                  size: pi.size,
-                  color: pi.color,
-                  sku: pi.sku,
-                })) : [{ name: 'Ling Petshop Verified Order', quantity: 1, unitPrice: (session.amount_total || 0) / 100 }],
-                subtotalUsd: session.metadata?.subtotalUsd ? parseFloat(session.metadata.subtotalUsd) : (session.amount_total || 0) / 100,
-                discountUsd: session.metadata?.discountUsd ? parseFloat(session.metadata.discountUsd) : 0,
-                shippingUsd: session.metadata?.shippingUsd ? parseFloat(session.metadata.shippingUsd) : 0,
-                totalUsd: (session.amount_total || 0) / 100,
-                appliedPromo: session.metadata?.appliedPromo || '',
-                paymentGateway: 'Stripe (Credit Card / Apple Pay)',
-                paymentStatus: 'Paid (Stripe Verified)',
-                fulfillmentStatus: 'Aguardando Despacho',
-                sessionId: session.id,
-              };
-              orders.unshift(newOrder);
-              targetOrder = newOrder;
-            }
-
-            // Save order first before attempting email (Never lose order on email failure)
-            saveStoredOrders(orders);
-
-            // Trigger confirmation email if not already sent (Strict Idempotency)
-            if (targetOrder && !targetOrder.confirmationEmailSent && targetOrder.customerEmail) {
-              try {
-                const emailResult = await sendOrderConfirmationEmail(targetOrder);
-                if (emailResult.success && emailResult.status === 'sent') {
-                  targetOrder.confirmationEmailSent = true;
-                  targetOrder.confirmationEmailSentAt = new Date().toISOString();
-                  targetOrder.confirmationEmailId = emailResult.messageId;
-                  targetOrder.confirmationEmailStatus = 'sent';
-                  delete targetOrder.confirmationEmailError;
-                } else {
-                  targetOrder.confirmationEmailStatus = emailResult.status;
-                  targetOrder.confirmationEmailError = emailResult.error || emailResult.reason;
-                }
-                saveStoredOrders(orders);
-              } catch (emailErr: any) {
-                targetOrder.confirmationEmailStatus = 'failed';
-                targetOrder.confirmationEmailError = emailErr.message;
-                saveStoredOrders(orders);
-              }
-            }
-          } catch (e) {
-            console.error('[Stripe Webhook] Error updating orders:', e);
-          }
-        } else {
-          console.log(`[Stripe Webhook] Session ${session.id} payment_status is ${session.payment_status} (not paid). Confirmation email withheld.`);
+          await markOrderPaidFromSession(session);
         }
+      } else if (event.type === 'checkout.session.expired' || event.type === 'checkout.session.async_payment_failed') {
+        const session = event.data.object as Stripe.Checkout.Session;
+        await withOrdersLock(() => {
+          const orders = getStoredOrders();
+          const order = findOrderForSession(orders, session);
+          if (order && !isOrderPaid(order)) {
+            order.paymentStatus = event.type === 'checkout.session.expired' ? 'Checkout Expirado' : 'Pagamento Falhou';
+            order.fulfillmentStatus = 'Cancelado (não pago)';
+            saveStoredOrders(orders);
+          }
+        });
       }
-
       return res.json({ received: true });
     } catch (err: any) {
-      console.error(`Webhook signature verification failed: ${err.message}`);
-      return res.status(400).send(`Webhook Error: ${err.message}`);
+      // 500 faz a Stripe reenviar o evento mais tarde, em vez de perder o pedido
+      console.error('[Stripe Webhook] Error processing event:', err);
+      return res.status(500).json({ error: 'Webhook processing failed.' });
     }
   }
 );
 
-app.use(express.json());
+function isOrderPaid(order: any): boolean {
+  const s = (order?.paymentStatus || '').toLowerCase();
+  return s.includes('paid') || s.includes('verified');
+}
+
+function findOrderForSession(orders: any[], session: Stripe.Checkout.Session): any | undefined {
+  const orderId = session.metadata?.orderId || session.client_reference_id;
+  return (
+    (orderId ? orders.find((o: any) => o.id === orderId) : undefined) ||
+    orders.find((o: any) => o.sessionId === session.id)
+  );
+}
+
+async function markOrderPaidFromSession(session: Stripe.Checkout.Session): Promise<void> {
+  const anySess = session as any;
+  const orderToEmail = await withOrdersLock(() => {
+    const orders = getStoredOrders();
+    let order = findOrderForSession(orders, session);
+
+    if (!order) {
+      // Sessão paga sem pedido no servidor (ex.: criada pela versão antiga do site). Registra para revisão manual.
+      order = {
+        id: `ord-${crypto.randomUUID()}`,
+        orderNumber: `LP-${session.id.slice(-8).toUpperCase()}`,
+        createdAt: new Date().toISOString(),
+        date: new Date().toISOString(),
+        customerName: anySess.customer_details?.name || 'Customer',
+        customerEmail: anySess.customer_details?.email || session.customer_email || '',
+        customerPhone: anySess.customer_details?.phone || '',
+        shippingAddress: null,
+        items: [],
+        totalUsd: (session.amount_total || 0) / 100,
+        paymentGateway: 'Stripe',
+        sessionId: session.id,
+        needsReview: true,
+        reviewReason: 'Pagamento recebido, mas o pedido não foi encontrado no servidor. Conferir na Stripe antes de despachar.',
+      };
+      orders.unshift(order);
+    }
+
+    if (isOrderPaid(order)) {
+      // Evento repetido (a Stripe pode reenviar): nada a mudar
+      return order.confirmationEmailSent ? null : { ...order };
+    }
+
+    order.paymentStatus = 'Paid (Stripe Verified)';
+    order.paidAt = new Date().toISOString();
+    order.sessionId = session.id;
+    order.paymentIntentId = typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id;
+    order.amountPaidCents = session.amount_total;
+
+    // Confere se o valor cobrado é exatamente o que o servidor calculou
+    const expected = order.expectedAmountCents;
+    if (typeof expected === 'number' && (session.amount_total !== expected || session.currency !== 'usd')) {
+      order.needsReview = true;
+      order.reviewReason = `Valor pago (${session.amount_total} ${session.currency}) diferente do esperado (${expected} usd).`;
+    }
+    order.fulfillmentStatus = order.needsReview ? 'Revisar antes de despachar' : 'Aguardando Despacho';
+
+    saveStoredOrders(orders);
+    return order.customerEmail && !order.confirmationEmailSent ? { ...order } : null;
+  });
+
+  if (orderToEmail) {
+    await sendConfirmationAndRecord(orderToEmail);
+  }
+}
+
+async function sendConfirmationAndRecord(order: any): Promise<void> {
+  let update: Record<string, any>;
+  try {
+    const emailResult = await sendOrderConfirmationEmail(order);
+    update =
+      emailResult.success && emailResult.status === 'sent'
+        ? {
+            confirmationEmailSent: true,
+            confirmationEmailSentAt: new Date().toISOString(),
+            confirmationEmailId: emailResult.messageId,
+            confirmationEmailStatus: 'sent',
+            confirmationEmailError: undefined,
+          }
+        : { confirmationEmailStatus: emailResult.status, confirmationEmailError: emailResult.error || emailResult.reason };
+  } catch (emailErr: any) {
+    update = { confirmationEmailStatus: 'failed', confirmationEmailError: emailErr.message };
+  }
+  await withOrdersLock(() => {
+    const orders = getStoredOrders();
+    const target = orders.find((o: any) => o.id === order.id);
+    if (target) {
+      Object.assign(target, update);
+      saveStoredOrders(orders);
+    }
+  });
+}
+
+app.use(express.json({ limit: '200kb' }));
 
 // Healthcheck endpoint for VPS monitoring & uptime checks
 app.get('/api/health', (_req: Request, res: Response) => {
@@ -255,9 +298,45 @@ function verifyAdminAuth(req: Request): boolean {
   return false;
 }
 
+function requireAdmin(req: Request, res: Response, next: () => void) {
+  if (!verifyAdminAuth(req)) {
+    return res.status(401).json({ success: false, error: 'Unauthorized. Admin authentication required.' });
+  }
+  next();
+}
+
+// Limite de tentativas de login no SERVIDOR (o bloqueio antigo ficava no navegador e era só limpar o cache)
+const LOGIN_MAX_FAILURES = 5;
+const LOGIN_WINDOW_MS = 15 * 60 * 1000;
+const loginFailures = new Map<string, { count: number; firstAt: number }>();
+
+function isLoginBlocked(ip: string): boolean {
+  const entry = loginFailures.get(ip);
+  if (!entry) return false;
+  if (Date.now() - entry.firstAt > LOGIN_WINDOW_MS) {
+    loginFailures.delete(ip);
+    return false;
+  }
+  return entry.count >= LOGIN_MAX_FAILURES;
+}
+
+function registerLoginFailure(ip: string): void {
+  const entry = loginFailures.get(ip);
+  if (!entry || Date.now() - entry.firstAt > LOGIN_WINDOW_MS) {
+    loginFailures.set(ip, { count: 1, firstAt: Date.now() });
+  } else {
+    entry.count += 1;
+  }
+}
+
 // Admin Password Verification & Session Generation Endpoint
 app.post('/api/admin/verify', async (req: Request, res: Response) => {
   try {
+    const ip = req.ip || 'unknown';
+    if (isLoginBlocked(ip)) {
+      return res.status(429).json({ success: false, error: 'Muitas tentativas. Tente novamente em 15 minutos.' });
+    }
+
     const adminSecret = process.env.ADMIN_SECRET_TOKEN;
     if (!adminSecret || typeof adminSecret !== 'string' || adminSecret.trim() === '') {
       return res.status(401).json({ success: false, error: 'Unauthorized. ADMIN_SECRET_TOKEN is not configured on the server.' });
@@ -276,8 +355,10 @@ app.post('/api/admin/verify', async (req: Request, res: Response) => {
     }
 
     if (!isValid) {
+      registerLoginFailure(ip);
       return res.status(401).json({ success: false, error: 'Incorrect password.' });
     }
+    loginFailures.delete(ip);
 
     // Generate secure session ID (NEVER return the password!)
     const sessionId = crypto.randomBytes(32).toString('hex');
@@ -317,20 +398,22 @@ app.get('/api/admin/session', (req: Request, res: Response) => {
 
 
 // Endpoint to check live Stripe Account status
-app.get('/api/stripe-status', async (_req: Request, res: Response) => {
+// A chave secreta fica SÓ no servidor; o painel admin consulta por aqui em vez de chamar a Stripe do navegador.
+app.get('/api/stripe-status', requireAdmin, async (_req: Request, res: Response) => {
   try {
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
     if (!stripeSecretKey || stripeSecretKey.trim() === '') {
       return res.status(400).json({ active: false, error: 'STRIPE_SECRET_KEY não está configurada.' });
     }
 
-    const stripeRes = await fetch('https://api.stripe.com/v1/account', {
-      headers: {
-        Authorization: `Bearer ${stripeSecretKey.trim()}`,
-      },
-    });
+    const authHeaders = { Authorization: `Bearer ${stripeSecretKey.trim()}` };
+    const [stripeRes, balanceRes] = await Promise.all([
+      fetch('https://api.stripe.com/v1/account', { headers: authHeaders }),
+      fetch('https://api.stripe.com/v1/balance', { headers: authHeaders }).catch(() => null),
+    ]);
 
     const data = await stripeRes.json();
+    const balance = balanceRes && balanceRes.ok ? await balanceRes.json() : null;
     if (!stripeRes.ok) {
       return res.status(stripeRes.status).json({ 
         active: false, 
@@ -350,6 +433,10 @@ app.get('/api/stripe-status', async (_req: Request, res: Response) => {
       country: data.country,
       currency: data.default_currency,
       accountId: data.id,
+      email: data.email,
+      livemode: stripeSecretKey.trim().startsWith('sk_live_'),
+      requirementsDue: data.requirements?.currently_due || [],
+      availableUsd: ((balance?.available || []).find((b: any) => b.currency === 'usd')?.amount || 0) / 100,
     });
   } catch (err: any) {
     return res.status(500).json({ active: false, error: err.message });
@@ -357,12 +444,9 @@ app.get('/api/stripe-status', async (_req: Request, res: Response) => {
 });
 
 // Zendrop API Status Endpoint
-app.post('/api/zendrop/status', async (req: Request, res: Response) => {
+app.post('/api/zendrop/status', requireAdmin, async (req: Request, res: Response) => {
   try {
-    const apiKey =
-      req.body?.apiKey ||
-      process.env.ZENDROP_API_KEY ||
-      'UUUvotHLOYoGQopIgxXnfpIFjD4BoQfUW7EisDnPqI9KHQHl2aD8G72eKRiVRbqN';
+    const apiKey = String(req.body?.apiKey || process.env.ZENDROP_API_KEY || '');
     if (!apiKey || apiKey.trim() === '') {
       return res.json({
         connected: false,
@@ -404,7 +488,7 @@ app.post('/api/zendrop/status', async (req: Request, res: Response) => {
 });
 
 // Zendrop Fetch Product Details & HD Images Endpoint
-app.post('/api/zendrop/fetch-product', async (req: Request, res: Response) => {
+app.post('/api/zendrop/fetch-product', requireAdmin, async (req: Request, res: Response) => {
   try {
     const { productId } = req.body;
     if (!productId) {
@@ -491,6 +575,9 @@ app.post('/api/zendrop/fetch-product', async (req: Request, res: Response) => {
   }
 });
 
+const zendropIdOf = (product: Product) => product.id.replace('zendrop-', '');
+const CATALOG_ZENDROP_IDS = new Set(PRODUCTS.map(zendropIdOf));
+
 // Real-time Single Product Zendrop Stock Endpoint
 app.get('/api/zendrop/stock/:id', async (req: Request, res: Response) => {
   try {
@@ -498,6 +585,10 @@ app.get('/api/zendrop/stock/:id', async (req: Request, res: Response) => {
     const cleanId = String(rawId).replace(/[^0-9]/g, '');
     if (!cleanId) {
       return res.status(400).json({ error: 'ID de produto Zendrop inválido.' });
+    }
+    // Só consulta produtos da loja; antes qualquer ID virava uma requisição ao Zendrop (proxy aberto)
+    if (!CATALOG_ZENDROP_IDS.has(cleanId)) {
+      return res.status(404).json({ error: 'Produto não encontrado na loja.' });
     }
 
     const zendropRes = await fetch('https://app.zendrop.com/api/get-product', {
@@ -548,7 +639,8 @@ let inventoryCache: {
 } | null = null;
 
 // Real-time Batch Zendrop Stock Sync Endpoint
-app.all(['/api/zendrop/sync-all-inventory', '/api/zendrop/sync-inventory'], async (req: Request, res: Response) => {
+// '/api/inventory/sync-all' é o caminho que o front (inventorySync.ts) chama; antes não existia no servidor
+app.all(['/api/zendrop/sync-all-inventory', '/api/zendrop/sync-inventory', '/api/inventory/sync-all'], async (req: Request, res: Response) => {
   try {
     const defaultProductIds = [
       '2000857', '2041862', '1603576', '2053714', '2058716', '2873973', '2632492', '2658755',
@@ -559,10 +651,13 @@ app.all(['/api/zendrop/sync-all-inventory', '/api/zendrop/sync-inventory'], asyn
     ];
 
     const requestedIds: string[] = Array.isArray(req.body?.productIds)
-      ? req.body.productIds.map((id: any) => String(id).replace(/[^0-9]/g, '')).filter(Boolean)
+      ? req.body.productIds
+          .map((id: any) => String(id).replace(/[^0-9]/g, ''))
+          .filter((id: string) => CATALOG_ZENDROP_IDS.has(id))
       : defaultProductIds;
 
-    const force = Boolean(req.body?.force || req.query.force === 'true');
+    // Forçar sincronização (ignorando o cache) só para o admin, senão qualquer um dispara dezenas de requisições
+    const force = Boolean(req.body?.force || req.query.force === 'true') && verifyAdminAuth(req);
     const now = Date.now();
 
     // 60-second cache unless force is requested
@@ -622,7 +717,7 @@ app.all(['/api/zendrop/sync-all-inventory', '/api/zendrop/sync-inventory'], asyn
 
     inventoryCache = {
       timestamp: now,
-      data: results,
+      data: { ...(inventoryCache?.data || {}), ...results },
     };
 
     const outOfStockList = Object.entries(results)
@@ -661,454 +756,427 @@ const getStripeInstance = () => {
   return new Stripe(trimmed, { apiVersion: '2023-10-16' as any });
 };
 
+const LIVE_STOCK_MAX_AGE_MS = 10 * 60 * 1000;
+
+function getPublicBaseUrl(req: Request): string {
+  // Nunca usa URL enviada pelo navegador: isso permitia redirecionar o cliente para outro site depois de pagar
+  const configured = (process.env.APP_URL || '').trim();
+  if (configured && /^https?:\/\//.test(configured)) {
+    return new URL(configured).origin;
+  }
+  return `${req.protocol}://${req.get('host')}`;
+}
+
+function liveStockFor(product: Product) {
+  if (!inventoryCache || Date.now() - inventoryCache.timestamp > LIVE_STOCK_MAX_AGE_MS) return undefined;
+  return inventoryCache.data[zendropIdOf(product)];
+}
+
 const handleCreateCheckoutSession = async (req: Request, res: Response) => {
-  console.log('[Stripe Diagnostic] POST /api/checkout/create-session called');
   try {
-    const { items, customerEmail, domainUrl, currency, shippingAddress, appliedPromo, deliveryOption } = req.body;
+    // 1. Carrinho montado com preços do catálogo do servidor (o preço enviado pelo navegador é ignorado)
+    const cart = buildServerCart(req.body?.items, PRODUCTS, liveStockFor);
+    // 2. Um endereço só: o que calcula o frete é o mesmo que vai para a Stripe e para o pedido
+    const address = validateCheckoutAddress(req.body);
+    const deliveryOption = req.body?.deliveryOption === 'usps_priority' ? 'usps_priority' : 'usps_ground';
+    const promoCode = typeof req.body?.appliedPromo === 'string' ? req.body.appliedPromo.slice(0, 40) : '';
 
-    if (!items || !Array.isArray(items) || items.length === 0) {
-      console.warn('[Stripe Diagnostic] Cart items missing or empty');
-      return res.status(400).json({ error: 'O carrinho está vazio.' });
-    }
-
-    // Strict inventory verification
-    for (const item of items) {
-      if (item.stockCount === 0 || item.inStock === false) {
-        console.warn(`[Stripe Diagnostic] Item out of stock: ${item.name}`);
-        return res.status(400).json({
-          error: `O produto "${item.name}" está esgotado no fornecedor Zendrop (0 unidades).`,
-          outOfStock: true,
-          item: item.name,
-        });
-      }
-    }
-
-    // Recalculate true order totals using the single source of truth
-    const destState = (shippingAddress?.state || '').trim().toUpperCase();
-    const destZip = (shippingAddress?.zip || '').trim();
     const calc = calculateOrderTotals(
-      items,
-      appliedPromo,
+      cart,
+      promoCode,
       'shipping',
-      destState,
-      destZip,
-      deliveryOption || 'usps_ground'
+      address.state,
+      address.zip,
+      deliveryOption,
+      getServerCoupons()
     );
-    const { subtotal, shipping: shippingCost, total: finalOrderTotal, isShippingCalculated, freeShippingQualified } = calc;
+    const { subtotal, shipping: shippingCost, total: finalOrderTotal, isShippingCalculated } = calc;
     const discount = calc.bundleDiscount + calc.repeatDeliverySavings + calc.promoDiscount;
 
-    // Enforce real address requirement if free shipping does not apply
-    if (!freeShippingQualified && !isShippingCalculated) {
-      console.warn('[Stripe Diagnostic] Attempt to create session without destination address for non-free shipping order.');
-      return res.status(400).json({
-        error: 'Shipping address (State and ZIP code) is required to calculate accurate shipping and initiate checkout.',
-        requiresAddress: true,
-      });
+    if (!isShippingCalculated || shippingCost === null) {
+      return res.status(400).json({ error: 'Não foi possível calcular o frete para este endereço.', requiresAddress: true });
     }
 
-    // Sanitize domainUrl (in case frontend sends literal 'null' or 'undefined')
-    let cleanDomain = domainUrl;
-    if (!cleanDomain || cleanDomain === 'null' || cleanDomain === 'undefined' || typeof cleanDomain !== 'string' || cleanDomain.trim() === '') {
-      cleanDomain = '';
-    }
-
-    let baseUrl = process.env.APP_URL || cleanDomain || req.headers.origin || `${req.protocol}://${req.get('host')}`;
-    if (!baseUrl || typeof baseUrl !== 'string' || baseUrl.trim() === '' || baseUrl === 'null' || baseUrl === 'undefined') {
-      baseUrl = 'https://lingpetshop.com';
-    }
-    if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
-      baseUrl = `https://${baseUrl}`;
-    }
-    if (baseUrl.startsWith('http://') && !baseUrl.includes('localhost') && !baseUrl.includes('127.0.0.1')) {
-      baseUrl = baseUrl.replace('http://', 'https://');
-    }
-
-    console.log(`[Stripe Diagnostic] Constructed base URL: ${baseUrl}`);
-
-    let success_url: string;
-    let cancel_url: string;
-    try {
-      const parsedBase = new URL(baseUrl);
-      const successObj = new URL('/checkout', parsedBase.origin);
-      successObj.searchParams.set('status', 'success');
-      successObj.searchParams.set('session_id', '{CHECKOUT_SESSION_ID}');
-      success_url = successObj.toString();
-
-      const cancelObj = new URL('/checkout', parsedBase.origin);
-      cancelObj.searchParams.set('status', 'cancelled');
-      cancel_url = cancelObj.toString();
-    } catch (urlErr: any) {
-      console.error('[Stripe Diagnostic] URL construction exception:', urlErr.message, { baseUrl });
-      const sanitizedBase = baseUrl.replace(/\/$/, '');
-      success_url = `${sanitizedBase}/checkout?status=success&session_id={CHECKOUT_SESSION_ID}`;
-      cancel_url = `${sanitizedBase}/checkout?status=cancelled`;
-    }
-
-    console.log(`[Stripe Diagnostic] success_url: ${success_url}`);
-    console.log(`[Stripe Diagnostic] cancel_url: ${cancel_url}`);
-
-    const selectedCurrency = (currency || 'usd').toLowerCase();
-
-    // Calculate line items ensuring discounts are applied and totals match finalOrderTotal
+    // 3. Itens com o desconto distribuído; cada linha tem quantidade 1 com o valor total da linha,
+    //    assim a soma na Stripe bate centavo por centavo com o total calculado aqui.
+    const baseUrl = getPublicBaseUrl(req);
     const itemsTargetCents = Math.round(Math.max(0, subtotal - discount) * 100);
-    const rawItemsTotalCents = Math.round(subtotal * 100);
+    const rawLineCents = cart.map((item) =>
+      Math.round((item.price + (item.addOn?.enabled ? item.addOn.price : 0)) * item.quantity * 100)
+    );
+    const rawItemsTotalCents = rawLineCents.reduce((a, b) => a + b, 0);
 
     let allocatedCents = 0;
-    const lineItems: any[] = [];
-
-    items.forEach((item: any, idx: number) => {
-      const isLast = idx === items.length - 1;
-      const itemRawCents = Math.round((Number(item.price) || 0) * (Number(item.quantity) || 1) * 100);
-      let itemShareCents = 0;
-
-      if (rawItemsTotalCents > 0) {
-        if (isLast) {
-          itemShareCents = itemsTargetCents - allocatedCents;
-        } else {
-          itemShareCents = Math.round(itemsTargetCents * (itemRawCents / rawItemsTotalCents));
-          allocatedCents += itemShareCents;
-        }
-      } else {
-        itemShareCents = itemRawCents;
-      }
-
-      const qty = Math.max(1, Number(item.quantity) || 1);
-      const unitCents = Math.max(1, Math.round(itemShareCents / qty));
+    const lineItems = cart.map((item, idx) => {
+      const isLast = idx === cart.length - 1;
+      const share = isLast
+        ? itemsTargetCents - allocatedCents
+        : Math.round(itemsTargetCents * (rawItemsTotalCents > 0 ? rawLineCents[idx] / rawItemsTotalCents : 0));
+      allocatedCents += share;
 
       const variantDesc = [item.size ? `Size: ${item.size}` : null, item.color ? `Color: ${item.color}` : null]
         .filter(Boolean)
         .join(' / ');
-      const displayName = variantDesc ? `${item.name} (${variantDesc})` : (item.name || 'Pet Product');
-
-      lineItems.push({
+      const imageUrl = item.image ? new URL(item.image, baseUrl).toString() : '';
+      return {
         price_data: {
-          currency: selectedCurrency,
-          unit_amount: unitCents,
+          currency: 'usd',
+          unit_amount: Math.max(0, share),
           product_data: {
-            name: displayName,
-            images: item.image && typeof item.image === 'string' && item.image.startsWith('http') ? [item.image] : [],
+            name: `${item.name}${variantDesc ? ` (${variantDesc})` : ''} × ${item.quantity}`,
+            images: imageUrl.startsWith('https://') ? [imageUrl] : [],
           },
         },
-        quantity: qty,
-      });
+        quantity: 1,
+      };
     });
 
-    if (shippingCost !== null && shippingCost > 0) {
+    const shippingCents = Math.round(shippingCost * 100);
+    if (shippingCents > 0) {
       lineItems.push({
         price_data: {
-          currency: selectedCurrency,
-          unit_amount: Math.round(shippingCost * 100),
-          product_data: {
-            name: `USPS Shipping ${destState ? `(${destState})` : ''} · Tracked US Delivery`.trim(),
-            images: [],
-          },
+          currency: 'usd',
+          unit_amount: shippingCents,
+          product_data: { name: `USPS Shipping (${address.state} ${address.zip})`, images: [] },
         },
         quantity: 1,
       });
     }
 
-    let stripe;
+    const expectedAmountCents = lineItems.reduce((acc, li) => acc + li.price_data.unit_amount, 0);
+    if (expectedAmountCents < 50) {
+      return res.status(400).json({ error: 'Valor do pedido abaixo do mínimo aceito pela Stripe.' });
+    }
+
+    let stripe: Stripe;
     try {
       stripe = getStripeInstance();
     } catch (configErr: any) {
-      console.error('[Stripe Diagnostic] Stripe configuration error:', configErr.message);
-      return res.status(400).json({
-        error: configErr.message,
-        code: 'STRIPE_KEY_MISSING'
-      });
+      console.error('[Stripe] configuration error:', configErr.message);
+      return res.status(500).json({ error: 'Pagamento indisponível no momento.', code: 'STRIPE_KEY_MISSING' });
     }
 
-    console.log(`[Stripe Diagnostic] Creating Stripe Checkout session with ${lineItems.length} line items (total $${finalOrderTotal})...`);
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      mode: 'payment',
-      customer_email: customerEmail || undefined,
-      line_items: lineItems,
-      success_url,
-      cancel_url,
-      shipping_address_collection: {
-        allowed_countries: ['US', 'BR', 'CA', 'GB', 'AU', 'FR', 'DE', 'IT', 'ES'],
+    // 4. Pedido pendente criado AQUI, pelo servidor, com os valores do servidor
+    const orderId = `ord-${crypto.randomUUID()}`;
+    const orderNumber = `LP-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
+    const order: any = {
+      id: orderId,
+      orderNumber,
+      createdAt: new Date().toISOString(),
+      date: new Date().toISOString(),
+      customerName: address.name,
+      customerEmail: address.email,
+      customerPhone: address.phone,
+      shippingAddress: {
+        street: [address.line1, address.line2].filter(Boolean).join(', '),
+        city: address.city,
+        state: address.state,
+        zip: address.zip,
+        country: 'United States',
       },
-      metadata: {
-        itemsSummary: JSON.stringify(items.map((i: any) => ({
-          sku: i.sku || i.id,
-          name: i.name || 'Pet Product',
-          unitPrice: Number(i.price) || 0,
-          size: i.size || '',
-          color: i.color || '',
-          qty: i.quantity,
-        }))),
-        subtotalUsd: subtotal.toFixed(2),
-        discountUsd: discount.toFixed(2),
-        shippingUsd: (shippingCost ?? 0).toFixed(2),
-        finalTotalUsd: finalOrderTotal.toFixed(2),
-        appliedPromo: appliedPromo || '',
-        customerEmail: customerEmail || '',
-      },
-    } as any);
+      items: cart.map((i) => ({
+        productId: i.productId,
+        sku: i.sku,
+        name: i.name,
+        size: i.size,
+        color: i.color,
+        quantity: i.quantity,
+        unitPrice: i.price,
+        addOn: i.addOn,
+        supplierCost: i.supplierCost,
+        supplier: 'Zendrop US Warehouse',
+        supplierSku: i.sku,
+      })),
+      subtotalUsd: subtotal,
+      discountUsd: Number(discount.toFixed(2)),
+      shippingUsd: shippingCost,
+      shippingMethod: deliveryOption,
+      totalUsd: finalOrderTotal,
+      expectedAmountCents,
+      appliedPromo: calc.appliedPromo || '',
+      supplierCostUsd: Number(cart.reduce((acc, i) => acc + i.supplierCost * i.quantity, 0).toFixed(2)),
+      profitUsd: calc.totalEstimatedProfit,
+      paymentGateway: 'Stripe (Credit Card / Apple Pay)',
+      paymentStatus: 'Pending Payment',
+      fulfillmentStatus: 'Aguardando Pagamento',
+      confirmationEmailSent: false,
+    };
 
-    console.log(`[Stripe Diagnostic] Stripe session created successfully: ${session.id}, url: ${session.url}`);
-    return res.json({ url: session.url, sessionId: session.id });
+    const session = await stripe.checkout.sessions.create({
+      mode: 'payment',
+      customer_email: address.email,
+      client_reference_id: orderId,
+      line_items: lineItems,
+      success_url: `${baseUrl}/checkout?status=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/checkout?status=cancelled`,
+      metadata: { orderId, orderNumber },
+      payment_intent_data: {
+        metadata: { orderId, orderNumber },
+        shipping: {
+          name: address.name,
+          phone: address.phone || undefined,
+          address: {
+            line1: address.line1,
+            line2: address.line2 || undefined,
+            city: address.city,
+            state: address.state,
+            postal_code: address.zip,
+            country: 'US',
+          },
+        },
+      },
+    });
+
+    order.sessionId = session.id;
+    await withOrdersLock(() => {
+      const orders = getStoredOrders();
+      orders.unshift(order);
+      saveStoredOrders(orders);
+    });
+
+    return res.json({ url: session.url, sessionId: session.id, orderNumber });
   } catch (err: any) {
-    console.error('[Stripe Diagnostic] Error creating Stripe checkout session:', {
+    if (err instanceof CheckoutValidationError) {
+      return res.status(400).json({
+        error: err.message,
+        outOfStock: err.outOfStock || undefined,
+        item: err.item,
+        requiresAddress: err.requiresAddress || undefined,
+      });
+    }
+    console.error('[Stripe] Error creating checkout session:', {
       message: err.message,
       type: err.type,
       code: err.code,
       statusCode: err.statusCode,
     });
-
-    if (err?.type === 'StripeAuthenticationError' || err?.message?.includes('API Key') || err?.message?.includes('expired') || err?.message?.includes('invalid')) {
-      return res.status(400).json({
-        error: `A chave secreta da Stripe fornecida expirou ou é inválida (${err.message}). Por favor, gere uma nova chave ativa no dashboard da Stripe e atualize a variável STRIPE_SECRET_KEY nas configurações de Segredos do Google AI Studio.`,
-        code: 'STRIPE_KEY_EXPIRED'
-      });
+    if (err?.type === 'StripeAuthenticationError') {
+      return res.status(500).json({ error: 'Pagamento indisponível no momento.', code: 'STRIPE_KEY_EXPIRED' });
     }
-
-    if (err?.message?.includes('URL') || err?.message?.includes('valid URL')) {
-      return res.status(400).json({
-        error: `Erro de URL inválida no checkout: ${err.message}.`,
-        code: 'INVALID_URL'
-      });
-    }
-
-    return res.status(500).json({ error: err.message || 'Erro interno ao criar sessão de checkout.' });
+    return res.status(500).json({ error: 'Erro ao iniciar o pagamento. Tente novamente.' });
   }
 };
 
 app.post('/api/checkout/create-session', handleCreateCheckoutSession);
 app.post('/api/create-checkout-session', handleCreateCheckoutSession);
 
+// Usado pela página de sucesso. Devolve só o necessário para mostrar a confirmação (sem endereço/telefone).
 app.get('/api/checkout/session/:sessionId', async (req: Request, res: Response) => {
   try {
     const { sessionId } = req.params;
-    const stripe = getStripeInstance();
-    const session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ['shipping_details', 'customer_details', 'line_items'],
-    });
-    const anySess = session as any;
+    if (!/^cs_(test|live)_[A-Za-z0-9]+$/.test(sessionId)) {
+      return res.status(400).json({ error: 'Sessão inválida.' });
+    }
+    const session = await getStripeInstance().checkout.sessions.retrieve(sessionId);
+    const order = findOrderForSession(getStoredOrders(), session);
     return res.json({
       status: session.status,
       payment_status: session.payment_status,
-      customer_email: session.customer_email || anySess.customer_details?.email,
-      customer_name: anySess.customer_details?.name || anySess.shipping_details?.name,
-      customer_phone: anySess.customer_details?.phone || anySess.shipping_details?.phone,
-      shipping_details: anySess.shipping_details,
-      customer_details: anySess.customer_details,
+      customer_email: session.customer_details?.email || session.customer_email,
       amount_total: session.amount_total ? session.amount_total / 100 : 0,
-      metadata: session.metadata,
+      orderNumber: order?.orderNumber || session.metadata?.orderNumber || null,
     });
   } catch (err: any) {
-    return res.status(500).json({ error: err.message });
+    return res.status(404).json({ error: 'Sessão não encontrada.' });
   }
 });
 
-
-
-app.get('/api/orders', (req: Request, res: Response) => {
-  if (!verifyAdminAuth(req)) {
-    return res.status(401).json({ success: false, error: 'Unauthorized. Admin authentication required.' });
-  }
-  const orders = getStoredOrders();
-  res.json({ success: true, orders });
+app.get('/api/orders', requireAdmin, (_req: Request, res: Response) => {
+  res.json({ success: true, orders: getStoredOrders() });
 });
 
-app.post('/api/orders', async (req: Request, res: Response) => {
-  try {
-    const newOrder = req.body;
-    if (!newOrder || !newOrder.id || !newOrder.orderNumber) {
-      return res.status(400).json({ success: false, error: 'Invalid order data: id and orderNumber are required.' });
+// Cupons: a lista completa só para o admin; o público só consegue validar um código por vez
+app.get('/api/admin/coupons', requireAdmin, (_req: Request, res: Response) => {
+  res.json({ success: true, coupons: getServerCoupons() });
+});
+
+app.put('/api/admin/coupons', requireAdmin, (req: Request, res: Response) => {
+  const list = req.body?.coupons;
+  if (!Array.isArray(list) || list.length > 200) {
+    return res.status(400).json({ success: false, error: 'Lista de cupons inválida.' });
+  }
+  const clean: Coupon[] = [];
+  for (const c of list) {
+    const code = String(c?.code || '').trim().toUpperCase();
+    const pct = Number(c?.discountPercent);
+    if (!/^[A-Z0-9_-]{2,40}$/.test(code) || !Number.isFinite(pct) || pct <= 0 || pct > 90) {
+      return res.status(400).json({ success: false, error: `Cupom inválido: ${code || '(sem código)'}` });
     }
-    const orders = getStoredOrders();
-    const existingIdx = orders.findIndex((o: any) => o.id === newOrder.id || o.orderNumber === newOrder.orderNumber);
-    let targetOrder: any = null;
+    clean.push({
+      id: String(c.id || `cp-${crypto.randomUUID()}`),
+      code,
+      discountPercent: pct,
+      description: String(c.description || '').slice(0, 200),
+      partnerName: String(c.partnerName || '').slice(0, 120),
+      active: Boolean(c.active),
+      usageCount: Number(c.usageCount) || 0,
+      createdAt: String(c.createdAt || new Date().toISOString().slice(0, 10)),
+      maxUses: c.maxUses ? Number(c.maxUses) : undefined,
+    });
+  }
+  saveServerCoupons(clean);
+  res.json({ success: true, coupons: clean });
+});
 
-    if (existingIdx >= 0) {
-      const existing = orders[existingIdx];
-      const isCurrentlyPaid = (existing.paymentStatus || '').toLowerCase().includes('paid') || (existing.paymentStatus || '').toLowerCase().includes('verified');
+app.get('/api/coupons/:code', (req: Request, res: Response) => {
+  const code = String(req.params.code || '').trim().toUpperCase();
+  const coupon = getServerCoupons().find((c) => c.active && c.code.trim().toUpperCase() === code);
+  if (!coupon) {
+    return res.status(404).json({ valid: false });
+  }
+  return res.json({ valid: true, coupon: { id: coupon.id, code: coupon.code, discountPercent: coupon.discountPercent, active: true } });
+});
 
-      orders[existingIdx] = {
-        ...existing,
-        ...newOrder,
-        // Enforce secure server-side payment status (never trust client to mark as paid)
-        paymentStatus: isCurrentlyPaid ? existing.paymentStatus : 'Pending Payment',
-        fulfillmentStatus: isCurrentlyPaid ? existing.fulfillmentStatus : 'Aguardando Pagamento',
-      };
-      targetOrder = orders[existingIdx];
-    } else {
-      const sanitizedOrder = {
-        ...newOrder,
-        paymentStatus: 'Pending Payment',
-        fulfillmentStatus: 'Aguardando Pagamento',
-        confirmationEmailSent: false,
-      };
-      orders.unshift(sanitizedOrder);
-      targetOrder = sanitizedOrder;
-    }
-    saveStoredOrders(orders);
+app.post('/api/orders/update-status', requireAdmin, (req: Request, res: Response) =>
+  // Lock: o envio de e-mail acontece entre ler e salvar o orders.json
+  withOrdersLock(async () => {
+    try {
+      // Security check: Only authenticated admins can modify fulfillment & tracking
+      if (!verifyAdminAuth(req)) {
+        return res.status(401).json({
+          success: false,
+          error: 'Unauthorized. Valid ADMIN_SECRET_TOKEN credentials required.'
+        });
+      }
 
-    // If order was confirmed as Paid (only via webhook) and confirmation email was not sent yet, attempt sending
-    const paymentStatus = (targetOrder.paymentStatus || '').toLowerCase();
-    if (paymentStatus.includes('paid') && !targetOrder.confirmationEmailSent && targetOrder.customerEmail) {
-      try {
-        const emailResult = await sendOrderConfirmationEmail(targetOrder);
-        if (emailResult.success && emailResult.status === 'sent') {
-          targetOrder.confirmationEmailSent = true;
-          targetOrder.confirmationEmailSentAt = new Date().toISOString();
-          targetOrder.confirmationEmailId = emailResult.messageId;
-          targetOrder.confirmationEmailStatus = 'sent';
-          delete targetOrder.confirmationEmailError;
-        } else {
-          targetOrder.confirmationEmailStatus = emailResult.status;
-          targetOrder.confirmationEmailError = emailResult.error || emailResult.reason;
+      const { orderId, fulfillmentStatus, trackingNumber, carrier, trackingUrl, sendEmail, forceResend } = req.body;
+      const orders = getStoredOrders();
+      const idx = orders.findIndex((o: any) => o.id === orderId || o.orderNumber === orderId);
+      if (idx === -1) {
+        return res.status(404).json({ success: false, error: 'Order not found.' });
+      }
+
+      const order = orders[idx];
+      const payStatus = (order.paymentStatus || '').toLowerCase();
+      const isPaid = payStatus.includes('paid') || payStatus.includes('verified');
+
+      // Prevent dispatching unpaid or abandoned orders
+      if (!isPaid && fulfillmentStatus === 'Despachado') {
+        return res.status(400).json({
+          success: false,
+          error: 'Cannot dispatch an unpaid or abandoned order. Payment must be confirmed by Stripe.'
+        });
+      }
+
+      // Pedido com valor pago diferente do calculado (ou sem pedido de origem) precisa ser conferido antes
+      if (order.needsReview && fulfillmentStatus === 'Despachado' && !req.body?.reviewConfirmed) {
+        return res.status(400).json({
+          success: false,
+          error: `Pedido marcado para revisão: ${order.reviewReason || 'conferir na Stripe'}. Confira antes de despachar.`,
+          needsReview: true,
+        });
+      }
+
+      order.fulfillmentStatus = fulfillmentStatus || order.fulfillmentStatus;
+
+      let emailResult: any = null;
+      const cleanTracking = (trackingNumber || '').trim();
+
+      if (cleanTracking) {
+        const isNewOrUpdatedCode = order.trackingNumber !== cleanTracking;
+        order.trackingNumber = cleanTracking;
+        if (carrier) order.carrier = carrier;
+        if (trackingUrl) order.trackingUrl = trackingUrl;
+
+        if (fulfillmentStatus === 'Despachado' || !order.dispatchedAt) {
+          order.dispatchedAt = new Date().toISOString();
         }
-        saveStoredOrders(orders);
-      } catch (e: any) {
-        targetOrder.confirmationEmailStatus = 'failed';
-        targetOrder.confirmationEmailError = e.message;
-        saveStoredOrders(orders);
-      }
-    }
 
-    return res.json({ success: true, order: targetOrder });
-  } catch (err: any) {
-    return res.status(500).json({ success: false, error: err.message });
-  }
-});
+        // Requirement 3: Automatically send tracking email in natural English after saving
+        if (sendEmail !== false && order.customerEmail) {
+          try {
+            emailResult = await sendOrderTrackingEmail(
+              order,
+              {
+                trackingNumber: cleanTracking,
+                carrier: order.carrier || carrier || 'USPS Ground Advantage',
+                trackingUrl: order.trackingUrl || trackingUrl,
+                forceResend: Boolean(forceResend || (isNewOrUpdatedCode && order.trackingEmailCode !== cleanTracking)),
+              }
+            );
 
-app.post('/api/orders/update-status', async (req: Request, res: Response) => {
-  try {
-    // Security check: Only authenticated admins can modify fulfillment & tracking
-    if (!verifyAdminAuth(req)) {
-      return res.status(401).json({
-        success: false,
-        error: 'Unauthorized. Valid ADMIN_SECRET_TOKEN credentials required.'
-      });
-    }
-
-    const { orderId, fulfillmentStatus, trackingNumber, carrier, trackingUrl, sendEmail, forceResend } = req.body;
-    const orders = getStoredOrders();
-    const idx = orders.findIndex((o: any) => o.id === orderId || o.orderNumber === orderId);
-    if (idx === -1) {
-      return res.status(404).json({ success: false, error: 'Order not found.' });
-    }
-
-    const order = orders[idx];
-    const payStatus = (order.paymentStatus || '').toLowerCase();
-    const isPaid = payStatus.includes('paid') || payStatus.includes('verified');
-
-    // Prevent dispatching unpaid or abandoned orders
-    if (!isPaid && fulfillmentStatus === 'Despachado') {
-      return res.status(400).json({
-        success: false,
-        error: 'Cannot dispatch an unpaid or abandoned order. Payment must be confirmed by Stripe.'
-      });
-    }
-
-    order.fulfillmentStatus = fulfillmentStatus || order.fulfillmentStatus;
-
-    let emailResult: any = null;
-    const cleanTracking = (trackingNumber || '').trim();
-
-    if (cleanTracking) {
-      const isNewOrUpdatedCode = order.trackingNumber !== cleanTracking;
-      order.trackingNumber = cleanTracking;
-      if (carrier) order.carrier = carrier;
-      if (trackingUrl) order.trackingUrl = trackingUrl;
-
-      if (fulfillmentStatus === 'Despachado' || !order.dispatchedAt) {
-        order.dispatchedAt = new Date().toISOString();
-      }
-
-      // Requirement 3: Automatically send tracking email in natural English after saving
-      if (sendEmail !== false && order.customerEmail) {
-        try {
-          emailResult = await sendOrderTrackingEmail(
-            order,
-            {
-              trackingNumber: cleanTracking,
-              carrier: order.carrier || carrier || 'USPS Ground Advantage',
-              trackingUrl: order.trackingUrl || trackingUrl,
-              forceResend: Boolean(forceResend || (isNewOrUpdatedCode && order.trackingEmailCode !== cleanTracking)),
+            if (emailResult.success && emailResult.status === 'sent') {
+              order.trackingEmailSent = true;
+              order.trackingEmailSentAt = new Date().toISOString();
+              order.trackingEmailCode = cleanTracking;
+              order.trackingEmailCarrier = order.carrier;
+              order.trackingEmailStatus = 'sent';
+              delete order.trackingEmailError;
+            } else {
+              order.trackingEmailStatus = emailResult.status;
+              if (emailResult.error) {
+                order.trackingEmailError = emailResult.error;
+              }
             }
-          );
-
-          if (emailResult.success && emailResult.status === 'sent') {
-            order.trackingEmailSent = true;
-            order.trackingEmailSentAt = new Date().toISOString();
-            order.trackingEmailCode = cleanTracking;
-            order.trackingEmailCarrier = order.carrier;
-            order.trackingEmailStatus = 'sent';
-            delete order.trackingEmailError;
-          } else {
-            order.trackingEmailStatus = emailResult.status;
-            if (emailResult.error) {
-              order.trackingEmailError = emailResult.error;
-            }
+          } catch (emailErr: any) {
+            order.trackingEmailStatus = 'failed';
+            order.trackingEmailError = emailErr.message;
+            emailResult = { success: false, status: 'failed', error: emailErr.message };
           }
-        } catch (emailErr: any) {
-          order.trackingEmailStatus = 'failed';
-          order.trackingEmailError = emailErr.message;
-          emailResult = { success: false, status: 'failed', error: emailErr.message };
         }
       }
-    }
 
-    saveStoredOrders(orders);
-    return res.json({ success: true, order, emailResult });
-  } catch (err: any) {
-    return res.status(500).json({ success: false, error: err.message });
-  }
-});
+      saveStoredOrders(orders);
+      return res.json({ success: true, order, emailResult });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  })
+);
 
 // Resend tracking email endpoint for manual controlled retries
-app.post('/api/orders/resend-tracking-email', async (req: Request, res: Response) => {
-  try {
-    if (!verifyAdminAuth(req)) {
-      return res.status(401).json({ success: false, error: 'Unauthorized.' });
-    }
-
-    const { orderId } = req.body;
-    const orders = getStoredOrders();
-    const idx = orders.findIndex((o: any) => o.id === orderId || o.orderNumber === orderId);
-    if (idx === -1) {
-      return res.status(404).json({ success: false, error: 'Order not found.' });
-    }
-
-    const order = orders[idx];
-    if (!order.trackingNumber) {
-      return res.status(400).json({ success: false, error: 'Order has no tracking number.' });
-    }
-
-    const emailResult = await sendOrderTrackingEmail(
-      order,
-      {
-        trackingNumber: order.trackingNumber,
-        carrier: order.carrier,
-        trackingUrl: order.trackingUrl,
-        forceResend: true,
+app.post('/api/orders/resend-tracking-email', requireAdmin, (req: Request, res: Response) =>
+  // Lock: o envio de e-mail acontece entre ler e salvar o orders.json
+  withOrdersLock(async () => {
+    try {
+      if (!verifyAdminAuth(req)) {
+        return res.status(401).json({ success: false, error: 'Unauthorized.' });
       }
-    );
 
-    if (emailResult.success && emailResult.status === 'sent') {
-      order.trackingEmailSent = true;
-      order.trackingEmailSentAt = new Date().toISOString();
-      order.trackingEmailCode = order.trackingNumber;
-      order.trackingEmailStatus = 'sent';
-      delete order.trackingEmailError;
-    } else {
-      order.trackingEmailStatus = emailResult.status;
-      order.trackingEmailError = emailResult.error || emailResult.reason;
+      const { orderId } = req.body;
+      const orders = getStoredOrders();
+      const idx = orders.findIndex((o: any) => o.id === orderId || o.orderNumber === orderId);
+      if (idx === -1) {
+        return res.status(404).json({ success: false, error: 'Order not found.' });
+      }
+
+      const order = orders[idx];
+      if (!order.trackingNumber) {
+        return res.status(400).json({ success: false, error: 'Order has no tracking number.' });
+      }
+
+      const emailResult = await sendOrderTrackingEmail(
+        order,
+        {
+          trackingNumber: order.trackingNumber,
+          carrier: order.carrier,
+          trackingUrl: order.trackingUrl,
+          forceResend: true,
+        }
+      );
+
+      if (emailResult.success && emailResult.status === 'sent') {
+        order.trackingEmailSent = true;
+        order.trackingEmailSentAt = new Date().toISOString();
+        order.trackingEmailCode = order.trackingNumber;
+        order.trackingEmailStatus = 'sent';
+        delete order.trackingEmailError;
+      } else {
+        order.trackingEmailStatus = emailResult.status;
+        order.trackingEmailError = emailResult.error || emailResult.reason;
+      }
+
+      saveStoredOrders(orders);
+      return res.json({ success: true, order, emailResult });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, error: err.message });
     }
-
-    saveStoredOrders(orders);
-    return res.json({ success: true, order, emailResult });
-  } catch (err: any) {
-    return res.status(500).json({ success: false, error: err.message });
-  }
-});
+  })
+);
 
 // Resend Email Sending Endpoint for support@lingpetshop.com
-app.post('/api/send-email', async (req: Request, res: Response) => {
+// Só admin: aberta, qualquer um mandava e-mail (phishing) saindo de support@lingpetshop.com
+app.post('/api/send-email', requireAdmin, async (req: Request, res: Response) => {
   try {
     const { to, subject, html, text, fromName, resendApiKey } = req.body;
     const apiKey = (resendApiKey || process.env.RESEND_API_KEY || '').trim();
@@ -1153,7 +1221,7 @@ app.get('/api/email/preview/:template', (req: Request, res: Response) => {
 });
 
 // Sandbox Test Email Endpoint (Requirement 3)
-app.post('/api/email/send-sandbox', async (req: Request, res: Response) => {
+app.post('/api/email/send-sandbox', requireAdmin, async (req: Request, res: Response) => {
   try {
     const { templateType, recipient, resendApiKey } = req.body;
     const apiKey = (resendApiKey || process.env.RESEND_API_KEY || '').trim();

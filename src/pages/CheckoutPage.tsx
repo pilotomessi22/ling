@@ -70,76 +70,14 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
       fetch(`/api/checkout/session/${sessionId}`, { signal: controller.signal })
         .then((res) => res.json())
         .then((data) => {
-          if (data.payment_status === 'paid' || data.status === 'complete') {
-            const generatedId = `LP-STRIPE-${sessionId.slice(-6).toUpperCase()}`;
-            setOrderId(generatedId);
-            setConfirmedPaidTotal(data.amount_total || finalTotal);
-            setCustomerEmail(data.customer_email || 'customer@lingpetshop.com');
+          if (data.payment_status === 'paid') {
+            // O pedido já foi criado pelo servidor e é confirmado pelo webhook da Stripe;
+            // aqui só mostramos a confirmação.
+            setOrderId(data.orderNumber || '');
+            setConfirmedPaidTotal(data.amount_total || 0);
+            setCustomerEmail(data.customer_email || '');
             setOrderComplete(true);
             onClearCart();
-
-            try {
-              const addr = data.shipping_details?.address;
-              const shippingAddress = addr ? {
-                street: [addr.line1, addr.line2].filter(Boolean).join(', '),
-                city: addr.city || 'Austin',
-                state: addr.state || 'TX',
-                zip: addr.postal_code || '78701',
-                country: addr.country || 'United States',
-              } : {
-                street: 'Verified Stripe Checkout Address',
-                city: 'Austin',
-                state: 'TX',
-                zip: '78701',
-                country: 'United States',
-              };
-
-              const custName = data.shipping_details?.name || data.customer_details?.name || data.customer_email || 'Stripe Verified Customer';
-              const custPhone = data.shipping_details?.phone || data.customer_details?.phone || '+1 (555) 019-2831';
-              const custEmail = data.customer_email || 'customer@lingpetshop.com';
-
-              const existingOrdersRaw = localStorage.getItem('ling_admin_orders');
-              const existingOrders = existingOrdersRaw ? JSON.parse(existingOrdersRaw) : [];
-              const newAdminOrder = {
-                id: `ord-${Date.now()}`,
-                orderNumber: generatedId,
-                date: 'Today, just now',
-                customerName: custName,
-                customerEmail: custEmail,
-                customerPhone: custPhone,
-                shippingAddress,
-                items: items.length > 0 ? items.map(i => ({
-                  sku: i.sku || i.id,
-                  name: i.name,
-                  size: i.size,
-                  color: i.color,
-                  quantity: i.quantity,
-                  unitPrice: i.price,
-                  supplierCost: i.supplierCost || 0,
-                  supplier: 'Zendrop US Warehouse',
-                  supplierSku: i.sku || i.id,
-                  supplierUrl: `https://app.zendrop.com/product/${i.sku || '2000857'}`,
-                })) : [{ name: 'Ling Petshop Verified Order', quantity: 1, unitPrice: data.amount_total, sku: 'LP-VERIFIED', supplier: 'Zendrop', supplierSku: 'LP-VERIFIED' }],
-                totalUsd: data.amount_total || finalTotal,
-                supplierCostUsd: 0,
-                profitUsd: data.amount_total || finalTotal,
-                paymentGateway: 'Stripe (Credit Card / Apple Pay)',
-                paymentStatus: 'Paid (Stripe Verified)',
-                fulfillmentStatus: 'Aguardando Despacho',
-                sessionId: sessionId,
-              };
-              const updatedOrders = [newAdminOrder, ...existingOrders];
-              localStorage.setItem('ling_admin_orders', JSON.stringify(updatedOrders));
-              window.dispatchEvent(new Event('storage'));
-
-              fetch('/api/orders', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(newAdminOrder),
-              }).catch((e) => console.error('Failed to sync order to server:', e));
-            } catch (e) {
-              console.error(e);
-            }
           } else {
             setCheckoutError('Pagamento ainda não confirmado pela Stripe.');
           }
@@ -190,7 +128,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
       return;
     }
 
-    if (!freeShippingQualified && (!state.trim() || !zip.trim())) {
+    if (!state.trim() || !zip.trim()) {
       setCheckoutError('Please enter your shipping State and ZIP code to calculate USPS shipping before proceeding to payment.');
       return;
     }
@@ -205,69 +143,33 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
     const timeoutId = setTimeout(() => controller.abort(), 15000);
 
     try {
-      const customerName = `${firstName.trim()} ${lastName.trim()}`.trim() || 'Valued Customer';
-      const shippingAddress = {
-        street: [address1.trim(), address2.trim()].filter(Boolean).join(', '),
-        city: city.trim(),
-        state: state.trim().toUpperCase(),
-        zip: zip.trim(),
-        country: country.trim() || 'United States',
-      };
+      const customerName = `${firstName.trim()} ${lastName.trim()}`.trim();
 
-      const temporaryOrderId = `LP-PENDING-${Date.now().toString().slice(-6)}`;
-
-      // Persist pending order to database before initiating payment
-      const pendingOrderRecord = {
-        id: `ord-${Date.now()}`,
-        orderNumber: temporaryOrderId,
-        date: 'Today, just now',
-        customerName,
-        customerEmail,
-        customerPhone: phone || '+1 (555) 019-2831',
-        shippingAddress,
-        items: items.map(i => ({
-          sku: i.sku || i.id,
-          name: i.name,
-          size: i.size,
-          color: i.color,
-          quantity: i.quantity,
-          unitPrice: i.price,
-          supplierCost: i.supplierCost || 0,
-          supplier: 'Zendrop US Warehouse',
-          supplierSku: i.sku || i.id,
-          supplierUrl: `https://app.zendrop.com/product/${i.sku || '2000857'}`,
-        })),
-        totalUsd: finalTotal,
-        shippingUsd: shippingCost ?? 0,
-        discountUsd: discount,
-        appliedPromo: appliedPromo || '',
-        supplierCostUsd: items.reduce((acc, i) => acc + (i.supplierCost || 5) * i.quantity, 0),
-        profitUsd: finalTotal - items.reduce((acc, i) => acc + (i.supplierCost || 5) * i.quantity, 0),
-        paymentGateway: 'Stripe (Credit Card / Apple Pay)',
-        paymentStatus: 'Pending Payment',
-        fulfillmentStatus: 'Aguardando Pagamento',
-      };
-
-      try {
-        await fetch('/api/orders', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(pendingOrderRecord),
-        });
-      } catch (err) {
-        console.warn('Could not pre-persist pending order to server:', err);
-      }
-
+      // Só identificação do produto e quantidade: preço, desconto e frete são calculados no servidor
       const response = await fetch('/api/checkout/create-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items,
-          customerEmail: customerEmail || undefined,
+          items: items.map((i) => ({
+            productId: i.productId,
+            sku: i.sku,
+            size: i.size,
+            color: i.color,
+            quantity: i.quantity,
+            isRepeatDelivery: i.isRepeatDelivery,
+            addOn: i.addOn,
+          })),
+          customerEmail: customerEmail.trim(),
           customerName,
-          shippingAddress,
-          currency: 'usd',
-          domainUrl: window.location.origin,
+          customerPhone: phone.trim(),
+          shippingAddress: {
+            line1: address1.trim(),
+            line2: address2.trim(),
+            city: city.trim(),
+            state: state.trim().toUpperCase(),
+            zip: zip.trim(),
+            country: country.trim() || 'United States',
+          },
           appliedPromo,
           deliveryOption: 'usps_ground',
         }),
@@ -480,13 +382,8 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                   onChange={(e) => setCountry(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB] focus:bg-white transition-all"
                 >
+                  {/* Frete calculado só para os EUA; o servidor recusa outros países */}
                   <option value="United States">United States (US)</option>
-                  <option value="Canada">Canada (CA)</option>
-                  <option value="United Kingdom">United Kingdom (UK)</option>
-                  <option value="Australia">Australia (AU)</option>
-                  <option value="Brazil">Brazil (BR)</option>
-                  <option value="Germany">Germany (DE)</option>
-                  <option value="France">France (FR)</option>
                 </select>
               </div>
 

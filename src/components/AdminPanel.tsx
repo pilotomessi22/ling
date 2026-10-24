@@ -366,6 +366,40 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const [simQuantity, setSimQuantity] = useState<number>(3);
   const [simCouponPercent, setSimCouponPercent] = useState<number>(20);
 
+  // Cupons ficam no servidor (coupons.json): é de lá que o checkout lê o desconto.
+  // Antes ficavam só no navegador do admin e não valiam para nenhum cliente.
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    fetch('/api/admin/coupons', { credentials: 'include' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.success && Array.isArray(data.coupons)) {
+          setCouponsList(data.coupons);
+          saveCouponsToStorage(data.coupons);
+        }
+      })
+      .catch(() => {});
+  }, [isAuthenticated]);
+
+  const persistCoupons = async (updated: Coupon[]) => {
+    setCouponsList(updated);
+    saveCouponsToStorage(updated);
+    try {
+      const res = await fetch('/api/admin/coupons', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ coupons: updated }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        setCouponFeedback({ type: 'error', msg: data?.error || 'Não foi possível salvar os cupons no servidor.' });
+      }
+    } catch {
+      setCouponFeedback({ type: 'error', msg: 'Sem conexão com o servidor: cupons não foram salvos.' });
+    }
+  };
+
   const handleCreateCoupon = (e: React.FormEvent) => {
     e.preventDefault();
     const codeClean = newCouponCode.trim().toUpperCase();
@@ -388,8 +422,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
       createdAt: new Date().toISOString().split('T')[0],
     };
     const updated = [newCp, ...couponsList];
-    setCouponsList(updated);
-    saveCouponsToStorage(updated);
+    persistCoupons(updated);
     setNewCouponCode('');
     setNewCouponPartner('');
     setNewCouponDesc('');
@@ -399,14 +432,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
   const handleToggleCoupon = (id: string) => {
     const updated = couponsList.map((c) => (c.id === id ? { ...c, active: !c.active } : c));
-    setCouponsList(updated);
-    saveCouponsToStorage(updated);
+    persistCoupons(updated);
   };
 
   const handleDeleteCoupon = (id: string) => {
     const updated = couponsList.filter((c) => c.id !== id);
-    setCouponsList(updated);
-    saveCouponsToStorage(updated);
+    persistCoupons(updated);
   };
 
   // Password change state
@@ -516,7 +547,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
     return [];
   });
 
+  // Busca os pedidos depois do login (antes buscava ao abrir o painel, ainda sem sessão, e voltava vazio)
   useEffect(() => {
+    if (!isAuthenticated) return;
     fetch('/api/orders', { credentials: 'include' })
       .then((res) => res.json())
       .then((data) => {
@@ -526,7 +559,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
         }
       })
       .catch((e) => console.error('Failed to fetch server orders:', e));
-  }, []);
+  }, [isAuthenticated]);
 
   const handleClearOrders = () => {
     setOrders([]);
@@ -543,7 +576,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
 
   const handleOpenDispatchModal = (ord: AdminOrder) => {
     setDispatchModalOrder(ord);
-    setDispatchTrackingInput(ord.trackingNumber || `9400 ${Math.floor(1000 + Math.random() * 9000)} ${Math.floor(1000 + Math.random() * 9000)} 3849 10`);
+    setDispatchTrackingInput(ord.trackingNumber || '');
     setDispatchCarrierInput(ord.carrier || 'USPS Ground Advantage (3-5 Days US Hub)');
   };
 
@@ -610,14 +643,20 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const [cjUserId, setCjUserId] = useState(() => localStorage.getItem('ling_cj_user_id') || 'CJ5954420');
   const [cjAccountName, setCjAccountName] = useState(() => localStorage.getItem('ling_cj_account_name') || 'Ling Petshop');
   const [cjApiKey, setCjApiKey] = useState(() => localStorage.getItem('ling_cj_api_key') || '');
-  const [zendropToken, setZendropToken] = useState(() => localStorage.getItem('ling_zendrop_token') || 'UUUvotHLOYoGQopIgxXnfpIFjD4BoQfUW7EisDnPqI9KHQHl2aD8G72eKRiVRbqN');
+  const [zendropToken, setZendropToken] = useState(() => localStorage.getItem('ling_zendrop_token') || '');
   const [apiPingStatus, setApiPingStatus] = useState<'idle' | 'testing' | 'connected'>('connected');
   const [cjSaveSuccess, setCjSaveSuccess] = useState(false);
   const [isRechargeOpen, setIsRechargeOpen] = useState(false);
   const [rechargeSuccess, setRechargeSuccess] = useState(false);
   // Stripe API Keys & Live Verification State (Configured for www.lingpetshop.com)
-  const [stripePk, setStripePk] = useState(() => localStorage.getItem('ling_stripe_pk') || 'pk_live_51UQtVzRwbavjytNi1ajMHnOFzU');
-  const [stripeSk, setStripeSk] = useState(() => localStorage.getItem('ling_stripe_sk') || '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');
+  const [stripePk, setStripePk] = useState(() => localStorage.getItem('ling_stripe_pk') || '');
+  // A Secret Key NUNCA fica no navegador: ela vive só no .env do servidor (STRIPE_SECRET_KEY).
+  // Apaga cópias antigas que versões anteriores do painel salvaram no localStorage.
+  useEffect(() => {
+    try {
+      localStorage.removeItem('ling_stripe_sk');
+    } catch {}
+  }, []);
   const [stripeSaveMsg, setStripeSaveMsg] = useState(false);
   const [isTestingStripeFlow, setIsTestingStripeFlow] = useState(false);
   const [stripeVerifyStatus, setStripeVerifyStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('success');
@@ -725,64 +764,35 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   };
 
   const handleVerifyStripeApi = async () => {
-    if (!stripeSk.trim()) {
-      setStripeVerifyStatus('error');
-      setStripeVerifyDetails({
-        errorMsg: 'Por favor, insira a Secret Key (começa com sk_live_ ou sk_test_) no campo abaixo antes de testar.',
-      });
-      return;
-    }
-
     setIsTestingStripeFlow(true);
     setStripeVerifyStatus('testing');
 
     try {
-      const [resBalance, resAccount] = await Promise.all([
-        fetch('https://api.stripe.com/v1/balance', {
-          headers: {
-            Authorization: `Bearer ${stripeSk.trim()}`,
-          },
-        }),
-        fetch('https://api.stripe.com/v1/account', {
-          headers: {
-            Authorization: `Bearer ${stripeSk.trim()}`,
-          },
-        }).catch(() => null),
-      ]);
+      // Consulta pelo servidor, que usa a STRIPE_SECRET_KEY do .env
+      const res = await fetch('/api/stripe-status', { credentials: 'include' });
+      const data = await res.json();
 
-      const data = await resBalance.json();
-      const accountData = resAccount && resAccount.ok ? await resAccount.json() : null;
-
-      if (!resBalance.ok) {
+      if (!res.ok) {
         setStripeVerifyStatus('error');
         setStripeVerifyDetails({
-          errorMsg: data?.error?.message || 'Chave do Stripe inválida ou recusada pelos servidores da Stripe.',
+          errorMsg: data?.error || 'Não foi possível consultar a conta Stripe. Confira a STRIPE_SECRET_KEY no .env do servidor.',
         });
         localStorage.removeItem('ling_stripe_verified');
       } else {
-        const isLive = Boolean(data.livemode);
-        const availableUsd = data.available?.find((a: any) => a.currency === 'usd')?.amount || 0;
-        const holder = accountData?.individual
-          ? `${accountData.individual.first_name || ''} ${accountData.individual.last_name || ''}`.trim()
-          : 'Luiz Eduardo Silva e Mendonça';
-        const accountId = accountData?.id ? `(${accountData.id})` : '(acct_1UQt...)';
-
         const details = {
-          isLive,
-          balanceUsd: (availableUsd / 100).toFixed(2),
-          currency: 'USD (Wise/BRL)',
-          accountEmail: accountData?.email || 'pilotomessi22@gmail.com',
+          isLive: Boolean(data.livemode),
+          balanceUsd: Number(data.availableUsd || 0).toFixed(2),
+          currency: String(data.currency || 'usd').toUpperCase(),
+          accountEmail: data.email || '',
           accountName: 'www.lingpetshop.com',
           verifiedAt: new Date().toLocaleTimeString('pt-BR'),
-          chargesEnabled: accountData ? Boolean(accountData.charges_enabled) : false,
-          holderName: `${holder} ${accountId}`,
+          chargesEnabled: Boolean(data.charges_enabled),
+          holderName: data.accountId ? `(${data.accountId})` : '',
         };
         setStripeVerifyStatus('success');
         setStripeVerifyDetails(details);
         localStorage.setItem('ling_stripe_verified', 'true');
         localStorage.setItem('ling_stripe_details', JSON.stringify(details));
-        localStorage.setItem('ling_stripe_pk', stripePk.trim());
-        localStorage.setItem('ling_stripe_sk', stripeSk.trim());
         setStripeSaveMsg(true);
         setTimeout(() => setStripeSaveMsg(false), 3500);
         playChimeSound();
@@ -790,7 +800,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
     } catch (err: any) {
       setStripeVerifyStatus('error');
       setStripeVerifyDetails({
-        errorMsg: 'Erro ao conectar aos servidores oficiais da Stripe. Verifique sua conexão à internet.',
+        errorMsg: 'Erro ao conectar ao servidor. Verifique sua conexão à internet.',
       });
     } finally {
       setIsTestingStripeFlow(false);
@@ -4186,7 +4196,7 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
                           <span>ℹ️</span> Status da Conta no Stripe: Ativação em Análise / Pendente
                         </strong>
                         <p className="leading-relaxed">
-                          Sua chave <strong>sk_live_...</strong> é 100% autêntica e conectada à sua conta oficial (<strong>acct_1UQtVzRwbavjytNi</strong>). Para começar a processar cartões ao vivo de clientes nos EUA, acesse seu Dashboard na Stripe (<a href="https://dashboard.stripe.com" target="_blank" rel="noreferrer" className="underline font-bold text-amber-100">dashboard.stripe.com</a>) e conclua a verificação de identidade / dados bancários.
+                          A chave do servidor está conectada, mas a conta ainda não pode receber pagamentos. Enquanto isso, o checkout não funciona. Para começar a processar cartões ao vivo de clientes nos EUA, acesse seu Dashboard na Stripe (<a href="https://dashboard.stripe.com" target="_blank" rel="noreferrer" className="underline font-bold text-amber-100">dashboard.stripe.com</a>) e conclua a verificação de identidade / dados bancários.
                         </p>
                         <p className="text-[10px] text-amber-300/80 pt-1 border-t border-amber-800/60">
                           💡 <strong>URL da Empresa:</strong> Se na Stripe sua conta ainda exibe &quot;lingpetshop.net&quot;, acesse <em>Configurações ➔ Perfil Comercial</em> e atualize para <strong>www.lingpetshop.com</strong>.
@@ -4226,19 +4236,11 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
 
                   <div>
                     <label className="text-[10px] font-bold text-blue-300 uppercase block mb-1">
-                      Stripe Secret Key (sk_live_... ou sk_test_...)
+                      Stripe Secret Key
                     </label>
-                    <input
-                      type="password"
-                      placeholder="Cole sua Secret Key aqui (ex: sk_live_51P...)"
-                      value={stripeSk}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setStripeSk(val);
-                        localStorage.setItem('ling_stripe_sk', val);
-                      }}
-                      className="w-full bg-[#002244] border border-blue-800 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white placeholder-blue-400 outline-none focus:border-amber-400"
-                    />
+                    <p className="w-full bg-[#002244] border border-blue-800 rounded-xl px-3.5 py-2.5 text-[11px] text-blue-200 leading-relaxed">
+                      Por segurança a Secret Key não é digitada aqui. Ela fica só no servidor, na variável <strong className="font-mono">STRIPE_SECRET_KEY</strong> do arquivo .env.
+                    </p>
                   </div>
                 </div>
 
@@ -4269,7 +4271,6 @@ ITEMS: ${ord.items.map((i) => `${i.quantity}x ${i.name} (SKU: ${i.supplierSku})`
                       type="button"
                       onClick={() => {
                         localStorage.setItem('ling_stripe_pk', stripePk);
-                        localStorage.setItem('ling_stripe_sk', stripeSk);
                         setStripeSaveMsg(true);
                         setTimeout(() => setStripeSaveMsg(false), 3000);
                       }}
