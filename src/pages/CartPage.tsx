@@ -53,10 +53,21 @@ export const CartPage: React.FC<CartPageProps> = ({
   const hasOutOfStock = items.some((i) => i.stockCount === 0 || i.inStock === false);
   const totalCount = items.reduce((acc, curr) => acc + curr.quantity, 0);
 
-  const handleApplyPromo = (e: React.FormEvent) => {
+  // Valida no servidor (a lista de cupons ativos é a mesma usada para cobrar na Stripe)
+  const handleApplyPromo = async (e: React.FormEvent) => {
     e.preventDefault();
     const clean = promoInput.trim().toUpperCase();
-    if (clean === 'LING20' || clean === 'VIP10' || clean === 'WELCOME15') {
+    if (!clean) return;
+    let valid = clean === 'FREESHIP';
+    if (!valid) {
+      try {
+        const res = await fetch(`/api/coupons/${encodeURIComponent(clean)}`);
+        valid = res.ok;
+      } catch {
+        valid = false;
+      }
+    }
+    if (valid) {
       onApplyPromo(clean);
       setPromoMsg(`Promo code "${clean}" applied successfully!`);
       setPromoInput('');

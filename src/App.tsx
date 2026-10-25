@@ -19,7 +19,7 @@ import { CheckoutPage } from './pages/CheckoutPage.tsx';
 import { AboutPage } from './pages/AboutPage.tsx';
 import { ShippingFaqPage } from './pages/ShippingFaqPage.tsx';
 
-import { PRODUCTS, Product, getSavedProducts } from './data/storeData.ts';
+import { PRODUCTS, Product, getSavedProducts, rememberValidatedCoupon } from './data/storeData.ts';
 import { CartItem, filterProducts, calculateOrderTotals } from './utils/storeLogic.ts';
 import { initSiteSecurity } from './utils/security.ts';
 import { initAutomatedInventorySync } from './utils/inventorySync.ts';
@@ -94,10 +94,44 @@ export default function App() {
     return list[0] || PRODUCTS[0] || null;
   });
 
-  // Cart items state - start with fresh empty cart for real shoppers
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  // Cart items state - guardado no navegador para sobreviver à ida e volta da Stripe (ex.: checkout cancelado)
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('ling_cart');
+      const parsed = saved ? JSON.parse(saved) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('ling_cart', JSON.stringify(cartItems));
+    } catch {}
+  }, [cartItems]);
 
   const [appliedPromo, setAppliedPromo] = useState('LING20');
+  const [, setCouponCheckVersion] = useState(0);
+
+  // O desconto do cupom só aparece depois que o servidor confirma que ele existe e está ativo,
+  // para o valor do carrinho ser o mesmo cobrado na Stripe
+  useEffect(() => {
+    const code = appliedPromo.trim().toUpperCase();
+    if (!code || code === 'FREESHIP') return;
+    let cancelled = false;
+    fetch(`/api/coupons/${encodeURIComponent(code)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (cancelled) return;
+        rememberValidatedCoupon(code, data?.valid ? data.coupon : null);
+        setCouponCheckVersion((v) => v + 1);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [appliedPromo]);
 
   // Admin and Modals state
   const [isAdminOpen, setIsAdminOpen] = useState(() => {
@@ -201,6 +235,7 @@ export default function App() {
     stockCount?: number;
     inStock?: boolean;
     productId?: string;
+    volumeTiers?: { qty: number; discountPercent: number }[];
   }) => {
     if (newItem.stockCount === 0 || newItem.inStock === false) {
       alert(`O produto "${newItem.name}" está esgotado no armazém central e indisponível para compra.`);
@@ -395,6 +430,7 @@ export default function App() {
                 stockCount: defaultVariant ? defaultVariant.inventory : p.stockCount,
                 inStock: (defaultVariant ? defaultVariant.inventory : p.stockCount) > 0,
                 productId: p.id,
+                volumeTiers: p.volumeTiers?.map((t) => ({ qty: t.qty, discountPercent: t.discountPercent })),
               });
             }}
             initialCategory={activeCategory}

@@ -610,14 +610,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
   const [cjUserId, setCjUserId] = useState(() => localStorage.getItem('ling_cj_user_id') || 'CJ5954420');
   const [cjAccountName, setCjAccountName] = useState(() => localStorage.getItem('ling_cj_account_name') || 'Ling Petshop');
   const [cjApiKey, setCjApiKey] = useState(() => localStorage.getItem('ling_cj_api_key') || '');
-  const [zendropToken, setZendropToken] = useState(() => localStorage.getItem('ling_zendrop_token') || 'UUUvotHLOYoGQopIgxXnfpIFjD4BoQfUW7EisDnPqI9KHQHl2aD8G72eKRiVRbqN');
+  const [zendropToken, setZendropToken] = useState(() => localStorage.getItem('ling_zendrop_token') || '');
   const [apiPingStatus, setApiPingStatus] = useState<'idle' | 'testing' | 'connected'>('connected');
   const [cjSaveSuccess, setCjSaveSuccess] = useState(false);
   const [isRechargeOpen, setIsRechargeOpen] = useState(false);
   const [rechargeSuccess, setRechargeSuccess] = useState(false);
   // Stripe API Keys & Live Verification State (Configured for www.lingpetshop.com)
   const [stripePk, setStripePk] = useState(() => localStorage.getItem('ling_stripe_pk') || 'pk_live_51UQtVzRwbavjytNi1ajMHnOFzU');
-  const [stripeSk, setStripeSk] = useState(() => localStorage.getItem('ling_stripe_sk') || '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');
+  const [stripeSk, setStripeSk] = useState(() => localStorage.getItem('ling_stripe_sk') || '');
   const [stripeSaveMsg, setStripeSaveMsg] = useState(false);
   const [isTestingStripeFlow, setIsTestingStripeFlow] = useState(false);
   const [stripeVerifyStatus, setStripeVerifyStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('success');

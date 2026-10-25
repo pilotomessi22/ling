@@ -13,7 +13,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { Product, PRODUCTS } from '../data/storeData.ts';
-import { formatCurrency, REPEAT_DELIVERY_DISCOUNT_PERCENT } from '../utils/storeLogic.ts';
+import { formatCurrency, getItemBundleDiscountPercent, REPEAT_DELIVERY_DISCOUNT_PERCENT } from '../utils/storeLogic.ts';
 
 interface ProductDetailPageProps {
   product: Product;
@@ -32,6 +32,7 @@ interface ProductDetailPageProps {
     stockCount?: number;
     inStock?: boolean;
     productId?: string;
+    volumeTiers?: { qty: number; discountPercent: number }[];
   }) => void;
   onNavigateToCart?: () => void;
 }
@@ -80,10 +81,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   ).filter(Boolean) as string[];
   const images = Array.from(new Set(rawImages));
 
-  // Calculate volume discount based on quantity
-  let discountMultiplier = 1;
-  if (quantity === 2) discountMultiplier = 0.85;
-  if (quantity >= 3) discountMultiplier = 0.75;
+  // Desconto por quantidade só para exibição: o carrinho recebe o preço cheio e aplica a mesma
+  // tabela (antes o desconto era embutido aqui E aplicado de novo no carrinho)
+  const volumeTiers = product.volumeTiers?.map((t) => ({ qty: t.qty, discountPercent: t.discountPercent }));
+  const discountMultiplier = 1 - getItemBundleDiscountPercent({ quantity, volumeTiers }) / 100;
 
   const repeatPrice = product.price * (1 - REPEAT_DELIVERY_DISCOUNT_PERCENT / 100);
   const baseUnitPrice = purchaseType === 'repeat' ? repeatPrice : product.price * discountMultiplier;
@@ -109,7 +110,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
     onAddToCart({
       sku: finalSku,
       name: product.name,
-      price: effectivePrice,
+      price: product.price,
+      volumeTiers,
       quantity,
       size: selectedSize || '',
       color: selectedColor || '',

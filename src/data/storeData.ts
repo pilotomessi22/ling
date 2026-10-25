@@ -3293,8 +3293,7 @@ export function saveProductsToStorage(products: Product[]): void {
   }
 }
 
-export function getSavedCoupons(): Coupon[] {
-  const DEFAULT_COUPONS: Coupon[] = [
+export const DEFAULT_COUPONS: Coupon[] = [
     {
       id: 'cp-1',
       code: 'LING20',
@@ -3327,6 +3326,25 @@ export function getSavedCoupons(): Coupon[] {
     },
   ];
 
+// Cupons confirmados pelo servidor (GET /api/coupons/:code). O carrinho só mostra
+// desconto de cupom que o servidor também vai aplicar na Stripe.
+const validatedCoupons = new Map<string, Coupon>();
+
+export function rememberValidatedCoupon(code: string, coupon: Coupon | null): void {
+  const key = (code || '').trim().toUpperCase();
+  if (!key) return;
+  if (coupon) {
+    validatedCoupons.set(key, coupon);
+  } else {
+    validatedCoupons.delete(key);
+  }
+}
+
+export function getCheckoutCoupons(): Coupon[] {
+  return Array.from(validatedCoupons.values());
+}
+
+export function getSavedCoupons(): Coupon[] {
   if (typeof window === 'undefined') return DEFAULT_COUPONS;
   try {
     const saved = localStorage.getItem('ling_admin_coupons');

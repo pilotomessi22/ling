@@ -81,11 +81,30 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       const response = await fetch('/api/checkout/create-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        // Só identificação do produto e quantidade: preço, desconto e frete são calculados no servidor
         body: JSON.stringify({
-          items,
+          items: items.map((i) => ({
+            productId: i.productId,
+            sku: i.sku,
+            size: i.size,
+            color: i.color,
+            quantity: i.quantity,
+            isRepeatDelivery: i.isRepeatDelivery,
+            addOn: i.addOn,
+          })),
           customerEmail: address.email,
-          currency: 'usd',
-          domainUrl: window.location.origin,
+          customerName: address.fullName,
+          customerPhone: address.phone,
+          shippingAddress: {
+            line1: address.streetAddress,
+            line2: address.aptOrSuite || '',
+            city: address.city,
+            state: address.state,
+            zip: address.zipCode,
+            country: 'US',
+          },
+          appliedPromo,
+          deliveryOption,
         }),
       });
 
