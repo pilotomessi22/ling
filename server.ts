@@ -1129,15 +1129,6 @@ app.post('/api/orders/update-status', async (req: Request, res: Response) => {
       });
     }
 
-    // Valor pago diferente do calculado (ou pagamento sem pedido de origem): conferir antes de despachar
-    if (order.needsReview && fulfillmentStatus === 'Despachado' && !req.body?.reviewConfirmed) {
-      return res.status(400).json({
-        success: false,
-        error: `Pedido marcado para revisão: ${order.reviewReason || 'conferir na Stripe'}. Confira antes de despachar.`,
-        needsReview: true,
-      });
-    }
-
     order.fulfillmentStatus = fulfillmentStatus || order.fulfillmentStatus;
 
     let emailResult: any = null;
