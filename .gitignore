@@ -9,5 +9,3 @@ coverage/
 public/assets/aistudio/
 *.tar.gz
 *.zip
-coupons.json
-*.json.tmp

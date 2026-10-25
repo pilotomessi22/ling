@@ -53,8 +53,65 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
     zip,
     'usps_ground'
   );
-  const { subtotal, shipping: shippingCost, total: finalTotal, isShippingCalculated, freeShippingQualified } = calc;
+  const { subtotal, isShippingCalculated, freeShippingQualified } = calc;
   const discount = calc.bundleDiscount + calc.repeatDeliverySavings + calc.promoDiscount;
+
+  // Frete pelo endereço exato: com o endereço completo, o servidor cota na USPS e devolve o total
+  // que vai ser cobrado na Stripe. Enquanto isso (ou se falhar) mostramos a estimativa local.
+  const [serverQuote, setServerQuote] = useState<{ key: string; shipping: number | null; total: number } | null>(null);
+  const quoteKey = JSON.stringify([
+    items.map((i) => [i.productId, i.sku, i.quantity, i.isRepeatDelivery]),
+    appliedPromo,
+    address1.trim(),
+    address2.trim(),
+    city.trim(),
+    state.trim(),
+    zip.trim(),
+  ]);
+  const addressComplete = Boolean(address1.trim() && city.trim() && state.trim() && /^\d{5}$/.test(zip.trim()));
+
+  useEffect(() => {
+    if (!addressComplete || items.length === 0) return;
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      fetch('/api/checkout/quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
+        body: JSON.stringify({
+          items: items.map((i) => ({
+            productId: i.productId,
+            sku: i.sku,
+            size: i.size,
+            color: i.color,
+            quantity: i.quantity,
+            isRepeatDelivery: i.isRepeatDelivery,
+            addOn: i.addOn,
+          })),
+          customerName: `${firstName.trim()} ${lastName.trim()}`.trim() || 'Customer',
+          customerEmail: customerEmail.trim() || 'quote@example.com',
+          shippingAddress: { line1: address1.trim(), line2: address2.trim(), city: city.trim(), state: state.trim(), zip: zip.trim() },
+          appliedPromo,
+          deliveryOption: 'usps_ground',
+        }),
+      })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data && typeof data.total === 'number') {
+            setServerQuote({ key: quoteKey, shipping: data.shipping, total: data.total });
+          }
+        })
+        .catch(() => {});
+    }, 600);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [quoteKey, addressComplete]);
+
+  const quote = serverQuote && serverQuote.key === quoteKey ? serverQuote : null;
+  const shippingCost = quote ? quote.shipping : calc.shipping;
+  const finalTotal = quote ? quote.total : calc.total;
 
   // Check Stripe return URL status and session_id on mount
   useEffect(() => {
